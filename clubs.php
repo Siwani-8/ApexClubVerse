@@ -1,6 +1,5 @@
 <?php 
 session_start();
-if (!isset($_SESSION['user_logged_in'])) { header("Location: login.php"); exit; }
 include 'db.php'; 
 include 'header.php'; 
 
@@ -20,9 +19,9 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
 
 <div class="container">
     <h1 class="page-title">Campus Clubs</h1>
-    <div class="club-grid">
-        <?php while($row = mysqli_fetch_assoc($result)) { ?>
-            <div class="club-card" onclick="window.location.href='<?php echo $row['page_url']; ?>'">
+   <div class="club-grid">
+    <?php while($row = mysqli_fetch_assoc($result)) { ?>
+        <div class="club-card" onclick="window.location.href='club_detail.php?id=<?php echo $row['id']; ?>'">
                 <h3><?php echo $row['name']; ?></h3>
                 <p><?php echo $row['description']; ?></p>
                 <span class="explore-link">Explore Club Page &rarr;</span>
