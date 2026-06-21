@@ -19,7 +19,7 @@ if (isset($_POST['vote'])) {
         mysqli_query($conn, "INSERT INTO poll_votes (poll_id, user_email, option_id) VALUES ($poll_id, '$email_safe', $option_id)");
         mysqli_query($conn, "UPDATE poll_options SET votes = votes + 1 WHERE id = $option_id");
     }
-    header("Location: vote-events.php");
+    header("Location: vote_events.php");
     exit;
 }
 
