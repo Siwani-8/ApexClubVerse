@@ -39,7 +39,7 @@ if (isset($_POST['apply'])) {
 
 <style>
     .form-container { max-width: 550px; margin: 4rem auto; padding: 3rem; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-    .form-container h2 { font-size: 2rem; color: var(--text-dark); margin-bottom: 0.5rem; text-align: center; }
+    .form-container h2 { font-size: 2rem; color:rgb(176, 14, 14); margin-bottom: 0.5rem; text-align: center; }
     .form-container p { font-family: 'Segoe UI', sans-serif; color: #666; text-align: center; margin-bottom: 2rem; font-size: 0.95rem; }
     
     .form-group { margin-bottom: 1.5rem; }
@@ -153,10 +153,11 @@ if (isset($_POST['apply'])) {
         <label>Faculty</label>
         <select name="faculty" required>
             <option value="">Select Faculty</option>
-            <option value="BCIS">BCIS</option>
+            <option value="BCSIT">BCSIT</option>
             <option value="BBA">BBA</option>
-            <option value="BHM">BHM</option>
-            <option value="BCA">BCA</option>
+            <option value="BBA-F">BBA-F</option>
+            <option value="BBA-TT">BBA-TT</option>
+        
         </select>
     </div>
 
@@ -165,13 +166,8 @@ if (isset($_POST['apply'])) {
         <select name="semester" required>
             <option value="">Select Semester</option>
             <option>1st Semester</option>
-            <option>2nd Semester</option>
             <option>3rd Semester</option>
-            <option>4th Semester</option>
             <option>5th Semester</option>
-            <option>6th Semester</option>
-            <option>7th Semester</option>
-            <option>8th Semester</option>
         </select>
     </div>
 
@@ -251,5 +247,5 @@ if (isset($_POST['apply'])) {
 
 </form>
 </div>
-
+</div>
 <?php include 'footer.php'; ?>

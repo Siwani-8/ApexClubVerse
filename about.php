@@ -5,6 +5,7 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true)
     exit;
 }
 include 'db.php';
+include 'header.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,7 +18,7 @@ include 'db.php';
     </style>
 </head>
 <body>
-<?php include 'navbar.php'; ?>
+
 
 <div class="container">
     <h2>About Apex College Clubs Hub</h2>
@@ -25,4 +26,5 @@ include 'db.php';
     <p style="margin-top: 1rem;">Whether you want to showcase leadership skills by running for the Board of Directors, cast your vote on student-led initiatives, or join a brand-new community, this web application acts as your definitive campus portal.</p>
 </div>
 </body>
+<?php include 'footer.php'; ?>
 </html>
