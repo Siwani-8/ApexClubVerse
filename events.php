@@ -50,9 +50,12 @@ $events = mysqli_query($conn, "
         <?php if($row['title'] == 'Blood Donation Drive'): ?>
             <img src="images/blood donation.jpg" style="width:100%; height:100%; object-fit:cover;">
             
-        <?php else: ?>
-            <div class="ph-icon">📷</div>
-            <span>Photo Coming Soon</span>
+            
+        
+        <?php endif; ?>
+         <?php if($row['title'] == 'Summer Cup'): ?>
+            <img src="images/football.jpg" style="width:100%; height:100%; object-fit:cover;">
+           
         <?php endif; ?>
     </div>
         <div class="event-details">
