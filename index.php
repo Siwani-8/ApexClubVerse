@@ -205,23 +205,7 @@
     }
 
     /* CTA banner */
-    .cta-banner {
-        background: #7a1028;
-        padding: 3.5rem 2rem;
-        text-align: center;
-    }
-    .cta-banner h2 {
-        color: #fff;
-        font-size: 1.6rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-    .cta-banner p {
-        color: rgba(255,255,255,0.65);
-        font-size: 14px;
-        font-family: 'Segoe UI', sans-serif;
-        margin-bottom: 1.5rem;
-    }
+    
     .btn-white {
         background: #fff;
         color: #7a1028;
@@ -251,10 +235,7 @@
     <div class="hero-dots"></div>
     <div class="hero-inner">
 
-        <div class="hero-badge">
-            <span class="hero-badge-dot"></span>
-            Discover campus life redefined
-        </div>
+       
 
         <h1 class="hero-title">
             Unleash Your Potential at
@@ -267,7 +248,7 @@
 
         <div class="hero-ctas">
             <a href="clubs.php" class="btn-primary">Browse clubs &rarr;</a>
-            <a href="register.php" class="btn-secondary">Join the portal</a>
+          
         </div>
 
         <div class="hero-stats">
@@ -280,7 +261,7 @@
                 <span class="stat-label">Members</span>
             </div>
             <div class="hero-stat">
-                <span class="stat-number">40+</span>
+                <span class="stat-number">8+</span>
                 <span class="stat-label">Events / year</span>
             </div>
             <div class="hero-stat">
@@ -291,12 +272,7 @@
 
     </div>
 </div>
-
-<!-- CTA banner -->
-<div class="cta-banner">
-    <h2>Ready to get involved?</h2>
-    <p>Create your account and start exploring clubs, events, and more.</p>
-    <a href="register.php" class="btn-white">Join the portal &rarr;</a>
 </div>
+<!-- CTA banner -->
 
 <?php include 'footer.php'; ?>
