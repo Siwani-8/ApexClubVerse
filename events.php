@@ -45,11 +45,16 @@ $events = mysqli_query($conn, "
     <?php endif; ?>
 
     <?php while($row = mysqli_fetch_assoc($events)): ?>
-    <div class="feed-card">
-        <div class="event-img-box">
+<div class="feed-card">
+    <div class="event-img-box">
+        <?php if($row['title'] == 'Blood Donation Drive'): ?>
+            <img src="images/blood donation.jpg" style="width:100%; height:100%; object-fit:cover;">
+            
+        <?php else: ?>
             <div class="ph-icon">📷</div>
             <span>Photo Coming Soon</span>
-        </div>
+        <?php endif; ?>
+    </div>
         <div class="event-details">
             <span class="event-club"><?php echo htmlspecialchars($row['club_name']); ?></span>
             <span class="event-status status-<?php echo $row['status']; ?>"><?php echo ucfirst($row['status']); ?></span>
