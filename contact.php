@@ -5,6 +5,7 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true)
     exit;
 }
 include 'db.php';
+include 'header.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,7 +19,7 @@ include 'db.php';
     </style>
 </head>
 <body>
-<?php include 'navbar.php'; ?>
+
 
 <div class="container">
     <h2>Contact Student Welfare</h2>
@@ -31,4 +32,5 @@ include 'db.php';
     </div>
 </div>
 </body>
+<?php include 'footer.php'; ?>
 </html>
