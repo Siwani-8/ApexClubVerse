@@ -1,10 +1,9 @@
-
 <style>
 .footer-top{
     background:#7f0d23;
     color:#fff;
-    padding:60px 8%;
-    margin:0;
+    padding:35px 6%;
+    margin-top:50px;
 }
 
 .footer-container{
@@ -12,133 +11,125 @@
     margin:auto;
     display:flex;
     justify-content:space-between;
-    gap:60px;
+    align-items:flex-start;
+    gap:30px;
     flex-wrap:wrap;
 }
 
 .footer-column{
     flex:1;
-    min-width:250px;
+    min-width:220px;
 }
 
 .footer-logo{
-    width:220px;
-    margin-bottom:25px;
+    width:140px;
+    height:auto;
+    margin-bottom:15px;
+    display:block;
 }
 
 .footer-column h2{
-    font-size:32px;
-    margin-bottom:25px;
+    font-size:22px;
+    margin-bottom:15px;
     color:#fff;
+    font-weight:bold;
 }
 
 .footer-column p{
     margin:8px 0;
-    line-height:1.8;
+    font-size:15px;
+    line-height:1.6;
 }
 
 .links-grid{
     display:flex;
-    gap:60px;
+    gap:50px;
 }
 
 .links-grid ul{
     list-style:none;
-    padding:0;
     margin:0;
+    padding:0;
 }
 
 .links-grid li{
-    margin-bottom:15px;
+    margin-bottom:12px;
 }
 
 .links-grid a{
     color:#fff;
     text-decoration:none;
-    transition:.3s;
+    font-size:15px;
+    transition:0.3s;
 }
 
 .links-grid a:hover{
-    color:#f5d6d6;
-    padding-left:5px;
+    opacity:0.8;
 }
 
 .contact-btn{
     display:inline-block;
-    margin:25px 0;
-    padding:12px 30px;
     background:#fff;
     color:#7f0d23;
     text-decoration:none;
+    padding:10px 25px;
     border-radius:5px;
     font-weight:bold;
+    margin-bottom:15px;
 }
 
 .contact-btn:hover{
-    background:#f3f3f3;
-}
-
-.social-icons{
-    display:flex;
-    gap:20px;
-    margin-top:20px;
-}
-
-.social-icons a{
-    color:#fff;
-    font-size:24px;
-    transition:.3s;
-}
-
-.social-icons a:hover{
-    transform:translateY(-3px);
+    background:#f5f5f5;
 }
 
 .copyright{
-    background:#ffffff;
+    background:#fff;
     color:#333;
     text-align:center;
-    padding:20px;
-    margin:0;
-    font-size:16px;
+    padding:12px;
+    font-size:14px;
 }
 
-/* Responsive */
-@media (max-width:768px){
+/* Mobile */
+@media(max-width:768px){
 
-.footer-container{
-    flex-direction:column;
-}
+    .footer-container{
+        flex-direction:column;
+        gap:25px;
+    }
 
-.links-grid{
-    flex-direction:column;
-    gap:0;
-}
+    .links-grid{
+        gap:30px;
+    }
 
-.footer-column{
-    margin-bottom:30px;
-}
+    .footer-column{
+        width:100%;
+    }
 
-.footer-column h2{
-    font-size:26px;
-}
+    .footer-column h2{
+        font-size:20px;
+    }
+
+    .footer-logo{
+        width:120px;
+    }
 }
 </style>
-<!-- Footer Top -->
+
+<!-- Footer -->
 <section class="footer-top">
 
     <div class="footer-container">
 
-        <!-- Left -->
+        <!-- Left Column -->
         <div class="footer-column">
 
-            <img src="assets/images/logo.png" class="footer-logo">
+            <!-- Change path if needed -->
+            <img src="assets/images/logo.png" alt="ApexClubVerse" class="footer-logo">
 
             <p>1261 Devkota Sadak</p>
             <p>Mid-Baneshwor, Kathmandu</p>
             <p>Nepal</p>
-
-           
 
         </div>
 
@@ -167,15 +158,13 @@
 
         </div>
 
-        <!-- Social -->
+        <!-- Contact -->
         <div class="footer-column">
 
             <a href="contact.php" class="contact-btn">Contact Us</a>
 
-            <p>
-                +977-9860390455<br>
-                info@apexclubverse.com
-            </p>
+            <p>+977-9860390455</p>
+            <p>info@apexclubverse.com</p>
 
         </div>
 
@@ -185,6 +174,7 @@
 
 <footer class="copyright">
     © <?php echo date("Y"); ?> ApexClubVerse - Apex College Student Activity Portal. All Rights Reserved.
-</footer></div> 
+</footer>
+
 </body>
 </html>
