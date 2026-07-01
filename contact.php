@@ -26,9 +26,9 @@ include 'header.php';
     <p>Have questions regarding club registrations, eligibility criteria, or event proposals? Drop by the administration block or get in touch through our official channels:</p>
     
     <div class="contact-info">
-        <p><strong>📍 Location:</strong> Apex College Main Campus, Mid-Baneshwor, Kathmandu</p>
-        <p><strong>✉️ Email:</strong> info@apexcollege.edu.np</p>
-        <p><strong>📞 Phone:</strong> +977-1-4467922</p>
+        <p><strong> Location:</strong> Apex College Main Campus, Mid-Baneshwor, Kathmandu</p>
+        <p><strong> Email:</strong> info@apexcollege.edu.np</p>
+        <p><strong> Phone:</strong> +977-1-4467922</p>
     </div>
 </div>
 </body>
