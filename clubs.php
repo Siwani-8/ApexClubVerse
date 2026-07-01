@@ -172,14 +172,27 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
     .club-card-body {
         padding: 1.1rem 1.25rem 1.25rem;
     }
+.club-card-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
 
-    .club-card-icon {
-        width: 40px; height: 40px;
-        border-radius: 10px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 18px;
-        margin-bottom: 0.85rem;
-    }
+.club-card-icon img {
+    max-width: 85px;
+    max-height: 85px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+    
 
     .club-card h3 {
         font-size: 15px;
@@ -261,7 +274,11 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
                 <a class="club-card" href="club_detail.php?id=<?php echo $row['id']; ?>">
                     <div class="club-card-accent"></div>
                     <div class="club-card-body">
-                        <div class="club-card-icon">&#127758;</div>
+                        <div class="club-card-icon">
+                        <img src="<?php echo htmlspecialchars($row['logo']); ?>" 
+                         alt="<?php echo htmlspecialchars($row['name']); ?>">
+                        </div> 
+                        
                         <h3><?php echo htmlspecialchars($row['name']); ?></h3>
                         <p><?php echo htmlspecialchars($row['description']); ?></p>
                         <div class="club-card-footer">
