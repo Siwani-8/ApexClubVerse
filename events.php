@@ -72,6 +72,15 @@ $events = mysqli_query($conn, "
             <img src="images/gamers.jpg" style="width:100%; height:100%; object-fit:cover;">
            
         <?php endif; ?>
+        
+         <?php if($row['title'] == 'Adventurous Apex'): ?>
+            <img src="images/adven.jpg" style="width:100%; height:100%; object-fit:cover;">
+           
+        <?php endif; ?>
+         <?php if($row['title'] == 'Apex EcoSprint'): ?>
+            <img src="images/ecosprint.jpg" style="width:100%; height:100%; object-fit:cover;">
+           
+        <?php endif; ?>
     </div>
         <div class="event-details">
             <span class="event-club"><?php echo htmlspecialchars($row['club_name']); ?></span>
