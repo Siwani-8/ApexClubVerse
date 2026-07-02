@@ -12,22 +12,19 @@ if (session_status() == PHP_SESSION_NONE) {
 </head>
 <body>
 
+
 <nav class="navbar">
-    <a href="index.php" class="brand">
-        <div class="logo-square">A</div>
-        <div class="brand-text">
-            <h2>ApexClubVerse</h2>
-            <p>APEX COLLEGE PORTAL</p>
-        </div>
-    </a>
+   
+       <div class="navbar-brand-container">
+<img src="logo.png" alt="ApexClubVerse Logo" class="navbar-logo-square"></div>  
     <ul class="nav-links">
         <li><a href="index.php">🏠 Home</a></li>
         <li><a href="clubs.php">📚 Clubs</a></li>
         <li><a href="events.php">📅 Events Feed</a></li>
         <li><a href="vote-events.php">🗳️ Event Vote</a></li>
         <li><a href="registration.php">📝 Club Intake</a></li>
-        <li><a href="about.php">📚 About Us</a></li>
-        <li><a href="contact.php">📚 Contact Us</a></li>
+        <li><a href="about.php">About Us</a></li>
+        <li><a href="contact.php">Contact Us</a></li>
 
 
         <?php if (isset($_SESSION['user_logged_in'])): ?>

@@ -132,7 +132,7 @@
         <!-- Left -->
         <div class="footer-column">
 
-            <img src="assets/images/logo.png" class="footer-logo">
+            <img src="logo.png" class="footer-logo">
 
             <p>1261 Devkota Sadak</p>
             <p>Mid-Baneshwor, Kathmandu</p>
