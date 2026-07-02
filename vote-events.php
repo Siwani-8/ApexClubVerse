@@ -329,12 +329,12 @@ $polls = mysqli_query($conn, "
 
         <?php
         $club_icons = [
-            'Apex Performing Arts Club'                    => '🎭',
-            'Apex Sports and Leadership Club'              => '⚽',
-            'Apex Travel and Tourism Club'                 => '✈️',
-            'Apex Media and Marketing Club'                => '📸',
-            'Apex IT Club'                                 => '💻',
-            'Apex Health Education and Awareness Team (HEAT)' => '❤️',
+            'Apex Performing Arts Club'                    => '',
+            'Apex Sports and Leadership Club'              => '',
+            'Apex Travel and Tourism Club'                 => '',
+            'Apex Media and Marketing Club'                => '',
+            'Apex IT Club'                                 => '',
+            'Apex Health Education and Awareness Team (HEAT)' => '',
         ];
 
         while($poll = mysqli_fetch_assoc($polls)):

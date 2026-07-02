@@ -59,7 +59,7 @@ $events = mysqli_query($conn, "
         <?php endif; ?>
 
         <?php if($row['title'] == 'Apex Smile'): ?>
-            <img src="images/smile.jpg" style="width:100%; height:100%; object-fit:cover;">
+            <img src="images/smilee.jpg" style="width:100%; height:100%; object-fit:cover;">
            
         <?php endif; ?>
 
