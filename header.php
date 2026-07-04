@@ -2,6 +2,11 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+$current_page = basename($_SERVER['PHP_SELF']);
+if ($current_page == 'vote-events.php' && !isset($_SESSION['user_logged_in'])) {
+    header("Location: login.php");
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
