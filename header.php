@@ -2,8 +2,11 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+
 $current_page = basename($_SERVER['PHP_SELF']);
-if ($current_page == 'vote-events.php' && !isset($_SESSION['user_logged_in'])) {
+$protected_pages = ['vote-events.php', 'registration.php', 'admin.php'];
+
+if (in_array($current_page, $protected_pages) && !isset($_SESSION['user_logged_in'])) {
     header("Location: login.php");
     exit;
 }
@@ -17,23 +20,22 @@ if ($current_page == 'vote-events.php' && !isset($_SESSION['user_logged_in'])) {
 </head>
 <body>
 
-
 <nav class="navbar">
-   
-       <div class="navbar-brand-container">
-<img src="logo.png" alt="ApexClubVerse Logo" class="navbar-logo-square"></div>  
+    <div class="navbar-brand-container">
+        <img src="logo.png" alt="ApexClubVerse Logo" class="navbar-logo-square">
+    </div>
     <ul class="nav-links">
-        <li><a href="index.php"> Home</a></li>
-        <li><a href="clubs.php"> Clubs</a></li>
-        <li><a href="events.php"> Events Feed</a></li>
-        <li><a href="vote-events.php"> Event Vote</a></li>
-        <li><a href="registration.php"> Club Intake</a></li>
-     
-    
-
+        <li><a href="index.php">Home</a></li>
+        <li><a href="clubs.php">Clubs</a></li>
+        <li><a href="events.php">Events Feed</a></li>
+        <li><a href="vote-events.php">Event Vote</a></li>
+        <li><a href="registration.php">Club Intake</a></li>
 
         <?php if (isset($_SESSION['user_logged_in'])): ?>
-            <li><a href="logout.php" style="color: var(--primary-crimson)">Logout</a></li>
+            <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin'): ?>
+                <li><a href="admin.php" style="color:#fff; font-weight:bold;">&#9881; Admin</a></li>
+            <?php endif; ?>
+            <li><a href="logout.php" style="color:rgba(255,255,255,0.85);">Logout</a></li>
         <?php else: ?>
             <li><a href="login.php">Sign In</a></li>
             <li><a href="signup.php" class="btn-join">Join Portal</a></li>

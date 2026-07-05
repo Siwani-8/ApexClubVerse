@@ -64,7 +64,7 @@ while($poll = mysqli_fetch_assoc($polls)) {
 <style>
     *, *::before, *::after { box-sizing: border-box; }
 
-    .vote-page { background: #f5f3ef; min-height: 100vh; }
+    .vote-page { background: #7a1028; min-height: 100vh; }
 
     .vote-hero {
         background: #7a1028;
@@ -120,7 +120,7 @@ while($poll = mysqli_fetch_assoc($polls)) {
     .vstat span { font-family: 'Segoe UI', sans-serif; font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; }
 
     .vote-content { max-width: 820px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
-    .section-label { font-size: 11px; font-weight: 600; color: #bbb; text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Segoe UI', sans-serif; margin-bottom: 1.25rem; }
+   .section-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Segoe UI', sans-serif; margin-bottom: 1.25rem; }
 
     .empty-state { text-align: center; padding: 4rem 2rem; color: #bbb; font-family: 'Segoe UI', sans-serif; font-size: 14px; }
 

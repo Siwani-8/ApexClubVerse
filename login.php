@@ -1,13 +1,12 @@
 <?php
+include 'header.php';
 include 'db.php';
-session_start();
 $msg = "";
 
 if (isset($_POST['submit'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
 
-    // Only allow @apexcollege.edu.np emails
     if (!str_ends_with($email, '@apexcollege.edu.np')) {
         $msg = "Only Apex College email addresses are allowed (e.g. name@apexcollege.edu.np)";
     } else {
@@ -18,7 +17,12 @@ if (isset($_POST['submit'])) {
                 $_SESSION['user_logged_in'] = true;
                 $_SESSION['user_name'] = $user['fullname'];
                 $_SESSION['user_email'] = $user['email'];
-                header("Location: vote-events.php");
+                $_SESSION['user_role'] = $user['role'];
+                if ($user['role'] == 'admin') {
+                    header("Location: admin.php");
+                } else {
+                    header("Location: vote-events.php");
+                }
                 exit;
             } else {
                 $msg = "Wrong password. Please try again.";
@@ -29,19 +33,10 @@ if (isset($_POST['submit'])) {
     }
 }
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sign In - ApexClubVerse</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<?php include 'header.php'; ?>
 
 <style>
     *, *::before, *::after { box-sizing: border-box; }
 
-    /* ── Page background ── */
     .login-page {
         min-height: 100vh;
         background: #7a1028;
@@ -74,7 +69,6 @@ if (isset($_POST['submit'])) {
         pointer-events: none;
     }
 
-    /* ── Card ── */
     .login-card {
         background: #fff;
         border-radius: 16px;
@@ -94,7 +88,6 @@ if (isset($_POST['submit'])) {
         border-radius: 16px 16px 0 0;
     }
 
-    /* Header */
     .login-header {
         text-align: center;
         margin-bottom: 1.75rem;
@@ -122,7 +115,6 @@ if (isset($_POST['submit'])) {
         color: #999; font-size: 13px;
     }
 
-    /* Alert */
     .alert-error {
         background: #fdecea;
         border: 0.5px solid #f5c6cb;
@@ -134,7 +126,6 @@ if (isset($_POST['submit'])) {
         text-align: center;
     }
 
-    /* Form */
     .form-group { margin-bottom: 1.1rem; }
     .form-group label {
         display: block;
@@ -162,14 +153,12 @@ if (isset($_POST['submit'])) {
         background: #fff;
     }
 
-    /* Email hint */
     .email-hint {
         font-family: 'Segoe UI', sans-serif;
         font-size: 11px; color: #bbb;
         margin-top: 4px;
     }
 
-    /* Submit */
     .btn-auth {
         width: 100%;
         background: #7a1028;
@@ -188,7 +177,6 @@ if (isset($_POST['submit'])) {
         transform: translateY(-1px);
     }
 
-    /* Hint */
     .hint {
         text-align: center;
         font-family: 'Segoe UI', sans-serif;
@@ -200,10 +188,6 @@ if (isset($_POST['submit'])) {
         text-decoration: none;
     }
     .hint a:hover { text-decoration: underline; }
-
-    @media (max-width: 480px) {
-        .login-card { padding: 2rem 1.25rem 1.5rem; }
-    }
 </style>
 
 <div class="login-page">
@@ -215,7 +199,7 @@ if (isset($_POST['submit'])) {
             <p class="login-sub">Sign in with your Apex College email</p>
         </div>
 
-        <?php if($msg): ?>
+        <?php if(!empty($msg)): ?>
             <div class="alert-error"><?php echo htmlspecialchars($msg); ?></div>
         <?php endif; ?>
 
@@ -238,5 +222,3 @@ if (isset($_POST['submit'])) {
 </div>
 
 <?php include 'footer.php'; ?>
-</body>
-</html>
