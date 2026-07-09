@@ -256,5 +256,6 @@ while($poll = mysqli_fetch_assoc($polls)) {
         <?php endforeach; ?>
     </div>
 </div>
+                            </div>
 
 <?php include 'footer.php'; ?>

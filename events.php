@@ -2,6 +2,7 @@
 include 'header.php';
 include 'db.php';
 
+
 $events = mysqli_query($conn, "
     SELECT e.*, c.name as club_name 
     FROM events e 
@@ -215,5 +216,6 @@ $events = mysqli_query($conn, "
 
     </div>
 </div>
+                </div>
 
 <?php include 'footer.php'; ?>

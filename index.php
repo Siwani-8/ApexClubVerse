@@ -1,5 +1,4 @@
-<?php include 'header.php'; ?>
-
+<?php include 'header.php';?>
 <style>
     /* ── Reset & base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -13,7 +12,7 @@
         align-items: center;
         justify-content: center;
         text-align: center;
-        padding: 5rem 2rem 4rem;
+        padding: ;
         position: relative;
         overflow: hidden;
     }

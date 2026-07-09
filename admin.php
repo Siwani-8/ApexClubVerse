@@ -25,6 +25,23 @@ if (isset($_POST['delete_event'])) {
     exit;
 }
 
+// Handle assign club admin
+if (isset($_POST['assign_club_admin'])) {
+    $email = mysqli_real_escape_string($conn, $_POST['user_email']);
+    $club_id = (int)$_POST['club_id'];
+    mysqli_query($conn, "UPDATE users SET role = 'club_admin', club_id = $club_id WHERE email = '$email' AND role != 'admin'");
+    header("Location: admin.php?tab=club_admins");
+    exit;
+}
+
+// Handle remove club admin (demote back to student)
+if (isset($_POST['remove_club_admin'])) {
+    $user_id = (int)$_POST['user_id'];
+    mysqli_query($conn, "UPDATE users SET role = 'student', club_id = NULL WHERE id = $user_id");
+    header("Location: admin.php?tab=club_admins");
+    exit;
+}
+
 // Handle add event
 if (isset($_POST['add_event'])) {
     $club_id   = (int)$_POST['club_id'];
@@ -323,7 +340,9 @@ $clubs = mysqli_query($conn, "SELECT * FROM clubs ORDER BY id");
         <a href="admin.php?tab=events"         class="tab-btn <?php echo $tab=='events'         ? 'active':''; ?>">&#128197; Events</a>
         <a href="admin.php?tab=votes"          class="tab-btn <?php echo $tab=='votes'          ? 'active':''; ?>">&#128313; Vote Results</a>
         <a href="admin.php?tab=users"          class="tab-btn <?php echo $tab=='users'          ? 'active':''; ?>">&#128101; Students</a>
+        <a href="admin.php?tab=club_admins"    class="tab-btn <?php echo $tab=='club_admins'    ? 'active':''; ?>">&#128081; Club Admins</a>
     </div>
+
 
     <?php if($tab == 'dashboard'): ?>
     <!-- DASHBOARD -->
@@ -532,6 +551,67 @@ $clubs = mysqli_query($conn, "SELECT * FROM clubs ORDER BY id");
                 <td><?php echo $i++; ?></td>
                 <td><?php echo htmlspecialchars($u['fullname']); ?></td>
                 <td><?php echo htmlspecialchars($u['email']); ?></td>
+            </tr>
+            <?php endwhile; ?>
+        </table>
+        <?php endif; ?>
+    </div>
+
+    <?php elseif($tab == 'club_admins'): ?>
+    <!-- ASSIGN CLUB ADMIN -->
+    <div class="form-box">
+        <h2>&#128081; Assign a Club Admin</h2>
+        <p style="font-family:'Segoe UI',sans-serif; font-size:12px; color:#999; margin-bottom:1rem;">
+            The user must already have an account (signed up via the Join Portal page). Assigning them here
+            gives them their own panel scoped to just that club.
+        </p>
+        <form method="POST">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Student Email</label>
+                    <input type="email" name="user_email" placeholder="name@apexcollege.edu.np" required>
+                </div>
+                <div class="form-group">
+                    <label>Club</label>
+                    <select name="club_id" required>
+                        <?php
+                        mysqli_data_seek($clubs, 0);
+                        while($c = mysqli_fetch_assoc($clubs)): ?>
+                            <option value="<?php echo $c['id']; ?>"><?php echo htmlspecialchars($c['name']); ?></option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" name="assign_club_admin" class="btn-submit">Make Club Admin</button>
+        </form>
+    </div>
+
+    <!-- CURRENT CLUB ADMINS -->
+    <div class="table-box">
+        <div class="table-box-header">
+            <h2>&#128081; Current Club Admins</h2>
+        </div>
+        <?php
+        $club_admins = mysqli_query($conn, "
+            SELECT u.id, u.fullname, u.email, c.name as club_name
+            FROM users u JOIN clubs c ON u.club_id = c.id
+            WHERE u.role = 'club_admin' ORDER BY c.name");
+        if(mysqli_num_rows($club_admins) == 0): ?>
+            <div class="empty-msg">No club admins assigned yet.</div>
+        <?php else: ?>
+        <table>
+            <tr><th>Name</th><th>Email</th><th>Club</th><th>Action</th></tr>
+            <?php while($ca = mysqli_fetch_assoc($club_admins)): ?>
+            <tr>
+                <td><?php echo htmlspecialchars($ca['fullname']); ?></td>
+                <td><?php echo htmlspecialchars($ca['email']); ?></td>
+                <td><?php echo htmlspecialchars($ca['club_name']); ?></td>
+                <td>
+                    <form method="POST" onsubmit="return confirm('Remove admin access for this user?')">
+                        <input type="hidden" name="user_id" value="<?php echo $ca['id']; ?>">
+                        <button type="submit" name="remove_club_admin" class="btn-delete">Remove</button>
+                    </form>
+                </td>
             </tr>
             <?php endwhile; ?>
         </table>

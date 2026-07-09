@@ -3,7 +3,7 @@
     background:#7f0d23;
     color:#fff;
     padding:35px 6%;
-    margin-top:50px;
+    margin-top:0;
 }
 
 .footer-container{
@@ -24,7 +24,7 @@
 .footer-logo{
     width:140px;
     height:auto;
-    margin-bottom:15px;
+    margin-bottom:0;
     display:block;
 }
 
@@ -173,6 +173,7 @@
         </div>
 
     </div>
+</div>
 
 </section>
 

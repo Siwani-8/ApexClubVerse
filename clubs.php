@@ -4,27 +4,10 @@ include 'db.php';
 include 'header.php'; 
 
 $result = mysqli_query($conn, "SELECT * FROM clubs");
-
-// Small per-club identity so each row actually looks like its own club,
-// not a repeated card template. Falls back to a default if a club id
-// isn't listed here yet.
-$club_identity = [
-    1 => ['icon' => '🎭', 'color' => '#7a1028', 'tint' => '#f6e6e9'],
-    2 => ['icon' => '⚽', 'color' => '#1a5c3a', 'tint' => '#e3f0e8'],
-    3 => ['icon' => '✈️', 'color' => '#1a5f9a', 'tint' => '#e2edf5'],
-    4 => ['icon' => '📸', 'color' => '#6d3a9c', 'tint' => '#efe6f5'],
-    5 => ['icon' => '💻', 'color' => '#c75000', 'tint' => '#fbe8db'],
-    6 => ['icon' => '🏥', 'color' => '#0f6e56', 'tint' => '#dff0ec'],
-];
-$default_identity = ['icon' => '🏛️', 'color' => '#5a5a5a', 'tint' => '#ececec'];
 ?>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500&display=swap');
-
-    .clubs-page { background: #faf8f4; }
-
-    /* ── Hero (kept crimson, simplified) ── */
+    /* ── Page layout ── */
     .clubs-hero {
         background: #7a1028;
         padding: 3rem 2rem 3.5rem;
@@ -89,7 +72,8 @@ $default_identity = ['icon' => '🏛️', 'color' => '#5a5a5a', 'tint' => '#ecec
         margin-bottom: 1.5rem;
         font-family: 'Segoe UI', sans-serif;
     }
-   .clubs-stats {
+
+    .clubs-stats {
         display: flex;
         gap: 2rem;
     }
@@ -107,143 +91,205 @@ $default_identity = ['icon' => '🏛️', 'color' => '#5a5a5a', 'tint' => '#ecec
         font-family: 'Segoe UI', sans-serif;
     }
 
+    /* ── Clubs section ── */
+    .clubs-section {
+        background: #f5f3ef;
+        padding: 2.5rem 2rem;
+    }
 
-    .clubs-hero .kicker {
-        font-family: 'Segoe UI', sans-serif;
-        font-size: 0.78rem;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.65);
+    .clubs-section-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .clubs-section-label {
+        font-size: 11px;
         font-weight: 600;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 1.25rem;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* ── Card grid ── */
+    .club-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.1rem;
+        justify-content: center;
+    }
+
+    .club-card {
+        flex: 0 1 280px;
+    }
+
+    .club-card {
+        background: #fff;
+        border: 0.5px solid #e0ddd6;
+        border-radius: 14px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.18s, box-shadow 0.18s;
+        text-decoration: none;
+        display: block;
+    }
+
+    .club-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 28px rgba(0,0,0,0.09);
+    }
+
+    /* Colour accent bar at top — cycles through 6 colours */
+    .club-card-accent {
+        height: 5px;
+        background: #7a1028;
+    }
+
+    .club-card:nth-child(6n+1) .club-card-accent { background: #7a1028; }
+    .club-card:nth-child(6n+2) .club-card-accent { background: #1a5f9a; }
+    .club-card:nth-child(6n+3) .club-card-accent { background: #1a7a4a; }
+    .club-card:nth-child(6n+4) .club-card-accent { background: #6d3a9c; }
+    .club-card:nth-child(6n+5) .club-card-accent { background: #c75000; }
+    .club-card:nth-child(6n+6) .club-card-accent { background: #0f6e56; }
+
+    /* Icon badge colours match accent */
+    .club-card:nth-child(6n+1) .club-card-icon { background: #fdecea; color: #7a1028; }
+    .club-card:nth-child(6n+2) .club-card-icon { background: #e8f0fb; color: #1a5f9a; }
+    .club-card:nth-child(6n+3) .club-card-icon { background: #e8f6ee; color: #1a7a4a; }
+    .club-card:nth-child(6n+4) .club-card-icon { background: #f3edfb; color: #6d3a9c; }
+    .club-card:nth-child(6n+5) .club-card-icon { background: #fef0e8; color: #c75000; }
+    .club-card:nth-child(6n+6) .club-card-icon { background: #e5f4f0; color: #0f6e56; }
+
+    /* explore link colour matches accent */
+    .club-card:nth-child(6n+1) .explore-link { color: #7a1028; }
+    .club-card:nth-child(6n+2) .explore-link { color: #1a5f9a; }
+    .club-card:nth-child(6n+3) .explore-link { color: #1a7a4a; }
+    .club-card:nth-child(6n+4) .explore-link { color: #6d3a9c; }
+    .club-card:nth-child(6n+5) .explore-link { color: #c75000; }
+    .club-card:nth-child(6n+6) .explore-link { color: #0f6e56; }
+
+    .club-card-body {
+        padding: 1.1rem 1.25rem 1.25rem;
+    }
+.club-card-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.club-card-icon img {
+    max-width: 85px;
+    max-height: 85px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+    
+
+    .club-card h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 0.4rem;
+        line-height: 1.35;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .club-card p {
+        font-family: 'Segoe UI', sans-serif;
+        color: #777;
+        font-size: 13px;
+        line-height: 1.6;
         margin-bottom: 1rem;
     }
-    
-    .clubs-hero .tally {
-        display: flex;
-        gap: 2.2rem;
-    }
-    .clubs-hero .tally div b {
-        display: block;
-        font-family: 'Newsreader', Georgia, serif;
-        font-size: 1.4rem;
-        color: #fff;
-    }
-    .clubs-hero .tally div span {
-        font-family: 'Segoe UI', sans-serif;
-        font-size: 0.78rem;
-        color: rgba(255,255,255,0.55);
-    }
 
-    /* ── Directory list ── */
-    .clubs-list {
-        max-width: 780px;
-        margin: -2rem auto 0;
-        padding: 0 1.5rem 5rem;
-        position: relative;
-        z-index: 3;
-    }
-
-    .club-row {
-        display: flex;
-        gap: 1.2rem;
-        align-items: center;
-        background: #fff;
-        border-radius: 12px;
-        border-left: 5px solid var(--club-color, #7a1028);
-        box-shadow: 0 2px 10px rgba(30,20,10,0.06);
-        padding: 1.3rem 1.4rem;
-        margin-bottom: 0.9rem;
-        text-decoration: none;
-        transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .club-row:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(30,20,10,0.12);
-    }
-
-    .club-row .mark {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
+    .club-card-footer {
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-size: 1.35rem;
-        flex-shrink: 0;
-        background: var(--club-tint, #f0eee9);
+        justify-content: flex-end;
+        border-top: 0.5px solid #f0ede7;
+        padding-top: 0.75rem;
+        margin-top: 0.25rem;
     }
 
-    .club-row .copy { flex: 1; min-width: 0; }
-
-    .club-row h3 {
-        font-family: 'Newsreader', Georgia, serif;
+    .explore-link {
+        font-size: 12px;
         font-weight: 600;
-        font-size: 1.2rem;
-        color: #201c17;
-        margin-bottom: 0.3rem;
-    }
-
-    .club-row p {
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
         font-family: 'Segoe UI', sans-serif;
-        font-size: 0.9rem;
-        color: #6b6459;
-        line-height: 1.55;
-        max-width: 480px;
     }
 
-    .club-row .go {
-        flex-shrink: 0;
-        font-family: 'Segoe UI', sans-serif;
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: var(--club-color, #7a1028);
-        white-space: nowrap;
-        border: 1.5px solid var(--club-color, #7a1028);
-        padding: 0.5rem 1rem;
-        border-radius: 30px;
-        transition: background 0.15s, color 0.15s;
+    .explore-link::after {
+        content: '→';
     }
-    .club-row:hover .go { background: var(--club-color, #7a1028); color: #fff; }
 
-    @media (max-width: 560px) {
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
         .clubs-hero h1 { font-size: 1.9rem; }
-        .clubs-hero .tally { gap: 1.4rem; }
-        .club-row { flex-wrap: wrap; gap: 0.9rem; }
-        .club-row .go { display: none; }
-        .club-row .mark { width: 42px; height: 42px; font-size: 1.1rem; }
+        .clubs-stats { gap: 1.2rem; }
+        .club-grid { grid-template-columns: 1fr; }
     }
 </style>
 
-<div class="clubs-page">
-    <div class="clubs-hero">
-        <div class="clubs-hero-inner">
-            <div class="kicker">Apex College</div>
-            <h1>A running list of the clubs students have built here.</h1>
-            <p>No two are run quite the same way — pick one that matches what you're into, and see who's behind it.</p>
-            <div class="tally">
-                <div><b><?php echo mysqli_num_rows($result); ?></b><span>Active clubs</span></div>
-                <div><b>100+</b><span>Members</span></div>
-                <div><b>10+</b><span>Events / year</span></div>
+<!-- Hero banner -->
+<div class="clubs-hero">
+    <div class="clubs-hero-inner">
+        <div class="clubs-eyebrow">&#127979; Apex College</div>
+        <h1>Find Your Campus Community</h1>
+        <p>Explore clubs built around your passions — from arts to tech, sports to health.</p>
+        <div class="clubs-stats">
+            <div>
+                <span class="clubs-stat-val">6</span>
+                <span class="clubs-stat-label">Active clubs</span>
+            </div>
+            <div>
+                <span class="clubs-stat-val">100+</span>
+                <span class="clubs-stat-label">Members</span>
+            </div>
+            <div>
+                <span class="clubs-stat-val">10+</span>
+                <span class="clubs-stat-label">Events / year</span>
             </div>
         </div>
     </div>
-
-    <div class="clubs-list">
-        <?php while($row = mysqli_fetch_assoc($result)) {
-            $id = (int)$row['id'];
-            $identity = $club_identity[$id] ?? $default_identity;
-        ?>
-            <a class="club-row" href="club_detail.php?id=<?php echo $id; ?>" style="--club-color: <?php echo $identity['color']; ?>; --club-tint: <?php echo $identity['tint']; ?>;">
-                <span class="mark"><?php echo $identity['icon']; ?></span>
-                <span class="copy">
-                    <h3><?php echo htmlspecialchars($row['name']); ?></h3>
-                    <p><?php echo htmlspecialchars($row['description']); ?></p>
-                </span>
-                <span class="go">View club</span>
-            </a>
-        <?php } ?>
 </div>
+
+<!-- Clubs grid -->
+<div class="clubs-section">
+    <div class="clubs-section-inner">
+        <div class="clubs-section-label">Campus clubs</div>
+        <div class="club-grid">
+            <?php while($row = mysqli_fetch_assoc($result)) { ?>
+                <a class="club-card" href="club_detail.php?id=<?php echo $row['id']; ?>">
+                    <div class="club-card-accent"></div>
+                    <div class="club-card-body">
+                        <div class="club-card-icon">
+                        <img src="<?php echo htmlspecialchars($row['logo']); ?>" 
+                         alt="<?php echo htmlspecialchars($row['name']); ?>">
+                        </div> 
+                        
+                        <h3><?php echo htmlspecialchars($row['name']); ?></h3>
+                        <p><?php echo htmlspecialchars($row['description']); ?></p>
+                        <div class="club-card-footer">
+                            <span class="explore-link">Explore club page</span>
+                        </div>
+                    </div>
+                </a>
+            <?php } ?>
+        </div>
     </div>
 </div>
 </div>
+
 <?php include 'footer.php'; ?>

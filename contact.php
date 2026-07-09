@@ -165,11 +165,11 @@ include 'header.php';
             </div>
             <div class="contact-card">
                 <div class="contact-card-label">Phone</div>
-                <p>+977-1-4467922</p>
+                <p>+977-9860390455</p>
             </div>
         </div>
 
     </div>
 </div>
-
+</div>
 <?php include 'footer.php'; ?>

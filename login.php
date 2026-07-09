@@ -18,12 +18,18 @@ if (isset($_POST['submit'])) {
                 $_SESSION['user_name'] = $user['fullname'];
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_role'] = $user['role'];
+                if ($user['role'] == 'club_admin') {
+                    $_SESSION['club_id'] = $user['club_id'];
+                }
                 if ($user['role'] == 'admin') {
                     header("Location: admin.php");
+                } elseif ($user['role'] == 'club_admin') {
+                    header("Location: club_admin.php");
                 } else {
                     header("Location: vote-events.php");
                 }
                 exit;
+
             } else {
                 $msg = "Wrong password. Please try again.";
             }
@@ -37,19 +43,45 @@ if (isset($_POST['submit'])) {
 <style>
     *, *::before, *::after { box-sizing: border-box; }
 
-    .login-page {
+    /* Fixes the gap below the white bar by eliminating any background bleed */
+    html, body {
+        margin: 0;
+        padding: 0;
+        background: #ebdede; /* Matches the login page background */
+        display: flex;
+        flex-direction: column;
         min-height: 100vh;
-        background: #7a1028;
+    }
+
+    .login-page {
+        flex: 1; 
+        background: #ebdede;
         background-image:
             radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 0%, transparent 40%),
             radial-gradient(circle at 85% 80%, rgba(0,0,0,0.15) 0%, transparent 40%);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 3rem 1.5rem;
+        padding: 4rem 1.5rem; 
         position: relative;
         overflow: hidden;
+        margin-bottom: 0; /* Ensures no gap pushes down onto the footer */
     }
+
+    /* Target the white copyright bar in your footer to strip out margin gaps */
+    footer, .footer, [class*="footer"] {
+        margin-top: 0 !important;
+        padding-top: 0;
+    }
+
+    /* Force the copy text row to sit tight against the red block above it */
+    footer p, .copyright, [class*="copy"] {
+        margin: 0;
+        padding: 15px 0; /* Adjust this padding to change the height of the white bar */
+        background: #fff; /* Keeps the bar white */
+    }
+
+    /* Existing Card & Form Styles */
     .login-page::before {
         content: '';
         position: absolute;
@@ -68,7 +100,6 @@ if (isset($_POST['submit'])) {
         bottom: -80px; left: -80px;
         pointer-events: none;
     }
-
     .login-card {
         background: #fff;
         border-radius: 16px;
@@ -87,17 +118,16 @@ if (isset($_POST['submit'])) {
         background: linear-gradient(to right, #7a1028, #d44000);
         border-radius: 16px 16px 0 0;
     }
-
     .login-header {
         text-align: center;
         margin-bottom: 1.75rem;
         padding-bottom: 1.25rem;
-        border-bottom: 0.5px solid #f0ede7;
+        border-bottom: 0.5px solid #ebdede;
     }
     .login-badge {
         display: inline-flex; align-items: center; gap: 6px;
-        background: #fdecea;
-        border: 0.5px solid #f5c6cb;
+        background: #ebdede;
+        border: 0.5px solid #ebdede;
         border-radius: 20px;
         padding: 4px 14px;
         font-size: 11px; font-weight: 700;
@@ -114,10 +144,9 @@ if (isset($_POST['submit'])) {
         font-family: 'Segoe UI', sans-serif;
         color: #999; font-size: 13px;
     }
-
     .alert-error {
         background: #fdecea;
-        border: 0.5px solid #f5c6cb;
+        border: 0.5px solid #ebdede;
         border-radius: 8px;
         padding: 10px 14px;
         font-family: 'Segoe UI', sans-serif;
@@ -125,7 +154,6 @@ if (isset($_POST['submit'])) {
         margin-bottom: 1.25rem;
         text-align: center;
     }
-
     .form-group { margin-bottom: 1.1rem; }
     .form-group label {
         display: block;
@@ -152,13 +180,11 @@ if (isset($_POST['submit'])) {
         outline: none;
         background: #fff;
     }
-
     .email-hint {
         font-family: 'Segoe UI', sans-serif;
         font-size: 11px; color: #bbb;
         margin-top: 4px;
     }
-
     .btn-auth {
         width: 100%;
         background: #7a1028;
@@ -176,7 +202,6 @@ if (isset($_POST['submit'])) {
         background: #5e0c1e;
         transform: translateY(-1px);
     }
-
     .hint {
         text-align: center;
         font-family: 'Segoe UI', sans-serif;
@@ -216,9 +241,10 @@ if (isset($_POST['submit'])) {
             <button type="submit" name="submit" class="btn-auth">Sign In &rarr;</button>
         </form>
 
-        <p class="hint">New to the portal? <a href="signup.php">Join Portal</a></p>
+        <p class="hint">New to the club? <a href="signup.php">Join Club</a></p>
 
     </div>
 </div>
+        </div>
 
 <?php include 'footer.php'; ?>

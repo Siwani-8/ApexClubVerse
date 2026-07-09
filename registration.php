@@ -1,9 +1,10 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
-    exit;
+    exit(); // Always use exit() after header("Location: ...")
+
 }
 
 include 'db.php';
