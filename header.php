@@ -29,17 +29,26 @@ if (in_array($current_page, $protected_pages) && !isset($_SESSION['user_logged_i
         <li><a href="clubs.php">Clubs</a></li>
         <li><a href="events.php">Events Feed</a></li>
         <li><a href="vote-events.php">Event Vote</a></li>
-        <li><a href="registration.php">Club Intake</a></li>
+        
+        <?php
+if (!empty($_SESSION['user_logged_in'])) {
 
-        <?php if (isset($_SESSION['user_logged_in'])): ?>
-            <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin'): ?>
-                <li><a href="admin.php" style="color:#fff; font-weight:bold;">&#9881; Admin</a></li>
-            <?php endif; ?>
-            <li><a href="logout.php" style="color:rgba(255,255,255,0.85);">Logout</a></li>
-        <?php else: ?>
-            <li><a href="login.php">Sign In</a></li>
-            <li><a href="signup.php" class="btn-join">Join Portal</a></li>
-        <?php endif; ?>
+    if ($_SESSION['user_role'] == 'admin') {
+        echo '<li><a href="admin.php?applications_only=1">Club Intake</a></li>';
+        echo '<li><a href="admin.php" style="color:#fff; font-weight:bold;">&#9881; Admin</a></li>';
+    } else {
+        echo '<li><a href="registration.php">Club Intake</a></li>';
+    }
+
+    echo '<li><a href="logout.php" style="color:rgba(255,255,255,0.85);">Logout</a>';
+
+} else {
+
+    echo '<li><a href="registration.php">Club Intake</a></li>';
+    echo '<li><a href="login.php">Sign In</a></li>';
+    echo '<li><a href="signup.php" class="btn-join">Join Portal</a>';
+}
+?>
     </ul>
 </nav>
 <div class="content-wrapper">

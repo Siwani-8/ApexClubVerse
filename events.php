@@ -1,6 +1,118 @@
 <?php
-include 'header.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include 'db.php';
+include 'club_admin_helpers.php';
+
+$is_club_admin = is_club_admin();
+$admin_club_id = admin_club_id();
+$edit_event = null;
+
+if ($is_club_admin) {
+    if (isset($_POST['add_event'])) {
+        $title    = mysqli_real_escape_string($conn, $_POST['title']);
+        $desc     = mysqli_real_escape_string($conn, $_POST['description']);
+        $date     = mysqli_real_escape_string($conn, $_POST['event_date']);
+        $time     = mysqli_real_escape_string($conn, $_POST['event_time']);
+        $location = mysqli_real_escape_string($conn, $_POST['location']);
+        $status   = mysqli_real_escape_string($conn, $_POST['status']);
+        $image = "";
+
+if(!empty($_FILES['event_image']['name'])){
+
+    $image = time() . "_" . basename($_FILES['event_image']['name']);
+
+    move_uploaded_file(
+        $_FILES['event_image']['tmp_name'],
+        "images/" . $image
+    );
+}
+        mysqli_query($conn,"
+INSERT INTO events
+(
+club_id,
+title,
+description,
+event_date,
+event_time,
+location,
+image,
+status
+)
+VALUES
+(
+$admin_club_id,
+'$title',
+'$desc',
+'$date',
+'$time',
+'$location',
+'$image',
+'$status'
+)");
+        header('Location: events.php');
+        exit;
+    }
+
+    if (isset($_POST['update_event'])) {
+        $event_id = (int)$_POST['event_id'];
+        if (event_belongs_to_club($conn, $event_id, $admin_club_id)) {
+            $title    = mysqli_real_escape_string($conn, $_POST['title']);
+            $desc     = mysqli_real_escape_string($conn, $_POST['description']);
+            $date     = mysqli_real_escape_string($conn, $_POST['event_date']);
+            $time     = mysqli_real_escape_string($conn, $_POST['event_time']);
+            $location = mysqli_real_escape_string($conn, $_POST['location']);
+            $status   = mysqli_real_escape_string($conn, $_POST['status']);
+            $image_sql = "";
+
+if(!empty($_FILES['event_image']['name'])){
+
+    $image = time() . "_" . basename($_FILES['event_image']['name']);
+
+    move_uploaded_file(
+        $_FILES['event_image']['tmp_name'],
+        "images/" . $image
+    );
+
+    $image_sql = ", image='$image'";
+}
+            mysqli_query($conn,"
+UPDATE events SET
+title='$title',
+description='$desc',
+event_date='$date',
+event_time='$time',
+location='$location'
+$image_sql,
+status='$status'
+WHERE id=$event_id
+AND club_id=$admin_club_id
+");
+        }
+        header('Location: events.php');
+        exit;
+    }
+
+    if (isset($_POST['delete_event'])) {
+        $event_id = (int)$_POST['event_id'];
+        if (event_belongs_to_club($conn, $event_id, $admin_club_id)) {
+            mysqli_query($conn, "DELETE FROM events WHERE id = $event_id AND club_id = $admin_club_id");
+        }
+        header('Location: events.php');
+        exit;
+    }
+
+    if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
+        $edit_id = (int)$_GET['edit'];
+        $edit_res = mysqli_query($conn, "SELECT * FROM events WHERE id = $edit_id AND club_id = $admin_club_id LIMIT 1");
+        if ($edit_res && mysqli_num_rows($edit_res) > 0) {
+            $edit_event = mysqli_fetch_assoc($edit_res);
+        }
+    }
+}
+
+include 'header.php';
 
 $events = mysqli_query($conn, "
     SELECT e.*, c.name as club_name 
@@ -8,6 +120,12 @@ $events = mysqli_query($conn, "
     JOIN clubs c ON e.club_id = c.id 
     ORDER BY e.event_date ASC
 ");
+
+$admin_club_name = '';
+if ($is_club_admin) {
+    $club_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name FROM clubs WHERE id = $admin_club_id LIMIT 1"));
+    $admin_club_name = $club_row['name'] ?? '';
+}
 ?>
 
 <style>
@@ -72,6 +190,67 @@ $events = mysqli_query($conn, "
         color: rgba(255,255,255,0.6);
         font-family: 'Segoe UI', sans-serif;
         font-size: 14px;
+    }
+
+    /* ── Admin panel ── */
+    .admin-panel {
+        background: #fff;
+        border-radius: 14px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .admin-panel h2 {
+        font-size: 15px; font-weight: 600;
+        color: #1a1a1a; margin-bottom: 1rem;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    .admin-form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.85rem;
+    }
+    .admin-form-grid .full { grid-column: 1 / -1; }
+    .admin-form-grid label {
+        display: block;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 11px; font-weight: 700;
+        color: #555; text-transform: uppercase;
+        letter-spacing: 0.05em; margin-bottom: 4px;
+    }
+    .admin-form-grid input,
+    .admin-form-grid select,
+    .admin-form-grid textarea {
+        width: 100%;
+        padding: 9px 12px;
+        border: 0.5px solid #ddd;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: 'Segoe UI', sans-serif;
+        color: #1a1a1a;
+        background: #fafaf9;
+    }
+    .btn-admin {
+        background: #7a1028; color: #fff;
+        border: none; border-radius: 8px;
+        padding: 9px 18px; font-size: 13px; font-weight: 600;
+        font-family: 'Segoe UI', sans-serif; cursor: pointer;
+        margin-top: 0.75rem;
+    }
+    .btn-admin:hover { background: #5e0c1e; }
+    .btn-admin-outline {
+        background: #fdecea; color: #7a1028;
+        border: 0.5px solid #f5c6cb;
+        border-radius: 6px; padding: 5px 12px;
+        font-size: 12px; font-weight: 600;
+        font-family: 'Segoe UI', sans-serif;
+        cursor: pointer; text-decoration: none;
+        display: inline-block;
+    }
+    .btn-admin-outline:hover { background: #7a1028; color: #fff; }
+    .event-actions {
+        display: flex; gap: 6px; flex-wrap: wrap;
+        margin-top: 0.75rem;
     }
 
     /* ── Feed card ── */
@@ -167,6 +346,63 @@ $events = mysqli_query($conn, "
             <p class="page-subtitle">All upcoming, ongoing, and past events across every campus club.</p>
         </div>
 
+        <?php if ($is_club_admin): ?>
+        <div class="admin-panel">
+            <h2><?php echo $edit_event ? '&#9998; Edit Event' : '&#128197; Add New Event'; ?> &mdash; <?php echo htmlspecialchars($admin_club_name); ?></h2>
+            <form method="POST" enctype="multipart/form-data">
+                <?php if ($edit_event): ?>
+                    <input type="hidden" name="event_id" value="<?php echo (int)$edit_event['id']; ?>">
+                <?php endif; ?>
+                <div class="admin-form-grid">
+                    <div>
+                        <label>Event Title</label>
+                        <input type="text" name="title" value="<?php echo $edit_event ? htmlspecialchars($edit_event['title']) : ''; ?>" required>
+                    </div>
+                    <div>
+                        <label>Date</label>
+                        <input type="date" name="event_date" value="<?php echo $edit_event ? htmlspecialchars($edit_event['event_date']) : ''; ?>" required>
+                    </div>
+                    <div>
+                        <label>Time</label>
+                        <input type="time" name="event_time" value="<?php echo $edit_event ? htmlspecialchars($edit_event['event_time']) : ''; ?>" required>
+                    </div>
+                    <div>
+                        <label>Location</label>
+                        <input type="text" name="location" value="<?php echo $edit_event ? htmlspecialchars($edit_event['location']) : ''; ?>" required>
+                    </div>
+                    <div>
+    <label>Event Image (Optional)</label>
+    <input type="file" name="event_image" accept="image/*">
+
+    <?php if($edit_event && !empty($edit_event['image'])): ?>
+        <small>Current Image:
+            <?php echo htmlspecialchars($edit_event['image']); ?>
+        </small>
+    <?php endif; ?>
+</div>
+                    <div>
+                        <label>Status</label>
+                        <select name="status">
+                            <?php foreach (['upcoming', 'ongoing', 'completed'] as $st): ?>
+                            <option value="<?php echo $st; ?>" <?php echo ($edit_event && $edit_event['status'] === $st) ? 'selected' : ''; ?>><?php echo ucfirst($st); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="full">
+                        <label>Description</label>
+                        <textarea name="description" rows="3"><?php echo $edit_event ? htmlspecialchars($edit_event['description']) : ''; ?></textarea>
+                    </div>
+                </div>
+                <button type="submit" name="<?php echo $edit_event ? 'update_event' : 'add_event'; ?>" class="btn-admin">
+                    <?php echo $edit_event ? 'Save Changes' : 'Add Event'; ?>
+                </button>
+                <?php if ($edit_event): ?>
+                    <a href="events.php" class="btn-admin-outline" style="margin-left:8px;">Cancel</a>
+                <?php endif; ?>
+            </form>
+        </div>
+        <?php endif; ?>
+
         <?php if(mysqli_num_rows($events) == 0): ?>
             <div class="empty-state">No events found. Check back soon!</div>
         <?php endif; ?>
@@ -175,28 +411,18 @@ $events = mysqli_query($conn, "
         <div class="feed-card status-<?php echo htmlspecialchars($row['status']); ?>">
 
             <div class="event-img-box">
-                <?php if($row['title'] == 'Blood Donation Drive'): ?>
-                    <img src="images/blood donation.jpg" alt="Blood Donation Drive">
-                <?php elseif($row['title'] == 'Summer Cup'): ?>
-                    <img src="images/football.jpg" alt="Summer Cup">
-                <?php elseif($row['title'] == 'Apex Smile'): ?>
-                    <img src="images/smilee.jpg" alt="Apex Smile">
-                <?php elseif($row['title'] == 'Apex Musical Evening'): ?>
-                    <img src="images/ame.jpg" alt="Apex Musical Evening">
-                <?php elseif($row['title'] == 'Apex Gamers Connect'): ?>
-                    <img src="images/gamers.jpg" alt="Apex Gamers Connect">
-                <?php elseif($row['title'] == 'Adventurous Apex'): ?>
-                    <img src="images/adven.jpg" alt="Adventurous Apex">
-                <?php elseif($row['title'] == 'Apex EcoSprint'): ?>
-                    <img src="images/ecosprint.jpg" alt="Apex EcoSprint">
-                <?php elseif($row['title'] == 'Apex Day'): ?>
-                    <img src="images/apexday.jpg" alt="Apex Day">
-                <?php elseif($row['title'] == 'Apex Code & Combat'): ?>
-                    <img src="images/code.jpg" alt="Apex Code and Combat">
-                <?php else: ?>
-                    <div class="ph-icon">&#128247;</div>
-                    <span>Photo coming soon</span>
-                <?php endif; ?>
+                <?php if(!empty($row['image']) && file_exists("images/".$row['image'])): ?>
+
+<img
+    src="images/<?php echo htmlspecialchars($row['image']); ?>"
+    alt="<?php echo htmlspecialchars($row['title']); ?>">
+
+<?php else: ?>
+
+<div class="ph-icon">&#128247;</div>
+<span>Photo coming soon</span>
+
+<?php endif; ?>
             </div>
 
             <div class="event-details">
@@ -208,6 +434,16 @@ $events = mysqli_query($conn, "
                 <p class="event-date">&#128197; <?php echo date('d M Y', strtotime($row['event_date'])); ?> &nbsp;|&nbsp; &#128336; <?php echo htmlspecialchars($row['event_time']); ?></p>
                 <p class="event-location">&#128205; <?php echo htmlspecialchars($row['location']); ?></p>
                 <p class="event-desc"><?php echo htmlspecialchars($row['description']); ?></p>
+
+                <?php if ($is_club_admin && (int)$row['club_id'] === $admin_club_id): ?>
+                <div class="event-actions">
+                    <a href="events.php?edit=<?php echo (int)$row['id']; ?>" class="btn-admin-outline">Edit</a>
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="event_id" value="<?php echo (int)$row['id']; ?>">
+                        <button type="submit" name="delete_event" class="btn-admin-outline" onclick="return confirm('Delete this event?')">Delete</button>
+                    </form>
+                </div>
+                <?php endif; ?>
             </div>
 
         </div>

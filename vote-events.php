@@ -1,8 +1,13 @@
 <?php
-include 'header.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include 'db.php';
+include 'club_admin_helpers.php';
 
 $user_email = $_SESSION['user_email'] ?? $_SESSION['user_name'];
+$is_club_admin = is_club_admin();
+$admin_club_id = admin_club_id();
 
 if (isset($_POST['vote'])) {
     $poll_id = (int)$_POST['poll_id'];
@@ -16,6 +21,45 @@ if (isset($_POST['vote'])) {
     header("Location: vote-events.php");
     exit;
 }
+
+if ($is_club_admin) {
+    if (isset($_POST['create_poll'])) {
+        $question = mysqli_real_escape_string($conn, trim($_POST['question']));
+        $options = array_filter(array_map('trim', explode("\n", $_POST['options'] ?? '')));
+        if ($question !== '' && count($options) >= 2) {
+            mysqli_query($conn, "INSERT INTO polls (club_id, question, is_active) VALUES ($admin_club_id, '$question', 1)");
+            $poll_id = (int)mysqli_insert_id($conn);
+            foreach ($options as $opt) {
+                $opt_safe = mysqli_real_escape_string($conn, $opt);
+                mysqli_query($conn, "INSERT INTO poll_options (poll_id, option_text, votes) VALUES ($poll_id, '$opt_safe', 0)");
+            }
+        }
+        header('Location: vote-events.php');
+        exit;
+    }
+
+    if (isset($_POST['close_poll'])) {
+        $poll_id = (int)$_POST['poll_id'];
+        if (poll_belongs_to_club($conn, $poll_id, $admin_club_id)) {
+            mysqli_query($conn, "UPDATE polls SET is_active = 0 WHERE id = $poll_id AND club_id = $admin_club_id");
+        }
+        header('Location: vote-events.php');
+        exit;
+    }
+
+    if (isset($_POST['delete_poll'])) {
+        $poll_id = (int)$_POST['poll_id'];
+        if (poll_belongs_to_club($conn, $poll_id, $admin_club_id)) {
+            mysqli_query($conn, "DELETE FROM poll_votes WHERE poll_id = $poll_id");
+            mysqli_query($conn, "DELETE FROM poll_options WHERE poll_id = $poll_id");
+            mysqli_query($conn, "DELETE FROM polls WHERE id = $poll_id AND club_id = $admin_club_id");
+        }
+        header('Location: vote-events.php');
+        exit;
+    }
+}
+
+include 'header.php';
 
 $polls = mysqli_query($conn, "
     SELECT p.*, c.name as club_name 
@@ -168,6 +212,55 @@ while($poll = mysqli_fetch_assoc($polls)) {
     .poll-option { background: #f5f3ef; border: 0.5px solid #ddd; border-radius: 8px; padding: 9px 16px; font-family: 'Segoe UI', sans-serif; font-size: 13px; font-weight: 500; color: #333; cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.12s; }
     .poll-option:hover { background: #7a1028; border-color: #7a1028; color: #fff; transform: translateY(-1px); }
 
+    .admin-poll-panel {
+        background: #fff;
+        border: 0.5px solid #e0ddd6;
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .admin-poll-panel h2 {
+        font-size: 14px; font-weight: 600; color: #1a1a1a;
+        margin-bottom: 0.85rem; font-family: 'Segoe UI', sans-serif;
+    }
+    .admin-poll-panel label {
+        display: block;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 11px; font-weight: 700;
+        color: #555; text-transform: uppercase;
+        letter-spacing: 0.05em; margin-bottom: 4px;
+    }
+    .admin-poll-panel input,
+    .admin-poll-panel textarea {
+        width: 100%;
+        padding: 9px 12px;
+        border: 0.5px solid #ddd;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: 'Segoe UI', sans-serif;
+        margin-bottom: 0.75rem;
+        background: #fafaf9;
+    }
+    .btn-poll-admin {
+        background: #7a1028; color: #fff;
+        border: none; border-radius: 8px;
+        padding: 8px 16px; font-size: 12px; font-weight: 600;
+        font-family: 'Segoe UI', sans-serif; cursor: pointer;
+    }
+    .btn-poll-admin:hover { background: #5e0c1e; }
+    .btn-poll-admin-outline {
+        background: #fdecea; color: #7a1028;
+        border: 0.5px solid #f5c6cb;
+        border-radius: 6px; padding: 5px 12px;
+        font-size: 12px; font-weight: 600;
+        font-family: 'Segoe UI', sans-serif; cursor: pointer;
+    }
+    .poll-admin-actions {
+        display: flex; gap: 8px; flex-wrap: wrap;
+        margin-top: 0.75rem; padding-top: 0.75rem;
+        border-top: 0.5px solid #f0ede7;
+    }
+
     @media (max-width: 600px) {
         .poll-card { flex-direction: column; }
         .poll-side { width: 100%; height: 52px; }
@@ -197,6 +290,21 @@ while($poll = mysqli_fetch_assoc($polls)) {
     </div>
 
     <div class="vote-content">
+        <?php if ($is_club_admin):
+            $club_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name FROM clubs WHERE id = $admin_club_id LIMIT 1"));
+        ?>
+        <div class="admin-poll-panel">
+            <h2>&#128313; Create New Poll &mdash; <?php echo htmlspecialchars($club_row['name'] ?? ''); ?></h2>
+            <form method="POST">
+                <label>Poll Question</label>
+                <input type="text" name="question" placeholder="Which event should we organize next?" required>
+                <label>Options (one per line, at least 2)</label>
+                <textarea name="options" rows="4" placeholder="Option A&#10;Option B&#10;Option C" required></textarea>
+                <button type="submit" name="create_poll" class="btn-poll-admin">Create Poll</button>
+            </form>
+        </div>
+        <?php endif; ?>
+
         <?php if($poll_count == 0): ?>
             <div class="empty-state">No active polls right now. Check back soon!</div>
         <?php else: ?>
@@ -250,6 +358,19 @@ while($poll = mysqli_fetch_assoc($polls)) {
                             <?php endforeach; ?>
                         </div>
                     </form>
+                <?php endif; ?>
+
+                <?php if ($is_club_admin && (int)$poll['club_id'] === $admin_club_id): ?>
+                <div class="poll-admin-actions">
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="poll_id" value="<?php echo (int)$poll['id']; ?>">
+                        <button type="submit" name="close_poll" class="btn-poll-admin-outline">Close Poll</button>
+                    </form>
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="poll_id" value="<?php echo (int)$poll['id']; ?>">
+                        <button type="submit" name="delete_poll" class="btn-poll-admin-outline" onclick="return confirm('Delete this poll permanently?')">Delete Poll</button>
+                    </form>
+                </div>
                 <?php endif; ?>
             </div>
         </div>

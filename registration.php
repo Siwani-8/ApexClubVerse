@@ -20,18 +20,81 @@ if (isset($_POST['apply'])) {
     $reasons = mysqli_real_escape_string($conn, $_POST['reasons']);
 
     $clubs = isset($_POST['selected_club']) ? $_POST['selected_club'] : [];
-    $club = mysqli_real_escape_string($conn, implode(', ', $clubs));
+    if(empty($clubs)){
+    $message = "<div class='alert error'>
+    Please select at least one club.
+    </div>";
+}else{
+    $success = true;
+$inserted = 0;
 
-    if (empty($clubs)) {
-        $message = "<div class='alert error'>Please select at least one club.</div>";
-    } else {
-        $query = "INSERT INTO registrations (student_name, student_email, faculty, semester, selected_club, interest, reasons) 
-                  VALUES ('$name', '$email', '$faculty', '$semester', '$club', '$interest', '$reasons')";
-        if (mysqli_query($conn, $query)) {
-            $message = "<div class='alert success'>✓ Application submitted successfully! We will contact you soon.</div>";
-        } else {
-            $message = "<div class='alert error'>Error: " . mysqli_error($conn) . "</div>";
+foreach ($clubs as $club) {
+
+    $club = mysqli_real_escape_string($conn, $club);
+
+    $check = mysqli_query($conn,"
+        SELECT id
+        FROM registrations
+        WHERE student_email='$email'
+        AND selected_club='$club'
+        LIMIT 1
+    ");
+
+    if(mysqli_num_rows($check)==0){
+
+        $query="
+        INSERT INTO registrations
+        (
+            student_name,
+            student_email,
+            faculty,
+            semester,
+            selected_club,
+            interest,
+            reasons
+        )
+        VALUES
+        (
+            '$name',
+            '$email',
+            '$faculty',
+            '$semester',
+            '$club',
+            '$interest',
+            '$reasons'
+        )";
+
+        if(mysqli_query($conn,$query)){
+            $inserted++;
+        }else{
+            $success=false;
         }
+    }
+}
+
+if($success){
+
+    if($inserted>0){
+
+        $message="<div class='alert success'>
+        ✓ Application submitted successfully!
+        </div>";
+
+    }else{
+
+        $message="<div class='alert error'>
+        You have already applied for all the selected clubs.
+        </div>";
+
+    }
+
+}else{
+
+    $message="<div class='alert error'>
+    Something went wrong.
+    </div>";
+
+}
     }
 }
 ?>

@@ -40,6 +40,10 @@ if (isset($_POST['add_event'])) {
 }
 
 $tab = $_GET['tab'] ?? 'dashboard';
+$applications_only = isset($_GET['applications_only']);
+if ($applications_only) {
+    $tab = 'registrations';
+}
 
 // Stats
 $total_users    = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as c FROM users WHERE role = 'student'"))['c'];
@@ -272,12 +276,15 @@ $clubs = mysqli_query($conn, "SELECT * FROM clubs ORDER BY id");
 <div class="admin-page">
 <div class="admin-inner">
 
-    <div class="admin-header">
-        <h1>&#9881; Admin Panel</h1>
-        <span>Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
-    </div>
+    <?php if (!$applications_only): ?>
+<div class="admin-header">
+    <h1>&#9881; Admin Panel</h1>
+    <span>Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+</div>
+<?php endif; ?>
 
     <!-- Stats -->
+     <?php if (!$applications_only): ?>
     <div class="stats-row">
         <div class="stat-box">
             <div class="stat-icon" style="background:#fdecea;">&#128101;</div>
@@ -315,8 +322,9 @@ $clubs = mysqli_query($conn, "SELECT * FROM clubs ORDER BY id");
             </div>
         </div>
     </div>
-
+    <?php endif; ?> 
     <!-- Tabs -->
+     <?php if (!$applications_only): ?>
     <div class="tab-row">
         <a href="admin.php?tab=dashboard"      class="tab-btn <?php echo $tab=='dashboard'      ? 'active':''; ?>">&#127968; Dashboard</a>
         <a href="admin.php?tab=registrations"  class="tab-btn <?php echo $tab=='registrations'  ? 'active':''; ?>">&#128203; Applications</a>
@@ -324,7 +332,7 @@ $clubs = mysqli_query($conn, "SELECT * FROM clubs ORDER BY id");
         <a href="admin.php?tab=votes"          class="tab-btn <?php echo $tab=='votes'          ? 'active':''; ?>">&#128313; Vote Results</a>
         <a href="admin.php?tab=users"          class="tab-btn <?php echo $tab=='users'          ? 'active':''; ?>">&#128101; Students</a>
     </div>
-
+    <?php endif; ?>
     <?php if($tab == 'dashboard'): ?>
     <!-- DASHBOARD -->
     <div class="table-box">

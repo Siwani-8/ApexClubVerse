@@ -13,16 +13,14 @@ if (isset($_POST['submit'])) {
         $res = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
         if (mysqli_num_rows($res) > 0) {
             $user = mysqli_fetch_assoc($res);
-            if (password_verify($password, $user['password'])) {
+            if ($password === $user['password']) {
                 $_SESSION['user_logged_in'] = true;
-                $_SESSION['user_name'] = $user['fullname'];
+                $_SESSION['user_id'] = (int)$user['id'];
+                $_SESSION['user_name'] = $user['name'] ?? $user['fullname'] ?? '';
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_role'] = $user['role'];
-                if ($user['role'] == 'admin') {
-                    header("Location: admin.php");
-                } else {
-                    header("Location: vote-events.php");
-                }
+                $_SESSION['club_id'] = !empty($user['club_id']) ? (int)$user['club_id'] : null;
+                header("Location: vote-events.php");
                 exit;
             } else {
                 $msg = "Wrong password. Please try again.";

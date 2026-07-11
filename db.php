@@ -1,5 +1,10 @@
 <?php
-$conn = mysqli_connect("localhost", "root", "", "apex_club_db");
+$host = "localhost";
+$user = "root";
+$password = "";
+$database = "apex_club_db";
+
+$conn = mysqli_connect($host, $user, $password, $database);
 
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
