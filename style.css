@@ -93,3 +93,11 @@ footer{
     color:#555;
     font-family:'Segoe UI',sans-serif;
 }
+.admin-link {
+    color: var(--primary-crimson) !important;
+    font-weight: bold;
+}
+
+.logout-link {
+    color: var(--text-dark);
+}

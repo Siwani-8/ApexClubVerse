@@ -529,7 +529,7 @@ $clubs = mysqli_query($conn, "SELECT * FROM clubs ORDER BY id");
             <span class="badge-count"><?php echo $total_users; ?> total</span>
         </div>
         <?php
-        $users = mysqli_query($conn, "SELECT id, fullname, email FROM users WHERE role = 'student' ORDER BY id DESC");
+        $users = mysqli_query($conn, "SELECT id, name, email FROM users WHERE role = 'student' ORDER BY id DESC");
         if(mysqli_num_rows($users) == 0): ?>
             <div class="empty-msg">No students registered yet.</div>
         <?php else: ?>
@@ -538,7 +538,7 @@ $clubs = mysqli_query($conn, "SELECT * FROM clubs ORDER BY id");
             <?php $i = 1; while($u = mysqli_fetch_assoc($users)): ?>
             <tr>
                 <td><?php echo $i++; ?></td>
-                <td><?php echo htmlspecialchars($u['fullname']); ?></td>
+                <td><?php echo htmlspecialchars($u['name']); ?></td>
                 <td><?php echo htmlspecialchars($u['email']); ?></td>
             </tr>
             <?php endwhile; ?>

@@ -25,30 +25,26 @@ if (in_array($current_page, $protected_pages) && !isset($_SESSION['user_logged_i
         <img src="logo.png" alt="ApexClubVerse Logo" class="navbar-logo-square">
     </div>
     <ul class="nav-links">
-        <li><a href="index.php">Home</a></li>
-        <li><a href="clubs.php">Clubs</a></li>
-        <li><a href="events.php">Events Feed</a></li>
-        <li><a href="vote-events.php">Event Vote</a></li>
-        
-        <?php
-if (!empty($_SESSION['user_logged_in'])) {
+    <li><a href="index.php">Home</a></li>
+    <li><a href="clubs.php">Clubs</a></li>
+    <li><a href="events.php">Events Feed</a></li>
+    <li><a href="vote-events.php">Event Vote</a></li>
 
-    if ($_SESSION['user_role'] == 'admin') {
-        echo '<li><a href="admin.php?applications_only=1">Club Intake</a></li>';
-        echo '<li><a href="admin.php" style="color:#fff; font-weight:bold;">&#9881; Admin</a></li>';
-    } else {
-        echo '<li><a href="registration.php">Club Intake</a></li>';
-    }
+    <?php if (!empty($_SESSION['user_logged_in'])): ?>
 
-    echo '<li><a href="logout.php" style="color:rgba(255,255,255,0.85);">Logout</a>';
+        <?php if ($_SESSION['user_role'] == 'admin'): ?>
+            <li><a href="admin.php?applications_only=1">Club Intake</a></li>
+            <li><a href="admin.php" class="admin-link">&#9881; Admin</a></li>
+        <?php endif; ?>
+        <li><a href="logout.php" class="logout-link">Logout</a></li>
 
-} else {
+    <?php else: ?>
 
-    echo '<li><a href="registration.php">Club Intake</a></li>';
-    echo '<li><a href="login.php">Sign In</a></li>';
-    echo '<li><a href="signup.php" class="btn-join">Join Portal</a>';
-}
-?>
-    </ul>
+        <li><a href="registration.php">Club Intake</a></li>
+        <li><a href="login.php">Sign In</a></li>
+        <li><a href="signup.php" class="btn-join">Join Portal</a></li>
+
+    <?php endif; ?>
+</ul>
 </nav>
 <div class="content-wrapper">
