@@ -43,6 +43,7 @@ if (!$club) { header("Location: clubs.php"); exit; }
 
 $bod_result = mysqli_query($conn, "SELECT * FROM bod_members WHERE club_id = $club_id ORDER BY FIELD(position, 'President', 'Vice President', 'Treasurer', 'General Secretary', 'Operations Head')");
 $boa_result = mysqli_query($conn, "SELECT * FROM boa_members WHERE club_id = $club_id");
+$events_result = mysqli_query($conn, "SELECT * FROM club_events WHERE club_id = $club_id");
 
 // Club-specific data
 $club_data = [
@@ -490,17 +491,35 @@ $data = $club_data[$club_id] ?? $club_data[1];
             <h2>Our Events</h2>
             <div class="section-line"></div>
         </div>
-        <div class="events-grid">
-            <?php foreach($data['events'] as $event): ?>
-            <div class="event-photo-card">
-                <div class="event-photo-placeholder">
-                    <div class="ph-icon">📷</div>
-                    <div class="ph-text">PHOTO COMING SOON</div>
-                </div>
-                <div class="event-label"><?php echo htmlspecialchars($event); ?></div>
-            </div>
-            <?php endforeach; ?>
+   <div class="events-grid">
+
+<?php while($event = mysqli_fetch_assoc($events_result)) { ?>
+
+<div class="event-photo-card">
+
+    <?php if(!empty($event['image'])) { ?>
+
+        <img src="<?php echo htmlspecialchars($event['image']); ?>"
+             style="width:100%; height:160px; object-fit:cover;">
+
+    <?php } else { ?>
+
+        <div class="event-photo-placeholder">
+            <div class="ph-icon">📷</div>
+            <div class="ph-text">PHOTO COMING SOON</div>
         </div>
+
+    <?php } ?>
+
+    <div class="event-label">
+        <?php echo htmlspecialchars($event['event_name']); ?>
+    </div>
+
+</div>
+
+<?php } ?>
+
+</div>
     </div>
 
     <!-- BOD Section -->
