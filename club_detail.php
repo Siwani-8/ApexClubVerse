@@ -1,9 +1,40 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include 'db.php';
-include 'header.php';
+include 'club_admin_helpers.php';
 
 $club_id = isset($_GET['id']) ? (int)$_GET['id'] : 1;
+$can_manage_board = is_club_admin() && admin_club_id() === $club_id;
+
+if ($can_manage_board) {
+    if (isset($_POST['update_bod'])) {
+        $member_id = (int)$_POST['member_id'];
+        if (bod_belongs_to_club($conn, $member_id, $club_id)) {
+            $name = mysqli_real_escape_string($conn, $_POST['name']);
+            $position = mysqli_real_escape_string($conn, $_POST['position']);
+            $bio = mysqli_real_escape_string($conn, $_POST['bio']);
+            mysqli_query($conn, "UPDATE bod_members SET name='$name', position='$position', bio='$bio' WHERE id = $member_id AND club_id = $club_id");
+        }
+        header("Location: club_detail.php?id=$club_id");
+        exit;
+    }
+
+    if (isset($_POST['update_boa'])) {
+        $member_id = (int)$_POST['member_id'];
+        if (boa_belongs_to_club($conn, $member_id, $club_id)) {
+            $name = mysqli_real_escape_string($conn, $_POST['name']);
+            $title = mysqli_real_escape_string($conn, $_POST['title']);
+            $expertise = mysqli_real_escape_string($conn, $_POST['expertise']);
+            mysqli_query($conn, "UPDATE boa_members SET name='$name', title='$title', expertise='$expertise' WHERE id = $member_id AND club_id = $club_id");
+        }
+        header("Location: club_detail.php?id=$club_id");
+        exit;
+    }
+}
+
+include 'header.php';
 
 $club_result = mysqli_query($conn, "SELECT * FROM clubs WHERE id = $club_id");
 $club = mysqli_fetch_assoc($club_result);
@@ -385,6 +416,45 @@ $data = $club_data[$club_id] ?? $club_data[1];
         position: relative;
     }
     .cta-btn:hover { background: #73001c; transform: translateY(-2px); }
+
+    .btn-modify {
+        display: inline-block;
+        margin-top: 0.75rem;
+        background: var(--primary-crimson);
+        color: #fff;
+        border: none;
+        border-radius: 20px;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.72rem;
+        font-family: sans-serif;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .board-edit-form {
+        margin-top: 0.85rem;
+        text-align: left;
+        display: none;
+    }
+    .board-edit-form.open { display: block; }
+    .board-edit-form input,
+    .board-edit-form textarea {
+        width: 100%;
+        padding: 0.45rem 0.6rem;
+        border: 1px solid #dcdbd7;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-family: 'Segoe UI', sans-serif;
+        margin-bottom: 0.45rem;
+    }
+    .board-edit-form label {
+        display: block;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #666;
+        text-transform: uppercase;
+        margin-bottom: 0.15rem;
+        font-family: sans-serif;
+    }
 </style>
 
 <div class="container">
@@ -448,6 +518,19 @@ $data = $club_data[$club_id] ?? $club_data[1];
                 <h3><?php echo htmlspecialchars($member['name']); ?></h3>
                 <span class="bod-position"><?php echo htmlspecialchars($member['position']); ?></span>
                 <p><?php echo htmlspecialchars($member['bio']); ?></p>
+                <?php if ($can_manage_board): ?>
+                <button type="button" class="btn-modify" onclick="toggleBoardForm('bod-<?php echo (int)$member['id']; ?>')">Modify</button>
+                <form method="POST" class="board-edit-form" id="bod-<?php echo (int)$member['id']; ?>">
+                    <input type="hidden" name="member_id" value="<?php echo (int)$member['id']; ?>">
+                    <label>Name</label>
+                    <input type="text" name="name" value="<?php echo htmlspecialchars($member['name']); ?>" required>
+                    <label>Position</label>
+                    <input type="text" name="position" value="<?php echo htmlspecialchars($member['position']); ?>" required>
+                    <label>Bio</label>
+                    <textarea name="bio" rows="3"><?php echo htmlspecialchars($member['bio']); ?></textarea>
+                    <button type="submit" name="update_bod" class="btn-modify">Save</button>
+                </form>
+                <?php endif; ?>
             </div>
             <?php } ?>
         </div>
@@ -469,6 +552,19 @@ $data = $club_data[$club_id] ?? $club_data[1];
                     <h3><?php echo htmlspecialchars($advisor['name']); ?></h3>
                     <span class="boa-title"><?php echo htmlspecialchars($advisor['title']); ?></span>
                     <p><?php echo htmlspecialchars($advisor['expertise']); ?></p>
+                    <?php if ($can_manage_board): ?>
+                    <button type="button" class="btn-modify" onclick="toggleBoardForm('boa-<?php echo (int)$advisor['id']; ?>')">Modify</button>
+                    <form method="POST" class="board-edit-form" id="boa-<?php echo (int)$advisor['id']; ?>">
+                        <input type="hidden" name="member_id" value="<?php echo (int)$advisor['id']; ?>">
+                        <label>Name</label>
+                        <input type="text" name="name" value="<?php echo htmlspecialchars($advisor['name']); ?>" required>
+                        <label>Title</label>
+                        <input type="text" name="title" value="<?php echo htmlspecialchars($advisor['title']); ?>" required>
+                        <label>Expertise</label>
+                        <textarea name="expertise" rows="3"><?php echo htmlspecialchars($advisor['expertise']); ?></textarea>
+                        <button type="submit" name="update_boa" class="btn-modify">Save</button>
+                    </form>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php } ?>
@@ -490,5 +586,12 @@ $data = $club_data[$club_id] ?? $club_data[1];
     </div>
     <?php endif; ?>
 </div>
+
+<script>
+function toggleBoardForm(id) {
+    var form = document.getElementById(id);
+    if (form) form.classList.toggle('open');
+}
+</script>
 
 <?php include 'footer.php'; ?>

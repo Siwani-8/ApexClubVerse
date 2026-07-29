@@ -124,8 +124,12 @@
         <!-- Left Column -->
         <div class="footer-column">
 
+
+            <img src="logo.png" class="footer-logo">
+
             <!-- Change path if needed -->
-            <img src="assets/images/logo.png" alt="ApexClubVerse" class="footer-logo">
+    
+
 
             <p>1261 Devkota Sadak</p>
             <p>Mid-Baneshwor, Kathmandu</p>
