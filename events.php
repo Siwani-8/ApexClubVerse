@@ -77,10 +77,7 @@ $events = mysqli_query($conn, "
             <img src="images/adven.jpg" style="width:100%; height:100%; object-fit:cover;">
            
         <?php endif; ?>  
-        <?php if($row['title'] == 'Apex EcoSprint'): ?>
-            <img src="images/ecosprint.jpg" style="width:100%; height:100%; object-fit:cover;">
-           
-        <?php endif; ?>
+        
         
          <?php if($row['title'] == 'Apex Day'): ?>
             <img src="images/apexday.jpg" style="width:100%; height:100%; object-fit:cover;">
@@ -89,6 +86,13 @@ $events = mysqli_query($conn, "
         <?php if($row['title'] == 'Apex Code & Combat'): ?>
             <img src="images/code.jpg" style="width:100%; height:100%; object-fit:cover;">    
         <?php endif; ?>
+         <?php if($row['title'] == 'Apex Sports Week'): ?>
+            <img src="images/sports.jpg" style="width:100%; height:100%; object-fit:cover;">    
+        <?php endif; ?>
+       <?php if($row['title'] == 'Apex Pitch & Pop'): ?>
+            <img src="images/pitch.jpg" style="width:100%; height:100%; object-fit:cover;">    
+        <?php endif; ?>
+       
              
         
     </div>
