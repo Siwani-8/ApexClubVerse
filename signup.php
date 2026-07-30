@@ -8,7 +8,7 @@ $msg_type = "";
 if (isset($_POST['submit'])) {
     $name  = mysqli_real_escape_string($conn, $_POST['name']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $pass  = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
     // Only allow @apexcollege.edu.np emails
     if (!str_ends_with($email, '@apexcollege.edu.np')) {
@@ -20,13 +20,13 @@ if (isset($_POST['submit'])) {
             $msg = "This email is already registered. Please sign in.";
             $msg_type = "error";
         } else {
-            if (mysqli_query($conn, "INSERT INTO users (fullname, email, password, role) VALUES ('$name', '$email', '$pass', 'student')")) {
+            if (mysqli_query($conn, "INSERT INTO users (name, email, password, role) VALUES ('$name', '$email', '$pass', 'student')")) {
                 header("Location: login.php");
                 exit;
             } else {
-                $msg = "Something went wrong. Please try again.";
-                $msg_type = "error";
-            }
+    $msg = "Database Error: " . mysqli_error($conn);
+    $msg_type = "error";
+}
         }
     }
 }

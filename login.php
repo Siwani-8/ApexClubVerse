@@ -1,33 +1,48 @@
 <?php
 include 'header.php';
 include 'db.php';
+
 $msg = "";
 
 if (isset($_POST['submit'])) {
+
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
 
     if (!str_ends_with($email, '@apexcollege.edu.np')) {
         $msg = "Only Apex College email addresses are allowed (e.g. name@apexcollege.edu.np)";
     } else {
+
         $res = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
+
         if (mysqli_num_rows($res) > 0) {
+
             $user = mysqli_fetch_assoc($res);
-          if (password_verify($password, $user['password'])) {
-    $_SESSION['user_logged_in'] = true;
-    $_SESSION['user_id'] = (int)$user['id'];
-    $_SESSION['user_name'] = $user['fullname'] ?? '';
-    $_SESSION['user_email'] = $user['email'];
-    $_SESSION['user_role'] = $user['role'];
-    if ($user['role'] == 'admin') {
-        header("Location: admin.php");
-    } else {
-        header("Location: vote-events.php");
-    }
-    exit;
+            
+
+            if (
+    password_verify($password, $user['password']) ||
+    $password == $user['password']
+) {
+
+                $_SESSION['user_logged_in'] = true;
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_name'] = $user['name'];
+                $_SESSION['user_email'] = $user['email'];
+                $_SESSION['user_role'] = $user['role'];
+                $_SESSION['club_name'] = $user['club_name'];
+
+                if ($user['role'] == 'admin') {
+                    header("Location: admin.php");
+                } else {
+                    header("Location: vote-events.php");
+                }
+                exit;
+
             } else {
                 $msg = "Wrong password. Please try again.";
             }
+
         } else {
             $msg = "No account found with this email.";
         }
