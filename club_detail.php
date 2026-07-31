@@ -288,7 +288,7 @@ $data = $club_data[$club_id] ?? $club_data[1];
     .bod-card:hover { transform: translateY(-5px); box-shadow: 0 12px 28px rgba(153,0,38,0.12); }
 
     .bod-avatar {
-        width: 75px; height: 75px;
+        width: 140px; height: 140px;
         border-radius: 50%;
         background: var(--primary-crimson);
         color: white;
@@ -300,7 +300,16 @@ $data = $club_data[$club_id] ?? $club_data[1];
         margin: 0 auto 1rem;
         font-family: sans-serif;
         border: 3px solid #f0e8e8;
+        overflow: hidden;
     }
+    .bod-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    border-radius: 50%;
+    display: block;
+}
     .bod-card h3 {
         font-size: 0.97rem;
         color: var(--text-dark);
@@ -345,7 +354,7 @@ $data = $club_data[$club_id] ?? $club_data[1];
     }
     .boa-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
     .boa-avatar {
-        width: 65px; height: 65px;
+        width: 140px; height: 140px;
         border-radius: 50%;
         background: var(--text-dark);
         color: white;
@@ -358,6 +367,14 @@ $data = $club_data[$club_id] ?? $club_data[1];
         flex-shrink: 0;
         border: 3px solid #e8eaf0;
     }
+    .boa-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    border-radius: 50%;
+    display: block;
+}
     .boa-info h3 {
         font-size: 1rem;
         color: var(--text-dark);
@@ -533,10 +550,20 @@ $data = $club_data[$club_id] ?? $club_data[1];
                 $initials = strtoupper(substr($member['name'], 0, 1));
             ?>
             <div class="bod-card">
-                <div class="bod-avatar"><?php echo $initials; ?></div>
+                <div class="bod-avatar">
+    <?php if (!empty($member['photo'])): ?>
+       <img src="images/members/<?php echo htmlspecialchars($member['photo']); ?>?v=<?php echo time(); ?>"
+     alt="<?php echo htmlspecialchars($member['name']); ?>">
+    <?php else: ?>
+        <?php echo $initials; ?>
+    <?php endif; ?>
+</div>
                 <h3><?php echo htmlspecialchars($member['name']); ?></h3>
-                <span class="bod-position"><?php echo htmlspecialchars($member['position']); ?></span>
-                <p><?php echo htmlspecialchars($member['bio']); ?></p>
+                <span class="bod-position">
+                    <?php echo htmlspecialchars($member['position']); ?></span>
+                <p>
+                    <?php echo htmlspecialchars($member['bio']); ?></p>
+
                 <?php if ($can_manage_board): ?>
                 <button type="button" class="btn-modify" onclick="toggleBoardForm('bod-<?php echo (int)$member['id']; ?>')">Modify</button>
                 <form method="POST" class="board-edit-form" id="bod-<?php echo (int)$member['id']; ?>">
@@ -565,8 +592,15 @@ $data = $club_data[$club_id] ?? $club_data[1];
             <?php while($advisor = mysqli_fetch_assoc($boa_result)) {
                 $initials = strtoupper(substr($advisor['name'], 0, 1));
             ?>
-            <div class="boa-card">
-                <div class="boa-avatar"><?php echo $initials; ?></div>
+       <div class="boa-card">
+    <div class="boa-avatar">
+<?php if (!empty($advisor['photo'])): ?>
+    <img src="images/members/<?php echo htmlspecialchars($advisor['photo']); ?>?v=<?php echo time(); ?>"
+         alt="<?php echo htmlspecialchars($advisor['name']); ?>">
+<?php else: ?>
+    <?php echo $initials; ?>
+<?php endif; ?>
+</div>
                 <div class="boa-info">
                     <h3><?php echo htmlspecialchars($advisor['name']); ?></h3>
                     <span class="boa-title"><?php echo htmlspecialchars($advisor['title']); ?></span>
