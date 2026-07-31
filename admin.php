@@ -54,7 +54,45 @@ $club_id = $clubRow['id'];
     $time      = mysqli_real_escape_string($conn, $_POST['event_time']);
     $location  = mysqli_real_escape_string($conn, $_POST['location']);
     $status    = mysqli_real_escape_string($conn, $_POST['status']);
-    mysqli_query($conn, "INSERT INTO events (club_id, title, description, event_date, event_time, location, status) VALUES ($club_id, '$title', '$desc', '$date', '$time', '$location', '$status')");
+    $image = "";
+
+if(isset($_FILES['event_image']) && $_FILES['event_image']['error']==0){
+
+    if(!is_dir("uploads/events")){
+        mkdir("uploads/events",0777,true);
+    }
+
+    $filename = time() . "_" . basename($_FILES['event_image']['name']);
+
+    move_uploaded_file(
+        $_FILES['event_image']['tmp_name'],
+        "uploads/events/".$filename
+    );
+
+    $image = "uploads/events/".$filename;
+}
+    mysqli_query($conn, "INSERT INTO events
+(
+club_id,
+title,
+description,
+event_date,
+event_time,
+location,
+image,
+status
+)
+VALUES
+(
+$club_id,
+'$title',
+'$desc',
+'$date',
+'$time',
+'$location',
+'$image',
+'$status'
+)");
     header("Location: admin.php?tab=events");
     exit;
 }
@@ -71,6 +109,7 @@ if (isset($_POST['schedule_interviews'])) {
         exit;
     }
 
+
     $check = mysqli_query($conn, "SELECT COUNT(*) AS total FROM registrations WHERE selected_club='$club' AND interview_status <> 'PENDING'");
     $already = mysqli_fetch_assoc($check);
 
@@ -84,6 +123,66 @@ if (isset($_POST['schedule_interviews'])) {
     exit;
 }
 
+if(isset($_POST['create_poll'])){
+
+    $club = mysqli_real_escape_string($conn, $_SESSION['club_name']);
+
+    $clubRow = mysqli_fetch_assoc(
+        mysqli_query($conn,
+        "SELECT id FROM clubs WHERE name='$club'")
+    );
+
+    $club_id = $clubRow['id'];
+
+    $question = mysqli_real_escape_string($conn,$_POST['question']);
+
+    mysqli_query($conn,
+"UPDATE polls
+SET is_active=0
+WHERE club_id=$club_id");
+
+mysqli_query($conn,
+"INSERT INTO polls
+(club_id,question,is_active)
+VALUES
+($club_id,'$question',1)");
+
+    $poll_id = mysqli_insert_id($conn);
+
+    foreach($_POST['options'] as $option){
+
+        $option = trim($option);
+
+        if($option!=""){
+
+            $option = mysqli_real_escape_string($conn,$option);
+
+            mysqli_query($conn,
+            "INSERT INTO poll_options
+            (poll_id,option_text,votes)
+            VALUES
+            ($poll_id,'$option',0)");
+        }
+    }
+
+    header("Location: admin.php?tab=votes");
+    exit;
+}
+if(isset($_POST['delete_poll'])){
+
+    $poll_id = (int)$_POST['poll_id'];
+
+    mysqli_query($conn,
+    "DELETE FROM poll_options
+     WHERE poll_id=$poll_id");
+
+    mysqli_query($conn,
+    "DELETE FROM polls
+     WHERE id=$poll_id");
+
+    header("Location: admin.php?tab=votes");
+    exit;
+}
 $tab = $_GET['tab'] ?? 'dashboard';
 $applications_only = isset($_GET['applications_only']);
 if ($applications_only) {
@@ -363,7 +462,7 @@ End time must be after start time.
         <?php elseif($tab == 'events'): ?>
         <div class="form-box">
             <h2>&#128197; Add New Event</h2>
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <div class="form-grid">
                     <div class="form-group">
                         <?php
@@ -413,6 +512,10 @@ End time must be after start time.
                         <label>Description</label>
                         <textarea name="description" rows="3"></textarea>
                     </div>
+                    <div class="form-group" style="grid-column:1/-1;">
+    <label>Event Image</label>
+    <input type="file" name="event_image" accept="image/*">
+</div>
                 </div>
                 <button type="submit" name="add_event" class="btn-submit">Add Event</button>
             </form>
@@ -436,11 +539,33 @@ End time must be after start time.
             <?php else: ?>
             <table>
                 <tr>
-                    <th>Title</th><th>Club</th><th>Date</th><th>Location</th><th>Status</th><th>Action</th>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Club</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Action</th>
                 </tr>
                 <?php while($e = mysqli_fetch_assoc($events)): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($e['title']); ?></td>
+                    <td>
+
+<?php
+if(!empty($e['image'])){
+?>
+<img
+src="<?php echo htmlspecialchars($e['image']); ?>"
+style="width:80px;height:55px;object-fit:cover;border-radius:8px;">
+<?php
+}else{
+    echo "No Image";
+}
+?>
+
+</td>
+
+<td><?php echo htmlspecialchars($e['title']); ?></td>
                     <td><?php echo htmlspecialchars($e['club_name']); ?></td>
                     <td><?php echo date('d M Y', strtotime($e['event_date'])); ?></td>
                     <td><?php echo htmlspecialchars($e['location']); ?></td>
@@ -458,7 +583,60 @@ End time must be after start time.
         </div>
 
         <?php elseif($tab == 'votes'): ?>
-        <?php
+        <div class="form-box">
+    <h2>&#128221; Create New Poll</h2>
+
+    <form method="POST">
+
+        <div class="form-group">
+            <label>Poll Question</label>
+            <input
+                type="text"
+                name="question"
+                placeholder="Enter poll question"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label>Option 1</label>
+            <input
+                type="text"
+                name="options[]"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label>Option 2</label>
+            <input
+                type="text"
+                name="options[]"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label>Option 3</label>
+            <input
+                type="text"
+                name="options[]">
+        </div>
+
+        <div class="form-group">
+            <label>Option 4</label>
+            <input
+                type="text"
+                name="options[]">
+        </div>
+
+        <button
+            type="submit"
+            name="create_poll"
+            class="btn-submit">
+            Create Poll
+        </button>
+
+    </form>
+</div>
+<?php
         $polls = mysqli_query($conn,
         "SELECT p.*, c.name as club_name
         FROM polls p
@@ -472,9 +650,36 @@ End time must be after start time.
         ?>
         <div class="table-box" style="margin-bottom:1rem;">
             <div class="table-box-header">
-                <h2><?php echo htmlspecialchars($poll['club_name']); ?> — <?php echo htmlspecialchars($poll['question']); ?></h2>
-                <span class="badge-count"><?php echo $total_poll_votes; ?> votes</span>
-            </div>
+
+    <h2>
+        <?php echo htmlspecialchars($poll['club_name']); ?>
+        —
+        <?php echo htmlspecialchars($poll['question']); ?>
+    </h2>
+
+    <div style="display:flex;gap:10px;align-items:center;">
+
+        <span class="badge-count">
+            <?php echo $total_poll_votes; ?> votes
+        </span>
+
+        <form method="POST">
+            <input type="hidden"
+                   name="poll_id"
+                   value="<?php echo $poll['id']; ?>">
+
+            <button
+                type="submit"
+                name="delete_poll"
+                class="btn-delete"
+                onclick="return confirm('Delete this poll?')">
+                Delete Poll
+            </button>
+        </form>
+
+    </div>
+
+</div>
             <table>
                 <tr><th>Option</th><th>Votes</th><th>Percentage</th></tr>
                 <?php while($opt = mysqli_fetch_assoc($options)):
