@@ -340,16 +340,29 @@ if($success){
             </div>
 
             <div class="form-group">
-                <label>Interested Clubs</label>
-                <div class="club-options">
-                    <label><input type="checkbox" name="selected_club[]" value="Performing Arts Club"> 🎭 Performing Arts Club</label>
-                    <label><input type="checkbox" name="selected_club[]" value="Sports and Leadership Club"> 🏆 Sports &amp; Leadership Club</label>
-                    <label><input type="checkbox" name="selected_club[]" value="Travel and Tourism Club"> ✈️ Travel &amp; Tourism Club</label>
-                    <label><input type="checkbox" name="selected_club[]" value="Media and Marketing Club"> 📢 Media &amp; Marketing Club</label>
-                    <label><input type="checkbox" name="selected_club[]" value="IT Club"> 💻 IT Club</label>
-                    <label><input type="checkbox" name="selected_club[]" value="HEAT"> ❤️ HEAT Club</label>
-                </div>
-            </div>
+    <label>Interested Clubs</label>
+
+    <div class="club-options">
+
+        <?php
+        $clubList = mysqli_query($conn, "SELECT name FROM clubs WHERE intake_open = 1");
+
+        while($club = mysqli_fetch_assoc($clubList)){
+        ?>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="selected_club[]"
+                    value="<?php echo htmlspecialchars($club['name']); ?>">
+
+                <?php echo htmlspecialchars($club['name']); ?>
+            </label>
+
+        <?php } ?>
+
+    </div>
+</div>
 
             <div class="form-group">
                 <label>Area of Interest</label>

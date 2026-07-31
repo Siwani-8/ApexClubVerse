@@ -30,7 +30,7 @@ if (in_array($current_page, $protected_pages) && !isset($_SESSION['user_logged_i
     <li><a href="events.php">Events Feed</a></li>
     <li><a href="vote-events.php">Event Vote</a></li>
 
-    <?php if (!empty($_SESSION['user_logged_in'])): ?>
+   <?php if (!empty($_SESSION['user_logged_in'])): ?>
 
     <?php if ($_SESSION['user_role'] == 'admin'): ?>
 
@@ -40,6 +40,7 @@ if (in_array($current_page, $protected_pages) && !isset($_SESSION['user_logged_i
     <?php else: ?>
 
         <li><a href="registration.php">Club Intake</a></li>
+        <li><a href="my_application.php">My Applications</a></li>
 
     <?php endif; ?>
 
