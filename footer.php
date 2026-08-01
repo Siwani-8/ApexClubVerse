@@ -125,7 +125,7 @@
         <div class="footer-column">
 
 
-            <img src="logo.png" class="footer-logo">
+            <img src="images/logo1.png" class="footer-logo">
 
             <!-- Change path if needed -->
     
@@ -173,6 +173,7 @@
         </div>
 
     </div>
+</div>
 
 </section>
 

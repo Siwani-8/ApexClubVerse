@@ -101,3 +101,9 @@ footer{
 .logout-link {
     color: var(--text-dark);
 }
+.navbar-brand-container img.navbar-logo-square {
+    height: 55px;           /* Controls header logo height */
+    width: auto;            /* Keeps original aspect ratio */
+    display: block;
+    object-fit: contain;
+}

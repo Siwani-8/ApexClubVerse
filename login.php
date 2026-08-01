@@ -232,7 +232,7 @@ if (isset($_POST['submit'])) {
             <button type="submit" name="submit" class="btn-auth">Sign In &rarr;</button>
         </form>
 
-        <p class="hint">New to the portal? <a href="signup.php">Join Portal</a></p>
+        <p class="hint">New to the Club? <a href="signup.php">Join Club</a></p>
 
     </div>
 </div>
