@@ -112,19 +112,15 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
         font-family: 'Segoe UI', sans-serif;
     }
 
-    /* ── Card grid ── */
+    /* ── Card grid (Updated to 3 columns) ── */
     .club-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.1rem;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
     }
 
     .club-card {
-        flex: 0 1 280px;
-    }
-
-    .club-card {
+        width: 100%;
         background: #fff;
         border: 0.5px solid #e0ddd6;
         border-radius: 14px;
@@ -172,27 +168,26 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
     .club-card-body {
         padding: 1.1rem 1.25rem 1.25rem;
     }
-.club-card-icon {
-    width: 100px;
-    height: 100px;
-    border-radius: 12px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 15px;
-}
 
-.club-card-icon img {
-    max-width: 85px;
-    max-height: 85px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    display: block;
-}
+    .club-card-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
 
-    
+    .club-card-icon img {
+        max-width: 85px;
+        max-height: 85px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        display: block;
+    }
 
     .club-card h3 {
         font-size: 15px;
@@ -235,6 +230,12 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
     }
 
     /* ── Responsive ── */
+    @media (max-width: 992px) {
+        .club-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
     @media (max-width: 600px) {
         .clubs-hero h1 { font-size: 1.9rem; }
         .clubs-stats { gap: 1.2rem; }
@@ -275,38 +276,30 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
                     <div class="club-card-accent"></div>
                     <div class="club-card-body">
                         <div class="club-card-icon">
+                            <?php if($row['name'] == 'Apex Performing Arts Club'): ?>
+                                <img src="images/apac.png" style="width:100%;height:100%;object-fit:contain;">
+                            <?php endif; ?>
 
-<?php if($row['name'] == 'Apex Performing Arts Club'): ?>
-    <img src="images/apac.png" style="width:100%;height:100%;object-fit:contain;">
+                            <?php if($row['name'] == 'Apex Sports and Leadership Club'): ?>
+                                <img src="images/sports.png" style="width:100%;height:100%;object-fit:contain;">
+                            <?php endif; ?>
 
-<?php endif; ?>
+                            <?php if($row['name'] == 'Apex Travel and Tourism Club'): ?>
+                                <img src="images/travel.png" style="width:100%;height:100%;object-fit:contain;">
+                            <?php endif; ?>
 
-<?php if($row['name'] == 'Apex Sports and Leadership Club'): ?>
-    <img src="images/sports.png" style="width:100%;height:100%;object-fit:contain;">
+                            <?php if($row['name'] == 'Apex Media and Marketing Club'): ?>
+                                <img src="images/media.png" style="width:100%;height:100%;object-fit:contain;">
+                            <?php endif; ?>
 
-<?php endif; ?>
+                            <?php if($row['name'] == 'Apex IT Club'): ?>
+                                <img src="images/it.png" style="width:100%;height:100%;object-fit:contain;">
+                            <?php endif; ?>
 
-<?php if($row['name'] == 'Apex Travel and Tourism Club'): ?>
-    <img src="images/travel.png" style="width:100%;height:100%;object-fit:contain;">
-
-<?php endif; ?>
-
-<?php if($row['name'] == 'Apex Media and Marketing Club'): ?>
-    <img src="images/media.png" style="width:100%;height:100%;object-fit:contain;">
-
-<?php endif; ?>
-
-<?php if($row['name'] == 'Apex IT Club'): ?>
-    <img src="images/it.png" style="width:100%;height:100%;object-fit:contain;">
-
-<?php endif; ?>
-
-<?php if($row['name'] == 'Apex Health Education and Awareness Team (HEAT)'): ?>
-    <img src="images/heat.png" style="width:100%;height:100%;object-fit:contain;">
-
-<?php endif; ?>
-
-</div>
+                            <?php if($row['name'] == 'Apex Health Education and Awareness Team (HEAT)'): ?>
+                                <img src="images/heat.png" style="width:100%;height:100%;object-fit:contain;">
+                            <?php endif; ?>
+                        </div>
                         
                         <h3><?php echo htmlspecialchars($row['name']); ?></h3>
                         <p><?php echo htmlspecialchars($row['description']); ?></p>
