@@ -94,12 +94,13 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
     /* ── Clubs section ── */
     .clubs-section {
         background: #f5f3ef;
-        padding: 2.5rem 2rem;
+        padding: 2.5rem 2rem 0rem 2rem; /* Bottom padding set to 0 to remove color gap */
     }
 
     .clubs-section-inner {
         max-width: 1200px;
         margin: 0 auto;
+        padding-bottom: 2.5rem; /* Padding kept inside container for spacing above red block */
     }
 
     .clubs-section-label {
@@ -137,7 +138,7 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
         box-shadow: 0 10px 28px rgba(0,0,0,0.09);
     }
 
-    /* Colour accent bar at top — cycles through 6 colours */
+    /* Accent top borders */
     .club-card-accent {
         height: 5px;
         background: #7a1028;
@@ -150,7 +151,6 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
     .club-card:nth-child(6n+5) .club-card-accent { background: #c75000; }
     .club-card:nth-child(6n+6) .club-card-accent { background: #0f6e56; }
 
-    /* explore link colour matches accent */
     .club-card:nth-child(6n+1) .explore-link { color: #7a1028; }
     .club-card:nth-child(6n+2) .explore-link { color: #1a5f9a; }
     .club-card:nth-child(6n+3) .explore-link { color: #1a7a4a; }
@@ -165,11 +165,10 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
         flex-grow: 1;
     }
 
-    /* ── Updated Rectangular Logo Container ── */
     .club-card-icon {
         width: 100%;
-        height: 160px;               /* Enlarged rectangular banner container */
-        background: transparent;     /* Removed solid square background */
+        height: 160px;
+        background: transparent;
         border-radius: 0;
         display: flex;
         align-items: center;
@@ -179,8 +178,8 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
     }
 
     .club-card-icon img {
-        max-width: 90% !important;   /* Allows logo to expand horizontally */
-        max-height: 140px !important;/* Scales logo up significantly */
+        max-width: 90% !important;
+        max-height: 140px !important;
         width: auto !important;
         height: auto !important;
         object-fit: contain !important;
