@@ -47,55 +47,21 @@ $events = mysqli_query($conn, "
     <?php while($row = mysqli_fetch_assoc($events)): ?>
 <div class="feed-card">
     <div class="event-img-box">
-        <?php if($row['title'] == 'Blood Donation Drive'): ?>
-            <img src="images/blood donation.jpg" style="width:100%; height:100%; object-fit:cover;">
-            
-            
-        
-        <?php endif; ?>
-         <?php if($row['title'] == 'Summer Cup'): ?>
-            <img src="images/football.jpg" style="width:100%; height:100%; object-fit:cover;">
-           
-        <?php endif; ?>
 
-        <?php if($row['title'] == 'Apex Smile'): ?>
-            <img src="images/smilee.jpg" style="width:100%; height:100%; object-fit:cover;">
-           
-        <?php endif; ?>
+<?php if(!empty($row['image'])): ?>
 
-         <?php if($row['title'] == 'Apex Musical Evening'): ?>
-            <img src="images/ame.jpg" style="width:100%; height:100%; object-fit:cover;">
-           
-        <?php endif; ?>
-        
-         <?php if($row['title'] == 'Apex Gamers Connect'): ?>
-            <img src="images/gamers.jpg" style="width:100%; height:100%; object-fit:cover;">
-           
-        <?php endif; ?>
-        
-         <?php if($row['title'] == 'Adventurous Apex'): ?>
-            <img src="images/adven.jpg" style="width:100%; height:100%; object-fit:cover;">
-           
-        <?php endif; ?>  
-        
-        
-         <?php if($row['title'] == 'Apex Day'): ?>
-            <img src="images/apexday.jpg" style="width:100%; height:100%; object-fit:cover;">
-           
-        <?php endif; ?>
-        <?php if($row['title'] == 'Apex Code & Combat'): ?>
-            <img src="images/code.jpg" style="width:100%; height:100%; object-fit:cover;">    
-        <?php endif; ?>
-         <?php if($row['title'] == 'Apex Sports Week'): ?>
-            <img src="images/sports.jpg" style="width:100%; height:100%; object-fit:cover;">    
-        <?php endif; ?>
-       <?php if($row['title'] == 'Apex Pitch & Pop'): ?>
-            <img src="images/pitch.jpg" style="width:100%; height:100%; object-fit:cover;">    
-        <?php endif; ?>
-       
-             
-        
-    </div>
+<img
+src="<?php echo htmlspecialchars($row['image']); ?>"
+style="width:100%;height:100%;object-fit:cover;">
+
+<?php else: ?>
+
+<div class="ph-icon">🖼️</div>
+<div>No Image</div>
+
+<?php endif; ?>
+
+</div>
         <div class="event-details">
             <span class="event-club"><?php echo htmlspecialchars($row['club_name']); ?></span>
             <span class="event-status status-<?php echo $row['status']; ?>"><?php echo ucfirst($row['status']); ?></span>

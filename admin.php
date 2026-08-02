@@ -71,28 +71,68 @@ if(isset($_FILES['event_image']) && $_FILES['event_image']['error']==0){
 
     $image = "uploads/events/".$filename;
 }
-    mysqli_query($conn, "INSERT INTO events
-(
-club_id,
-title,
-description,
-event_date,
-event_time,
-location,
-image,
-status
-)
-VALUES
-(
-$club_id,
-'$title',
-'$desc',
-'$date',
-'$time',
-'$location',
-'$image',
-'$status'
-)");
+    $event_id = (int)($_POST['event_id'] ?? 0);
+
+if($event_id > 0){
+
+    if($image==""){
+
+        mysqli_query($conn,"
+        UPDATE events
+        SET
+        title='$title',
+        description='$desc',
+        event_date='$date',
+        event_time='$time',
+        location='$location',
+        status='$status'
+        WHERE id=$event_id
+        ");
+
+    }else{
+
+        mysqli_query($conn,"
+        UPDATE events
+        SET
+        title='$title',
+        description='$desc',
+        event_date='$date',
+        event_time='$time',
+        location='$location',
+        image='$image',
+        status='$status'
+        WHERE id=$event_id
+        ");
+
+    }
+
+}else{
+
+    mysqli_query($conn,"
+    INSERT INTO events
+    (
+    club_id,
+    title,
+    description,
+    event_date,
+    event_time,
+    location,
+    image,
+    status
+    )
+    VALUES
+    (
+    $club_id,
+    '$title',
+    '$desc',
+    '$date',
+    '$time',
+    '$location',
+    '$image',
+    '$status'
+    )");
+
+}
     header("Location: admin.php?tab=events");
     exit;
 }
@@ -222,6 +262,20 @@ AND selected_club='$club'")
 )['c'];
 
 $clubs = mysqli_query($conn, "SELECT * FROM clubs ORDER BY id");
+$edit_event = null;
+
+if(isset($_GET['edit'])){
+
+    $id = (int)$_GET['edit'];
+
+    $result = mysqli_query($conn,
+    "SELECT *
+    FROM events
+    WHERE id=$id");
+
+    $edit_event = mysqli_fetch_assoc($result);
+
+}
 ?>
 
 <style>
@@ -460,64 +514,155 @@ End time must be after start time.
         </div>
 
         <?php elseif($tab == 'events'): ?>
+            <?php
+
+$editing = false;
+
+$event = [
+    'title' => '',
+    'description' => '',
+    'event_date' => '',
+    'event_time' => '',
+    'location' => '',
+    'status' => 'upcoming'
+];
+
+if(isset($_GET['edit'])){
+
+    $editing = true;
+
+    $id = (int)$_GET['edit'];
+
+    $event = mysqli_fetch_assoc(
+        mysqli_query($conn,
+        "SELECT *
+         FROM events
+         WHERE id=$id")
+    );
+
+}
+
+?>
         <div class="form-box">
-            <h2>&#128197; Add New Event</h2>
+            <h2>
+<?php
+if($edit_event){
+    echo "Edit Event";
+}else{
+    echo "Add New Event";
+}
+?>
+</h2>
             <form method="POST" enctype="multipart/form-data">
                 <div class="form-grid">
                     <div class="form-group">
-                        <?php
-                    $clubData = mysqli_fetch_assoc(
-                    mysqli_query($conn,
-                    "SELECT id,name
-                    FROM clubs
-                    WHERE name='$club'")
-                    );
-                    ?>
+    <?php
+    $clubData = mysqli_fetch_assoc(
+    mysqli_query($conn,
+    "SELECT id,name
+    FROM clubs
+    WHERE name='$club'")
+    );
+    ?>
 
-                    <input
-                    type="hidden"
-                    name="club_id"
-                    value="<?php echo $clubData['id']; ?>">
+    <input
+    type="hidden"
+    name="club_id"
+    value="<?php echo $clubData['id']; ?>">
 
-                    <input
-                    type="text"
-                    value="<?php echo htmlspecialchars($clubData['name']); ?>"
-                    readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Event Title</label>
-                        <input type="text" name="title" required>
-                    </div>
+    <input
+    type="text"
+    value="<?php echo htmlspecialchars($clubData['name']); ?>"
+    readonly>
+</div>
+
+<!-- ADD THIS -->
+<input
+type="hidden"
+name="event_id"
+value="<?php echo $event['id'] ?? ''; ?>">
+
+<div class="form-group">
+    <label>Event Title</label>
+    <input
+    type="text"
+    name="title"
+    value="<?php echo htmlspecialchars($event['title']); ?>"
+    required>
+</div>
                     <div class="form-group">
                         <label>Date</label>
-                        <input type="date" name="event_date" required>
+                        <input
+                        type="date"
+                        name="event_date"
+                        value="<?php echo $event['event_date']; ?>"
+                        required>
                     </div>
                     <div class="form-group">
                         <label>Time</label>
-                        <input type="time" name="event_time" required>
+                        <input
+                        type="time"
+                        name="event_time"
+                        value="<?php echo $event['event_time']; ?>"
+                        required>
                     </div>
                     <div class="form-group">
                         <label>Location</label>
-                        <input type="text" name="location" required>
+                        <input
+                        type="text"
+                        name="location"
+                        value="<?php echo htmlspecialchars($event['location']); ?>"
+                        required>
                     </div>
                     <div class="form-group">
                         <label>Status</label>
                         <select name="status">
-                            <option value="upcoming">Upcoming</option>
-                            <option value="ongoing">Ongoing</option>
-                            <option value="completed">Completed</option>
+
+                        <option
+                        value="upcoming"
+                        <?php if(($edit_event['status'] ?? '')=="upcoming") echo "selected"; ?>>
+                        Upcoming
+                        </option>
+
+                        <option
+                        value="ongoing"
+                        <?php if(($edit_event['status'] ?? '')=="ongoing") echo "selected"; ?>>
+                        Ongoing
+                        </option>
+
+                        <option
+                        value="completed"
+                        <?php if(($edit_event['status'] ?? '')=="completed") echo "selected"; ?>>
+                        Completed
+                        </option>
+
                         </select>
                     </div>
                     <div class="form-group" style="grid-column: 1/-1;">
                         <label>Description</label>
-                        <textarea name="description" rows="3"></textarea>
+                        <textarea
+                        name="description"
+                        rows="3"><?php echo htmlspecialchars($event['description']); ?></textarea>
                     </div>
                     <div class="form-group" style="grid-column:1/-1;">
     <label>Event Image</label>
     <input type="file" name="event_image" accept="image/*">
 </div>
                 </div>
-                <button type="submit" name="add_event" class="btn-submit">Add Event</button>
+                <button
+type="submit"
+name="add_event"
+class="btn-submit">
+
+<?php
+if($editing){
+    echo "Update Event";
+}else{
+    echo "Add Event";
+}
+?>
+
+</button>
             </form>
         </div>
 
@@ -545,7 +690,8 @@ End time must be after start time.
                     <th>Date</th>
                     <th>Location</th>
                     <th>Status</th>
-                    <th>Action</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
                 </tr>
                 <?php while($e = mysqli_fetch_assoc($events)): ?>
                 <tr>
@@ -571,11 +717,37 @@ style="width:80px;height:55px;object-fit:cover;border-radius:8px;">
                     <td><?php echo htmlspecialchars($e['location']); ?></td>
                     <td><span class="badge badge-<?php echo $e['status']; ?>"><?php echo ucfirst($e['status']); ?></span></td>
                     <td>
-                        <form method="POST">
-                            <input type="hidden" name="event_id" value="<?php echo $e['id']; ?>">
-                            <button type="submit" name="delete_event" class="btn-delete" onclick="return confirm('Delete this event?')">Delete</button>
-                        </form>
-                    </td>
+
+<a
+href="admin.php?tab=events&edit=<?php echo $e['id']; ?>"
+class="btn-submit"
+style="padding:6px 12px;margin:0;text-decoration:none;">
+Edit
+</a>
+
+</td>
+
+<td>
+
+<a
+href="admin.php?tab=events&edit=<?php echo $e['id']; ?>"
+class="btn-submit"
+style="padding:5px 10px;margin-right:5px;text-decoration:none;">
+Edit
+</a>
+
+<form method="POST" style="display:inline;">
+    <input type="hidden" name="event_id" value="<?php echo $e['id']; ?>">
+    <button
+        type="submit"
+        name="delete_event"
+        class="btn-delete"
+        onclick="return confirm('Delete this event?')">
+        Delete
+    </button>
+</form>
+
+</td>
                 </tr>
                 <?php endwhile; ?>
             </table>
