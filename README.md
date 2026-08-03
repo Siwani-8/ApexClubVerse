@@ -41,7 +41,7 @@ Features
   - bod_members
   - boa_members
     
-Team Members
+Team Members:
 - Monali Kharel 
 - Shristi Shrestha 
 - Siwani Koirala 
