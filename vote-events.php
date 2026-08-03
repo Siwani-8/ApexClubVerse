@@ -71,16 +71,8 @@ $polls = mysqli_query($conn, "
 
 $poll_count = mysqli_num_rows($polls);
 mysqli_data_seek($polls, 0);
-$total_all_votes = mysqli_fetch_assoc(mysqli_query($conn, "SELECT SUM(votes) as c FROM poll_options"))['c'] ?? 0;
 
-$club_icons = [
-    'Apex Performing Arts Club'                       => '🎭',
-    'Apex Sports and Leadership Club'                 => '⚽',
-    'Apex Travel and Tourism Club'                    => '✈️',
-    'Apex Media and Marketing Club'                   => '📸',
-    'Apex IT Club'                                    => '💻',
-    'Apex Health Education and Awareness Team (HEAT)' => '❤️',
-];
+//here
 
 $all_polls = [];
 while($poll = mysqli_fetch_assoc($polls)) {
@@ -171,14 +163,7 @@ while($poll = mysqli_fetch_assoc($polls)) {
     .poll-card { background: #fff; border: 0.5px solid #e0ddd6; border-radius: 14px; overflow: hidden; margin-bottom: 1.25rem; display: flex; transition: box-shadow 0.18s; }
     .poll-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
 
-    .poll-side { width: 72px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; background: #7a1028; }
-
-    .poll-card:nth-child(6n+1) .poll-side { background: #7a1028; }
-    .poll-card:nth-child(6n+2) .poll-side { background: #1a5f9a; }
-    .poll-card:nth-child(6n+3) .poll-side { background: #1a7a4a; }
-    .poll-card:nth-child(6n+4) .poll-side { background: #6d3a9c; }
-    .poll-card:nth-child(6n+5) .poll-side { background: #c75000; }
-    .poll-card:nth-child(6n+6) .poll-side { background: #0f6e56; }
+    
 
     .poll-card:nth-child(6n+1) .poll-club-tag, .poll-card:nth-child(6n+1) .result-name.is-leader { color: #7a1028; }
     .poll-card:nth-child(6n+1) .result-fill { background: #7a1028; }
@@ -263,7 +248,6 @@ while($poll = mysqli_fetch_assoc($polls)) {
 
     @media (max-width: 600px) {
         .poll-card { flex-direction: column; }
-        .poll-side { width: 100%; height: 52px; }
         .vote-stats { flex-direction: column; width: 100%; }
         .vstat { border-right: none; border-bottom: 0.5px solid rgba(255,255,255,0.15); }
         .vstat:last-child { border-bottom: none; }
@@ -281,10 +265,7 @@ while($poll = mysqli_fetch_assoc($polls)) {
                     <strong><?php echo $poll_count; ?></strong>
                     <span>Active polls</span>
                 </div>
-                <div class="vstat">
-                    <strong><?php echo $total_all_votes; ?></strong>
-                    <span>Total votes</span>
-                </div>
+                
             </div>
         </div>
     </div>
@@ -312,7 +293,7 @@ while($poll = mysqli_fetch_assoc($polls)) {
         <?php endif; ?>
 
         <?php foreach($all_polls as $poll):
-            $icon = $club_icons[$poll['club_name']] ?? '🗳️';
+            
             $has_voted = $poll['has_voted'];
             $voted_option_id = $poll['voted_option_id'];
             $options_data = $poll['options_data'];
@@ -320,8 +301,7 @@ while($poll = mysqli_fetch_assoc($polls)) {
             $max_votes = $poll['max_votes'];
         ?>
         <div class="poll-card">
-            <div class="poll-side"><?php echo $icon; ?></div>
-            <div class="poll-main">
+    <div class="poll-main">
                 <span class="poll-club-tag"><?php echo htmlspecialchars($poll['club_name']); ?></span>
                 <h2 class="poll-question"><?php echo htmlspecialchars($poll['question']); ?></h2>
 

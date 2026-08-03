@@ -223,6 +223,195 @@ if(isset($_POST['delete_poll'])){
     header("Location: admin.php?tab=votes");
     exit;
 }
+
+if(isset($_POST['delete_bod'])){
+
+    $id = (int)$_POST['bod_id'];
+
+    mysqli_query($conn,"
+        DELETE FROM bod_members
+        WHERE id=$id
+    ");
+
+    header("Location: admin.php?tab=members");
+    exit;
+}
+if(isset($_POST['delete_boa'])){
+
+    $id=(int)$_POST['boa_id'];
+
+    mysqli_query($conn,
+    "DELETE FROM boa_members
+    WHERE id=$id");
+
+    header("Location: admin.php?tab=members");
+    exit;
+}
+if(isset($_POST['add_bod'])){
+
+    $club = mysqli_real_escape_string($conn,$_SESSION['club_name']);
+
+    $clubRow = mysqli_fetch_assoc(
+        mysqli_query($conn,
+        "SELECT id FROM clubs WHERE name='$club'")
+    );
+
+    $club_id = $clubRow['id'];
+
+    $name = mysqli_real_escape_string($conn,$_POST['name']);
+    $position = mysqli_real_escape_string($conn,$_POST['position']);
+    $bio = mysqli_real_escape_string($conn,$_POST['bio']);
+
+    $photo = "default.jpg";
+
+    if(isset($_FILES['photo']) && $_FILES['photo']['error']==0){
+
+        $photo = basename($_FILES['photo']['name']);
+
+        move_uploaded_file(
+            $_FILES['photo']['tmp_name'],
+            "images/members/".$photo
+        );
+    }
+
+    mysqli_query($conn,"
+        INSERT INTO bod_members
+        (
+            club_id,
+            name,
+            position,
+            bio,
+            photo
+        )
+        VALUES
+        (
+            $club_id,
+            '$name',
+            '$position',
+            '$bio',
+            '$photo'
+        )
+    ");
+
+    header("Location: admin.php?tab=members");
+    exit;
+}
+if(isset($_POST['add_boa'])){
+
+    $club = mysqli_real_escape_string($conn,$_SESSION['club_name']);
+
+    $clubRow=mysqli_fetch_assoc(
+    mysqli_query($conn,
+    "SELECT id FROM clubs WHERE name='$club'")
+    );
+
+    $club_id=$clubRow['id'];
+
+    $name=mysqli_real_escape_string($conn,$_POST['boa_name']);
+    $title=mysqli_real_escape_string($conn,$_POST['boa_title']);
+    $expertise=mysqli_real_escape_string($conn,$_POST['boa_expertise']);
+
+    $photo="default.jpg";
+
+    if(isset($_FILES['boa_photo']) && $_FILES['boa_photo']['error']==0){
+
+        $photo=time()."_".basename($_FILES['boa_photo']['name']);
+
+        move_uploaded_file(
+            $_FILES['boa_photo']['tmp_name'],
+            "images/members/".$photo
+        );
+
+    }
+
+    mysqli_query($conn,"
+    INSERT INTO boa_members
+    (club_id,name,title,expertise,photo)
+    VALUES
+    ($club_id,'$name','$title','$expertise','$photo')
+    ");
+
+    header("Location: admin.php?tab=members");
+    exit;
+}
+if(isset($_POST['update_bod'])){
+
+    $id = (int)$_POST['member_id'];
+
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $position = mysqli_real_escape_string($conn, $_POST['position']);
+    $bio = mysqli_real_escape_string($conn, $_POST['bio']);
+
+    $photo_sql = "";
+
+    if(isset($_FILES['photo']) && $_FILES['photo']['error']==0){
+
+        $photo = time() . "_" . basename($_FILES['photo']['name']);
+
+        move_uploaded_file(
+            $_FILES['photo']['tmp_name'],
+            "images/members/".$photo
+        );
+
+        $photo_sql = ", photo='$photo'";
+    }
+
+    mysqli_query($conn,"
+    UPDATE bod_members
+    SET
+        name='$name',
+        position='$position',
+        bio='$bio'
+        $photo_sql
+    WHERE id=$id
+    ");
+
+    header("Location: admin.php?tab=members");
+    exit;
+}
+if(isset($_POST['update_boa'])){
+
+    $id=(int)$_POST['boa_member_id'];
+
+    $name=mysqli_real_escape_string($conn,$_POST['boa_name']);
+    $title=mysqli_real_escape_string($conn,$_POST['boa_title']);
+    $expertise=mysqli_real_escape_string($conn,$_POST['boa_expertise']);
+
+    if(isset($_FILES['boa_photo']) && $_FILES['boa_photo']['error']==0){
+
+        $photo=time()."_".basename($_FILES['boa_photo']['name']);
+
+        move_uploaded_file(
+            $_FILES['boa_photo']['tmp_name'],
+            "images/members/".$photo
+        );
+
+        mysqli_query($conn,"
+        UPDATE boa_members
+        SET
+        name='$name',
+        title='$title',
+        expertise='$expertise',
+        photo='$photo'
+        WHERE id=$id
+        ");
+
+    }else{
+
+        mysqli_query($conn,"
+        UPDATE boa_members
+        SET
+        name='$name',
+        title='$title',
+        expertise='$expertise'
+        WHERE id=$id
+        ");
+
+    }
+
+    header("Location: admin.php?tab=members");
+    exit;
+}
 $tab = $_GET['tab'] ?? 'dashboard';
 $applications_only = isset($_GET['applications_only']);
 if ($applications_only) {
@@ -263,6 +452,46 @@ AND selected_club='$club'")
 
 $clubs = mysqli_query($conn, "SELECT * FROM clubs ORDER BY id");
 $edit_event = null;
+$edit_bod = null;
+$edit_boa = null;
+
+if(isset($_GET['edit_bod'])){
+
+    $id = (int)$_GET['edit_bod'];
+
+    $result = mysqli_query($conn,
+    "SELECT *
+     FROM bod_members
+     WHERE id=$id");
+
+    $edit_bod = mysqli_fetch_assoc($result);
+}
+if(isset($_GET['edit_boa'])){
+
+    $id = (int)$_GET['edit_boa'];
+
+    $result = mysqli_query($conn,
+    "SELECT *
+    FROM boa_members
+    WHERE id=$id");
+
+    $edit_boa = mysqli_fetch_assoc($result);
+
+}
+$edit_boa = null;
+
+if(isset($_GET['edit_boa'])){
+
+    $id = (int)$_GET['edit_boa'];
+
+    $result = mysqli_query($conn,
+    "SELECT *
+    FROM boa_members
+    WHERE id=$id");
+
+    $edit_boa = mysqli_fetch_assoc($result);
+
+}
 
 if(isset($_GET['edit'])){
 
@@ -384,7 +613,12 @@ if(isset($_GET['edit'])){
             <a href="admin.php?tab=dashboard" class="tab-btn <?php echo $tab=='dashboard' ? 'active':''; ?>">&#127968; Dashboard</a>
             <a href="admin.php?tab=registrations" class="tab-btn <?php echo $tab=='registrations' ? 'active':''; ?>">&#128203; Applications</a>
             <a href="admin.php?tab=events" class="tab-btn <?php echo $tab=='events' ? 'active':''; ?>">&#128197; Events</a>
-            <a href="admin.php?tab=votes" class="tab-btn <?php echo $tab=='votes' ? 'active':''; ?>">&#128313; Vote Results</a>
+
+<a href="admin.php?tab=members" class="tab-btn <?php echo $tab=='members' ? 'active':''; ?>">
+    👥 Members
+</a>
+
+<a href="admin.php?tab=votes" class="tab-btn <?php echo $tab=='votes' ? 'active':''; ?>">&#128313; Vote Results</a>
             <a href="admin.php?tab=users" class="tab-btn <?php echo $tab=='users' ? 'active':''; ?>">&#128101; Students</a>
         </div>
         <?php endif; ?>
@@ -754,7 +988,7 @@ Edit
             <?php endif; ?>
         </div>
 
-        <?php elseif($tab == 'votes'): ?>
+        
         <div class="form-box">
     <h2>&#128221; Create New Poll</h2>
 
@@ -767,7 +1001,7 @@ Edit
                 name="question"
                 placeholder="Enter poll question"
                 required>
-        </div>
+        </div><?php elseif($tab == 'votes'): ?>
 
         <div class="form-group">
             <label>Option 1</label>
@@ -873,7 +1107,394 @@ Edit
             </table>
         </div>
         <?php endwhile; ?>
+        <?php elseif($tab == 'members'): ?>
+        <div class="form-box">
 
+<h2>Add New BOD Member</h2>
+
+<form method="POST" enctype="multipart/form-data">
+
+<div class="form-group">
+<label>Name</label>
+<input type="text" name="name" required>
+</div>
+
+<div class="form-group">
+<label>Position</label>
+<input type="text" name="position" required>
+</div>
+
+<div class="form-group">
+<label>Bio</label>
+<textarea name="bio" rows="4"></textarea>
+</div>
+
+<div class="form-group">
+<label>Photo</label>
+<input type="file" name="photo" required>
+</div>
+
+<button
+type="submit"
+name="add_bod"
+class="btn-submit">
+Add Member
+</button>
+
+</form>
+
+</div>
+<?php if($edit_bod): ?>
+
+<div class="form-box">
+
+<h2>
+<?php
+if($edit_bod){
+    echo "Edit BOD Member";
+}else{
+    echo "Add BOD Member";
+}
+?>
+</h2>
+
+<form method="POST" enctype="multipart/form-data">
+
+<input
+type="hidden"
+name="member_id"
+value="<?php echo $edit_bod['id']; ?>">
+
+<div class="form-group">
+<label>Name</label>
+
+<input
+type="text"
+name="name"
+value="<?php echo htmlspecialchars($edit_bod['name']); ?>"
+required>
+</div>
+
+<div class="form-group">
+<label>Position</label>
+
+<input
+type="text"
+name="position"
+value="<?php echo htmlspecialchars($edit_bod['position']); ?>"
+required>
+</div>
+
+<div class="form-group">
+<label>Bio</label>
+
+<textarea
+name="bio"
+rows="4"><?php echo htmlspecialchars($edit_bod['bio']); ?></textarea>
+</div>
+
+<div class="form-group">
+<label>Photo</label>
+
+<input
+type="file"
+name="photo">
+</div>
+
+<?php if($edit_bod): ?>
+
+<button
+type="submit"
+name="update_bod"
+class="btn-submit">
+Update Member
+</button>
+
+<?php else: ?>
+
+<button
+type="submit"
+name="add_bod"
+class="btn-submit">
+Add Member
+</button>
+
+<?php endif; ?>
+
+</form>
+
+</div>
+
+<?php endif; ?>
+<div class="table-box">
+
+    <div class="table-box-header">
+        <h2>👥 Board of Directors</h2>
+    </div>
+
+<?php
+
+$clubRow = mysqli_fetch_assoc(
+mysqli_query($conn,
+"SELECT id
+FROM clubs
+WHERE name='$club'")
+);
+
+$club_id = $clubRow['id'];
+
+$bod = mysqli_query($conn,
+"SELECT *
+FROM bod_members
+WHERE club_id=$club_id
+ORDER BY id");
+
+?>
+
+<table>
+
+<tr>
+    <th>Photo</th>
+    <th>Name</th>
+    <th>Position</th>
+    <th>Edit</th>
+    <th>Delete</th>
+</tr>
+
+<?php while($member = mysqli_fetch_assoc($bod)): ?>
+
+<tr>
+
+<td>
+
+<img
+src="images/members/<?php echo htmlspecialchars($member['photo']); ?>"
+style="width:80px;height:80px;object-fit:cover;border-radius:50%;">
+
+</td>
+
+<td>
+<?php echo htmlspecialchars($member['name']); ?>
+</td>
+
+<td>
+<?php echo htmlspecialchars($member['position']); ?>
+</td>
+
+<td>
+
+<a
+href="admin.php?tab=members&edit_bod=<?php echo $member['id']; ?>"
+class="btn-submit">
+
+Edit
+
+</a>
+
+</td>
+
+<td>
+
+<form method="POST">
+
+<input
+type="hidden"
+name="bod_id"
+value="<?php echo $member['id']; ?>">
+
+<button
+class="btn-delete"
+name="delete_bod">
+
+Delete
+
+</button>
+
+</form>
+
+</td>
+
+</tr>
+
+<?php endwhile; ?>
+
+</table>
+
+</div>
+<div class="form-box">
+
+<h2>Add New BOA Member</h2>
+
+<form method="POST" enctype="multipart/form-data">
+
+<div class="form-group">
+<label>Name</label>
+<input type="text" name="boa_name" required>
+</div>
+
+<div class="form-group">
+<label>Title</label>
+<input type="text" name="boa_title" required>
+</div>
+
+<div class="form-group">
+<label>Expertise</label>
+<textarea name="boa_expertise" rows="4"></textarea>
+</div>
+
+<div class="form-group">
+<label>Photo</label>
+<input type="file" name="boa_photo" required>
+</div>
+
+<button
+type="submit"
+name="add_boa"
+class="btn-submit">
+Add BOA Member
+</button>
+
+</form>
+
+</div>
+
+<?php if($edit_boa): ?>
+
+<div class="form-box">
+
+<h2>Edit BOA Member</h2>
+
+<form method="POST" enctype="multipart/form-data">
+
+<input
+type="hidden"
+name="boa_member_id"
+value="<?php echo $edit_boa['id']; ?>">
+
+<div class="form-group">
+<label>Name</label>
+<input
+type="text"
+name="boa_name"
+value="<?php echo htmlspecialchars($edit_boa['name']); ?>"
+required>
+</div>
+
+<div class="form-group">
+<label>Title</label>
+<input
+type="text"
+name="boa_title"
+value="<?php echo htmlspecialchars($edit_boa['title']); ?>"
+required>
+</div>
+
+<div class="form-group">
+<label>Expertise</label>
+<textarea
+name="boa_expertise"
+rows="4"><?php echo htmlspecialchars($edit_boa['expertise']); ?></textarea>
+</div>
+
+<div class="form-group">
+<label>Photo</label>
+<input
+type="file"
+name="boa_photo">
+</div>
+
+<button
+type="submit"
+name="update_boa"
+class="btn-submit">
+Update BOA Member
+</button>
+
+</form>
+
+</div>
+
+<?php endif; ?>
+
+<div class="table-box">
+
+<div class="table-box-header">
+<h2>👥 Board of Advisors</h2>
+</div>
+
+<?php
+
+$boa = mysqli_query($conn,
+"SELECT *
+FROM boa_members
+WHERE club_id=$club_id
+ORDER BY id");
+
+?>
+
+<table>
+
+<tr>
+<th>Photo</th>
+<th>Name</th>
+<th>Title</th>
+<th>Edit</th>
+<th>Delete</th>
+</tr>
+
+<?php while($member=mysqli_fetch_assoc($boa)): ?>
+
+<tr>
+
+<td>
+
+<img
+src="images/members/<?php echo htmlspecialchars($member['photo']); ?>"
+style="width:80px;height:80px;object-fit:cover;border-radius:50%;">
+
+</td>
+
+<td><?php echo htmlspecialchars($member['name']); ?></td>
+
+<td><?php echo htmlspecialchars($member['title']); ?></td>
+
+<td>
+
+<a
+href="admin.php?tab=members&edit_boa=<?php echo $member['id']; ?>"
+class="btn-submit">
+Edit
+</a>
+
+</td>
+
+<td>
+
+<form method="POST">
+
+<input
+type="hidden"
+name="boa_id"
+value="<?php echo $member['id']; ?>">
+
+<button
+type="submit"
+name="delete_boa"
+class="btn-delete">
+Delete
+</button>
+
+</form>
+
+</td>
+
+</tr>
+
+<?php endwhile; ?>
+
+</table>
+
+</div>
         <?php elseif($tab == 'users'): ?>
         <div class="table-box">
             <div class="table-box-header">
