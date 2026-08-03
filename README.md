@@ -40,4 +40,9 @@ Features
   - registrations
   - bod_members
   - boa_members
-
+    
+Team Members
+Monali Kharel 
+Shristi Shrestha 
+Siwani Koirala 
+Yunisha Shakya 
