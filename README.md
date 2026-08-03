@@ -42,7 +42,7 @@ Features
   - boa_members
     
 Team Members
-Monali Kharel 
-Shristi Shrestha 
-Siwani Koirala 
-Yunisha Shakya 
+- Monali Kharel 
+- Shristi Shrestha 
+- Siwani Koirala 
+- Yunisha Shakya 
