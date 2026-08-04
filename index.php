@@ -4,48 +4,34 @@
     /* ── Reset & base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Hero ── */
+    /* ══════════════════ HERO ══════════════════ */
     .hero {
-        min-height: 92vh;
-        background: #f5f3ef;
+        position: relative;
+        min-height: 90vh;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-align: center;
-        padding: 5rem 2rem 4rem;
-        position: relative;
+        padding: 6rem 2rem 5rem;
         overflow: hidden;
+        background: #1c0810;
     }
 
-    /* Decorative background circles */
-    .hero::before {
-        content: '';
-        position: absolute;
-        width: 500px; height: 500px;
-        border-radius: 50%;
-        background: rgba(122, 16, 40, 0.06);
-        top: -120px; right: -120px;
-        pointer-events: none;
-    }
-    .hero::after {
-        content: '';
-        position: absolute;
-        width: 340px; height: 340px;
-        border-radius: 50%;
-        background: rgba(255, 69, 0, 0.05);
-        bottom: -100px; left: -80px;
-        pointer-events: none;
-    }
-
-    /* Decorative dots grid */
-    .hero-dots {
+    .hero-bg-img {
         position: absolute;
         inset: 0;
-        background-image: radial-gradient(circle, #c8b8b8 1px, transparent 1px);
-        background-size: 32px 32px;
-        opacity: 0.25;
-        pointer-events: none;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 30%;
+        opacity: 0.55;
+    }
+
+    .hero-bg-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(28,8,16,0.55) 0%, rgba(28,8,16,0.75) 55%, rgba(28,8,16,0.95) 100%);
     }
 
     .hero-inner {
@@ -55,28 +41,27 @@
         margin: 0 auto;
     }
 
-    /* Badge */
     .hero-badge {
         display: inline-flex;
         align-items: center;
         gap: 7px;
-        background: #fff;
-        border: 0.5px solid #e0ddd6;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(6px);
+        border: 0.5px solid rgba(255,255,255,0.25);
         border-radius: 30px;
         padding: 6px 16px;
         font-size: 11px;
         font-weight: 700;
         letter-spacing: 0.1em;
         text-transform: uppercase;
-        color: #7a1028;
+        color: #ffd8c2;
         font-family: 'Segoe UI', sans-serif;
         margin-bottom: 2rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     .hero-badge-dot {
         width: 7px; height: 7px;
         border-radius: 50%;
-        background: #7a1028;
+        background: #ff4500;
         animation: pulse 2s infinite;
     }
     @keyframes pulse {
@@ -84,10 +69,9 @@
         50% { opacity: 0.5; transform: scale(1.4); }
     }
 
-    /* Headline */
     .hero-title {
         font-size: clamp(2.4rem, 5vw, 3.8rem);
-        color: #1c1c1c;
+        color: #fff;
         line-height: 1.12;
         font-weight: 700;
         margin-bottom: 0.5rem;
@@ -96,34 +80,32 @@
 
     .hero-title .brand {
         display: block;
-        background: linear-gradient(100deg, #7a1028 0%, #d44000 100%);
+        background: linear-gradient(100deg, #ff8a3d 0%, #ffd166 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         margin-top: 0.2rem;
     }
 
-    /* Sub-text */
     .hero-desc {
         font-size: 1.05rem;
-        color: #666;
+        color: #e9dfda;
         line-height: 1.7;
         margin: 1.75rem auto 2.5rem;
         max-width: 580px;
         font-family: 'Segoe UI', sans-serif;
     }
 
-    /* CTA buttons */
     .hero-ctas {
         display: flex;
         gap: 12px;
         justify-content: center;
         flex-wrap: wrap;
-        margin-bottom: 3.5rem;
+        margin-bottom: 0;
     }
 
     .btn-primary {
-        background: #7a1028;
+        background: #ff4500;
         color: #fff;
         border: none;
         border-radius: 8px;
@@ -139,14 +121,14 @@
         transition: background 0.18s, transform 0.15s;
     }
     .btn-primary:hover {
-        background: #5e0c1e;
+        background: #d63a00;
         transform: translateY(-1px);
     }
 
     .btn-secondary {
-        background: #fff;
-        color: #1c1c1c;
-        border: 0.5px solid #d0cdc7;
+        background: rgba(255,255,255,0.08);
+        color: #fff;
+        border: 0.5px solid rgba(255,255,255,0.35);
         border-radius: 8px;
         padding: 13px 28px;
         font-size: 14px;
@@ -157,55 +139,14 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        transition: border-color 0.18s, transform 0.15s;
+        transition: border-color 0.18s, transform 0.15s, background 0.18s;
     }
     .btn-secondary:hover {
-        border-color: #7a1028;
-        color: #7a1028;
+        border-color: #ff4500;
+        background: rgba(255,255,255,0.16);
         transform: translateY(-1px);
     }
 
-    /* Stat pills */
-    .hero-stats {
-        display: flex;
-        gap: 0;
-        justify-content: center;
-        background: #fff;
-        border: 0.5px solid #e0ddd6;
-        border-radius: 14px;
-        padding: 0;
-        overflow: hidden;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        width: fit-content;
-        margin: 0 auto 3.5rem;
-    }
-
-    .hero-stat {
-        padding: 1.1rem 2rem;
-        text-align: center;
-        border-right: 0.5px solid #e0ddd6;
-    }
-    .hero-stat:last-child { border-right: none; }
-
-    .stat-number {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #7a1028;
-        display: block;
-        line-height: 1;
-        margin-bottom: 4px;
-    }
-    .stat-label {
-        font-size: 11px;
-        color: #999;
-        text-transform: uppercase;
-        letter-spacing: 0.07em;
-        font-family: 'Segoe UI', sans-serif;
-        font-weight: 500;
-    }
-
-    /* CTA banner */
-    
     .btn-white {
         background: #fff;
         color: #7a1028;
@@ -221,21 +162,227 @@
     }
     .btn-white:hover { opacity: 0.9; }
 
+    /* ══════════════════ SECTION SHELL ══════════════════ */
+    .section {
+        padding: 5.5rem 2rem;
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+    .section-eyebrow {
+        text-align: center;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #7a1028;
+        font-family: 'Segoe UI', sans-serif;
+        margin-bottom: 0.8rem;
+    }
+    .section-title {
+        text-align: center;
+        font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+        font-weight: 700;
+        color: #1c1c1c;
+        margin-bottom: 0.9rem;
+        letter-spacing: -0.01em;
+    }
+    .section-desc {
+        text-align: center;
+        font-size: 1rem;
+        color: #666;
+        max-width: 560px;
+        margin: 0 auto 3.5rem;
+        line-height: 1.7;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* ══════════════════ LIFE AT CLUBVERSE CARDS ══════════════════ */
+    .life-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.75rem;
+    }
+    .life-card {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        aspect-ratio: 3 / 4;
+        text-decoration: none;
+        display: block;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .life-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 32px rgba(0,0,0,0.18);
+    }
+    .life-card img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+    .life-card:hover img { transform: scale(1.06); }
+    .life-card-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(20,4,8,0.88) 100%);
+    }
+    .life-card-content {
+        position: absolute;
+        left: 0; right: 0; bottom: 0;
+        padding: 1.5rem 1.4rem;
+        color: #fff;
+    }
+    .life-card-tag {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #ffb88a;
+        font-family: 'Segoe UI', sans-serif;
+        margin-bottom: 6px;
+        display: block;
+    }
+    .life-card-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+    .life-card-desc {
+        font-size: 0.85rem;
+        color: #e5d9d4;
+        font-family: 'Segoe UI', sans-serif;
+        line-height: 1.5;
+        margin-bottom: 10px;
+    }
+    .life-card-link {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #fff;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* ══════════════════ NUMBERS BAND ══════════════════ */
+    .numbers-band {
+        background: #7a1028;
+        padding: 4rem 2rem;
+    }
+    .numbers-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+        text-align: center;
+    }
+    .numbers-inner .num {
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+    .numbers-inner .label {
+        font-size: 12px;
+        color: #ffcbb0;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-family: 'Segoe UI', sans-serif;
+        font-weight: 600;
+    }
+
+    /* ══════════════════ GALLERY ══════════════════ */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: 190px;
+        grid-auto-flow: dense;
+        gap: 14px;
+    }
+    .gallery-item {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.4s ease;
+    }
+    .gallery-item:hover img { transform: scale(1.08); }
+    .gallery-item .gcap {
+        position: absolute;
+        left: 0; right: 0; bottom: 0;
+        padding: 10px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
+    }
+    .gi-1 { grid-column: span 2; grid-row: span 2; }
+    .gi-2 { grid-column: span 1; grid-row: span 1; }
+    .gi-3 { grid-column: span 1; grid-row: span 1; }
+    .gi-4 { grid-column: span 1; grid-row: span 2; }
+    .gi-5 { grid-column: span 1; grid-row: span 1; }
+    .gi-6 { grid-column: span 1; grid-row: span 1; }
+    .gi-7 { grid-column: span 1; grid-row: span 2; }
+    .gi-8 { grid-column: span 1; grid-row: span 1; }
+
+    /* ══════════════════ CTA BANNER ══════════════════ */
+    .cta-banner {
+        margin: 0 auto 5.5rem;
+        max-width: 1180px;
+        border-radius: 20px;
+        background: linear-gradient(110deg, #7a1028 0%, #b23417 100%);
+        padding: 3.5rem 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+    .cta-banner h3 {
+        color: #fff;
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+    .cta-banner p {
+        color: #ffd8c2;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 0.95rem;
+    }
+
     /* ── Responsive ── */
+    @media (max-width: 900px) {
+        .life-grid { grid-template-columns: 1fr; }
+        .numbers-inner { grid-template-columns: repeat(2, 1fr); }
+        .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
+        .gi-1, .gi-4, .gi-7 { grid-column: span 2; grid-row: span 1; }
+        .cta-banner { flex-direction: column; text-align: center; }
+    }
     @media (max-width: 600px) {
-        .hero-stats { flex-direction: column; width: 100%; }
-        .hero-stat { border-right: none; border-bottom: 0.5px solid #e0ddd6; }
-        .hero-stat:last-child { border-bottom: none; }
         .hero-title { font-size: 2rem; }
+        .gallery-grid { grid-template-columns: repeat(2, 1fr); }
     }
 </style>
 
-<!-- Hero -->
+<!-- ══════════════════ HERO ══════════════════ -->
 <div class="hero">
-    <div class="hero-dots"></div>
+    <img class="hero-bg-img" src="images/hero-group.jpeg" alt="ApexClubVerse members at Adventurous Apex retreat">
+    <div class="hero-bg-overlay"></div>
     <div class="hero-inner">
 
-       
+        <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            SIX CLUBS &middot; ONE COMMUNITY
+        </div>
 
         <h1 class="hero-title">
             Unleash Your Potential at
@@ -248,31 +395,128 @@
 
         <div class="hero-ctas">
             <a href="clubs.php" class="btn-primary">Browse clubs &rarr;</a>
-          
-        </div>
-
-        <div class="hero-stats">
-            <div class="hero-stat">
-                <span class="stat-number">6</span>
-                <span class="stat-label">Active clubs</span>
-            </div>
-            <div class="hero-stat">
-                <span class="stat-number">800+</span>
-                <span class="stat-label">Members</span>
-            </div>
-            <div class="hero-stat">
-                <span class="stat-number">8+</span>
-                <span class="stat-label">Events / year</span>
-            </div>
-            <div class="hero-stat">
-                <span class="stat-number">100%</span>
-                <span class="stat-label">Student-led</span>
-            </div>
+            <a href="events.php" class="btn-secondary">See events feed</a>
         </div>
 
     </div>
 </div>
+
+<!-- ══════════════════ LIFE AT CLUBVERSE ══════════════════ -->
+<div class="section">
+    <div class="section-eyebrow">Life at ApexClubVerse</div>
+    <h2 class="section-title">Your Adventure Starts Here</h2>
+    <p class="section-desc">From flagship retreats to championship nights, our clubs give you a place to lead, compete, and connect.</p>
+
+    <div class="life-grid">
+        <a href="clubs.php" class="life-card">
+            <img src="images/clubs-stage.jpeg" alt="Club leaders on stage at Apex Day 2026">
+            <div class="life-card-overlay"></div>
+            <div class="life-card-content">
+                <span class="life-card-tag">Student Clubs</span>
+                <div class="life-card-title">Six Clubs, One Stage</div>
+                <p class="life-card-desc">From Apex Heat to Media &amp; Marketing, find the club that matches your passion.</p>
+                <span class="life-card-link">Explore clubs &rarr;</span>
+            </div>
+        </a>
+
+        <a href="events.php" class="life-card">
+            <img src="images/night-crowd.jpeg" alt="Students celebrating at an ApexClubVerse night event">
+            <div class="life-card-overlay"></div>
+            <div class="life-card-content">
+                <span class="life-card-tag">Events &amp; Adventures</span>
+                <div class="life-card-title">Nights to Remember</div>
+                <p class="life-card-desc">Flagship retreats, tournaments, and celebrations that bring the whole campus together.</p>
+                <span class="life-card-link">See events feed &rarr;</span>
+            </div>
+        </a>
+
+        <a href="vote-events.php" class="life-card">
+            <img src="images/football.jpeg" alt="Apex Sports Club football match">
+            <div class="life-card-overlay"></div>
+            <div class="life-card-content">
+                <span class="life-card-tag">Sports &amp; Wellness</span>
+                <div class="life-card-title">Compete &amp; Recharge</div>
+                <p class="life-card-desc">Cheer on club teams and cast your vote for the next big event on campus.</p>
+                <span class="life-card-link">Cast your vote &rarr;</span>
+            </div>
+        </a>
+    </div>
 </div>
-<!-- CTA banner -->
+
+<!-- ══════════════════ NUMBERS BAND ══════════════════ -->
+<div class="numbers-band">
+    <div class="numbers-inner">
+        <div>
+            <div class="num">6</div>
+            <div class="label">Active clubs</div>
+        </div>
+        <div>
+            <div class="num">800+</div>
+            <div class="label">Members</div>
+        </div>
+        <div>
+            <div class="num">8+</div>
+            <div class="label">Events / year</div>
+        </div>
+        <div>
+            <div class="num">100%</div>
+            <div class="label">Student-led</div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════ GALLERY ══════════════════ -->
+<div class="section">
+    <div class="section-eyebrow">Club Moments</div>
+    <h2 class="section-title">Highlights from ApexClubVerse</h2>
+    <p class="section-desc">Guest talks, wellness sessions, gaming nights, and teams giving it their all   "a look back at our latest moments".</p>
+
+    <div class="gallery-grid">
+        <div class="gallery-item gi-1">
+            <img src="images/speaker-man.jpeg" alt="Guest speaker addressing ApexClubVerse members">
+            <div class="gcap">Guest Speaker Series</div>
+        </div>
+        <div class="gallery-item gi-2">
+            <img src="images/soundbath.jpeg" alt="Apex Heat wellness sound bath session">
+            <div class="gcap">Apex Heat Wellness</div>
+        </div>
+        <div class="gallery-item gi-3">
+            <img src="images/gaming.jpeg" alt="Apex gaming club members competing">
+            <div class="gcap">Gaming Nights</div>
+        </div>
+        <div class="gallery-item gi-4">
+            <img src="images/basketball-team.jpeg" alt="Apex Sports Club basketball team">
+            <div class="gcap">Sports &amp; Leadership Club</div>
+        </div>
+        <div class="gallery-item gi-5">
+            <img src="images/speaker-woman.jpeg" alt="Guest speaker at ApexClubVerse event">
+            <div class="gcap">Talks &amp; Panels</div>
+        </div>
+        <div class="gallery-item gi-6">
+            <img src="images/hero-group.jpeg" alt="ApexClubVerse members at Adventurous Apex retreat">
+            <div class="gcap">Adventurous Apex Retreat</div>
+        </div>
+        <div class="gallery-item gi-7">
+            <img src="images/dance.jpeg" alt="Apex Performing Arts Club classical dance performance">
+            <div class="gcap">Performing Arts Club</div>
+        </div>
+        <div class="gallery-item gi-8">
+            <img src="images/siwani.jpeg" alt="ApexClubVerse members celebrating Apex Day">
+            <div class="gcap">Apex Day</div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════ CTA BANNER ══════════════════ -->
+<div class="cta-banner">
+    <div>
+        <h3>Ready to join the ClubVerse?</h3>
+        <p>Submit your club intake application and start shaping Apex culture today.</p>
+    </div>
+    <a href="registration.php" class="btn-white">Get started &rarr;</a>
+</div>
+
+</div>
+<!-- closes .content-wrapper opened in header.php -->
 
 <?php include 'footer.php'; ?>

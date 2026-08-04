@@ -94,12 +94,13 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
     /* ── Clubs section ── */
     .clubs-section {
         background: #f5f3ef;
-        padding: 2.5rem 2rem;
+        padding: 2.5rem 2rem 0rem 2rem; /* Bottom padding set to 0 to remove color gap */
     }
 
     .clubs-section-inner {
         max-width: 1200px;
         margin: 0 auto;
+        padding-bottom: 2.5rem; /* Padding kept inside container for spacing above red block */
     }
 
     .clubs-section-label {
@@ -112,19 +113,15 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
         font-family: 'Segoe UI', sans-serif;
     }
 
-    /* ── Card grid ── */
+    /* ── Card grid (3 columns) ── */
     .club-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.1rem;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
     }
 
     .club-card {
-        flex: 0 1 280px;
-    }
-
-    .club-card {
+        width: 100%;
         background: #fff;
         border: 0.5px solid #e0ddd6;
         border-radius: 14px;
@@ -132,7 +129,8 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
         cursor: pointer;
         transition: transform 0.18s, box-shadow 0.18s;
         text-decoration: none;
-        display: block;
+        display: flex;
+        flex-direction: column;
     }
 
     .club-card:hover {
@@ -140,7 +138,7 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
         box-shadow: 0 10px 28px rgba(0,0,0,0.09);
     }
 
-    /* Colour accent bar at top — cycles through 6 colours */
+    /* Accent top borders */
     .club-card-accent {
         height: 5px;
         background: #7a1028;
@@ -153,15 +151,6 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
     .club-card:nth-child(6n+5) .club-card-accent { background: #c75000; }
     .club-card:nth-child(6n+6) .club-card-accent { background: #0f6e56; }
 
-    /* Icon badge colours match accent */
-    .club-card:nth-child(6n+1) .club-card-icon { background: #fdecea; color: #7a1028; }
-    .club-card:nth-child(6n+2) .club-card-icon { background: #e8f0fb; color: #1a5f9a; }
-    .club-card:nth-child(6n+3) .club-card-icon { background: #e8f6ee; color: #1a7a4a; }
-    .club-card:nth-child(6n+4) .club-card-icon { background: #f3edfb; color: #6d3a9c; }
-    .club-card:nth-child(6n+5) .club-card-icon { background: #fef0e8; color: #c75000; }
-    .club-card:nth-child(6n+6) .club-card-icon { background: #e5f4f0; color: #0f6e56; }
-
-    /* explore link colour matches accent */
     .club-card:nth-child(6n+1) .explore-link { color: #7a1028; }
     .club-card:nth-child(6n+2) .explore-link { color: #1a5f9a; }
     .club-card:nth-child(6n+3) .explore-link { color: #1a7a4a; }
@@ -171,31 +160,35 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
 
     .club-card-body {
         padding: 1.1rem 1.25rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
     }
-.club-card-icon {
-    width: 100px;
-    height: 100px;
-    border-radius: 12px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 15px;
-}
 
-.club-card-icon img {
-    max-width: 85px;
-    max-height: 85px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    display: block;
-}
+    .club-card-icon {
+        width: 100%;
+        height: 160px;
+        background: transparent;
+        border-radius: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.25rem;
+        padding: 10px;
+    }
 
-    
+    .club-card-icon img {
+        max-width: 90% !important;
+        max-height: 140px !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
+        display: block !important;
+        margin: 0 auto !important;
+    }
 
     .club-card h3 {
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 600;
         color: #1a1a1a;
         margin-bottom: 0.4rem;
@@ -209,6 +202,7 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
         font-size: 13px;
         line-height: 1.6;
         margin-bottom: 1rem;
+        flex-grow: 1;
     }
 
     .club-card-footer {
@@ -217,7 +211,7 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
         justify-content: flex-end;
         border-top: 0.5px solid #f0ede7;
         padding-top: 0.75rem;
-        margin-top: 0.25rem;
+        margin-top: auto;
     }
 
     .explore-link {
@@ -235,10 +229,18 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
     }
 
     /* ── Responsive ── */
+    @media (max-width: 992px) {
+        .club-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
     @media (max-width: 600px) {
         .clubs-hero h1 { font-size: 1.9rem; }
         .clubs-stats { gap: 1.2rem; }
         .club-grid { grid-template-columns: 1fr; }
+        .club-card-icon { height: 130px; }
+        .club-card-icon img { max-height: 110px !important; }
     }
 </style>
 
@@ -275,38 +277,30 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
                     <div class="club-card-accent"></div>
                     <div class="club-card-body">
                         <div class="club-card-icon">
+                            <?php if($row['name'] == 'Apex Performing Arts Club'): ?>
+                                <img src="images/apac.png" alt="Apex Performing Arts Club">
+                            <?php endif; ?>
 
-<?php if($row['name'] == 'Apex Performing Arts Club'): ?>
-    <img src="images/apac.png" style="width:100%;height:100%;object-fit:contain;">
+                            <?php if($row['name'] == 'Apex Sports and Leadership Club'): ?>
+                                <img src="images/sports.png" alt="Apex Sports and Leadership Club">
+                            <?php endif; ?>
 
-<?php endif; ?>
+                            <?php if($row['name'] == 'Apex Travel and Tourism Club'): ?>
+                                <img src="images/travel.png" alt="Apex Travel and Tourism Club">
+                            <?php endif; ?>
 
-<?php if($row['name'] == 'Apex Sports and Leadership Club'): ?>
-    <img src="images/sports.png" style="width:100%;height:100%;object-fit:contain;">
+                            <?php if($row['name'] == 'Apex Media and Marketing Club'): ?>
+                                <img src="images/media.png" alt="Apex Media and Marketing Club">
+                            <?php endif; ?>
 
-<?php endif; ?>
+                            <?php if($row['name'] == 'Apex IT Club'): ?>
+                                <img src="images/it.png" alt="Apex IT Club">
+                            <?php endif; ?>
 
-<?php if($row['name'] == 'Apex Travel and Tourism Club'): ?>
-    <img src="images/travel.png" style="width:100%;height:100%;object-fit:contain;">
-
-<?php endif; ?>
-
-<?php if($row['name'] == 'Apex Media and Marketing Club'): ?>
-    <img src="images/media.png" style="width:100%;height:100%;object-fit:contain;">
-
-<?php endif; ?>
-
-<?php if($row['name'] == 'Apex IT Club'): ?>
-    <img src="images/it.png" style="width:100%;height:100%;object-fit:contain;">
-
-<?php endif; ?>
-
-<?php if($row['name'] == 'Apex Health Education and Awareness Team (HEAT)'): ?>
-    <img src="images/heat.png" style="width:100%;height:100%;object-fit:contain;">
-
-<?php endif; ?>
-
-</div>
+                            <?php if($row['name'] == 'Apex Health Education and Awareness Team (HEAT)'): ?>
+                                <img src="images/heat.png" alt="Apex Health Education and Awareness Team (HEAT)">
+                            <?php endif; ?>
+                        </div>
                         
                         <h3><?php echo htmlspecialchars($row['name']); ?></h3>
                         <p><?php echo htmlspecialchars($row['description']); ?></p>
