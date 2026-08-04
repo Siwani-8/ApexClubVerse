@@ -1,6 +1,7 @@
 <?php
 include 'header.php';
 include 'db.php';
+include 'send_verification_email.php';
 
 $msg = "";
 $msg_type = "";
@@ -20,12 +21,49 @@ if (isset($_POST['submit'])) {
             $msg = "This email is already registered. Please sign in.";
             $msg_type = "error";
         } else {
-            if (mysqli_query($conn, "INSERT INTO users (name, email, password, role) VALUES ('$name', '$email', '$pass', 'student')")) {
-                header("Location: login.php");
-                exit;
-            } else {
-    $msg = "Database Error: " . mysqli_error($conn);
+            $token = bin2hex(random_bytes(32));
+
+$sql = "INSERT INTO users
+(
+    name,
+    email,
+    password,
+    role,
+    email_verified,
+    verification_token
+)
+VALUES
+(
+    '$name',
+    '$email',
+    '$pass',
+    'student',
+    0,
+    '$token'
+)";
+
+if(mysqli_query($conn, $sql)){
+
+    if(sendVerificationEmail($email, $token)){
+
+        $msg = "Registration successful! Please check your email to verify your account.";
+
+        $msg_type = "success";
+
+    }else{
+
+        $msg = "Account created, but verification email could not be sent.";
+
+        $msg_type = "error";
+
+    }
+
+}else{
+
+    $msg = "Database Error: ".mysqli_error($conn);
+
     $msg_type = "error";
+
 }
         }
     }
