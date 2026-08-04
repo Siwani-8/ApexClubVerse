@@ -40,14 +40,14 @@ if (isset($_POST['delete_event'])) {
 if (isset($_POST['add_event'])) {
     $club = mysqli_real_escape_string($conn, $_SESSION['club_name']);
 
-$clubRow = mysqli_fetch_assoc(
-mysqli_query($conn,
-"SELECT id
-FROM clubs
-WHERE name='$club'")
-);
+    $clubRow = mysqli_fetch_assoc(
+        mysqli_query($conn,
+        "SELECT id
+        FROM clubs
+        WHERE name='$club'")
+    );
 
-$club_id = $clubRow['id'];
+    $club_id = $clubRow['id'];
     $title     = mysqli_real_escape_string($conn, $_POST['title']);
     $desc      = mysqli_real_escape_string($conn, $_POST['description']);
     $date      = mysqli_real_escape_string($conn, $_POST['event_date']);
@@ -56,83 +56,83 @@ $club_id = $clubRow['id'];
     $status    = mysqli_real_escape_string($conn, $_POST['status']);
     $image = "";
 
-if(isset($_FILES['event_image']) && $_FILES['event_image']['error']==0){
+    if(isset($_FILES['event_image']) && $_FILES['event_image']['error']==0){
 
-    if(!is_dir("uploads/events")){
-        mkdir("uploads/events",0777,true);
+        if(!is_dir("uploads/events")){
+            mkdir("uploads/events",0777,true);
+        }
+
+        $filename = time() . "_" . basename($_FILES['event_image']['name']);
+
+        move_uploaded_file(
+            $_FILES['event_image']['tmp_name'],
+            "uploads/events/".$filename
+        );
+
+        $image = "uploads/events/".$filename;
     }
-
-    $filename = time() . "_" . basename($_FILES['event_image']['name']);
-
-    move_uploaded_file(
-        $_FILES['event_image']['tmp_name'],
-        "uploads/events/".$filename
-    );
-
-    $image = "uploads/events/".$filename;
-}
     $event_id = (int)($_POST['event_id'] ?? 0);
 
-if($event_id > 0){
+    if($event_id > 0){
 
-    if($image==""){
+        if($image==""){
 
-        mysqli_query($conn,"
-        UPDATE events
-        SET
-        title='$title',
-        description='$desc',
-        event_date='$date',
-        event_time='$time',
-        location='$location',
-        status='$status'
-        WHERE id=$event_id
-        ");
+            mysqli_query($conn,"
+            UPDATE events
+            SET
+            title='$title',
+            description='$desc',
+            event_date='$date',
+            event_time='$time',
+            location='$location',
+            status='$status'
+            WHERE id=$event_id
+            ");
+
+        }else{
+
+            mysqli_query($conn,"
+            UPDATE events
+            SET
+            title='$title',
+            description='$desc',
+            event_date='$date',
+            event_time='$time',
+            location='$location',
+            image='$image',
+            status='$status'
+            WHERE id=$event_id
+            ");
+
+        }
 
     }else{
 
         mysqli_query($conn,"
-        UPDATE events
-        SET
-        title='$title',
-        description='$desc',
-        event_date='$date',
-        event_time='$time',
-        location='$location',
-        image='$image',
-        status='$status'
-        WHERE id=$event_id
-        ");
+        INSERT INTO events
+        (
+        club_id,
+        title,
+        description,
+        event_date,
+        event_time,
+        location,
+        image,
+        status
+        )
+        VALUES
+        (
+        $club_id,
+        '$title',
+        '$desc',
+        '$date',
+        '$time',
+        '$location',
+        '$image',
+        '$status'
+        )");
 
     }
-
-}else{
-
-    mysqli_query($conn,"
-    INSERT INTO events
-    (
-    club_id,
-    title,
-    description,
-    event_date,
-    event_time,
-    location,
-    image,
-    status
-    )
-    VALUES
-    (
-    $club_id,
-    '$title',
-    '$desc',
-    '$date',
-    '$time',
-    '$location',
-    '$image',
-    '$status'
-    )");
-
-}
     header("Location: admin.php?tab=events");
     exit;
 }
@@ -148,7 +148,6 @@ if (isset($_POST['schedule_interviews'])) {
         header("Location: admin.php?tab=registrations&error=time");
         exit;
     }
-
 
     $check = mysqli_query($conn, "SELECT COUNT(*) AS total FROM registrations WHERE selected_club='$club' AND interview_status <> 'PENDING'");
     $already = mysqli_fetch_assoc($check);
@@ -177,15 +176,15 @@ if(isset($_POST['create_poll'])){
     $question = mysqli_real_escape_string($conn,$_POST['question']);
 
     mysqli_query($conn,
-"UPDATE polls
-SET is_active=0
-WHERE club_id=$club_id");
+    "UPDATE polls
+    SET is_active=0
+    WHERE club_id=$club_id");
 
-mysqli_query($conn,
-"INSERT INTO polls
-(club_id,question,is_active)
-VALUES
-($club_id,'$question',1)");
+    mysqli_query($conn,
+    "INSERT INTO polls
+    (club_id,question,is_active)
+    VALUES
+    ($club_id,'$question',1)");
 
     $poll_id = mysqli_insert_id($conn);
 
@@ -208,6 +207,7 @@ VALUES
     header("Location: admin.php?tab=votes");
     exit;
 }
+
 if(isset($_POST['delete_poll'])){
 
     $poll_id = (int)$_POST['poll_id'];
@@ -236,6 +236,7 @@ if(isset($_POST['delete_bod'])){
     header("Location: admin.php?tab=members");
     exit;
 }
+
 if(isset($_POST['delete_boa'])){
 
     $id=(int)$_POST['boa_id'];
@@ -247,6 +248,7 @@ if(isset($_POST['delete_boa'])){
     header("Location: admin.php?tab=members");
     exit;
 }
+
 if(isset($_POST['add_bod'])){
 
     $club = mysqli_real_escape_string($conn,$_SESSION['club_name']);
@@ -296,6 +298,7 @@ if(isset($_POST['add_bod'])){
     header("Location: admin.php?tab=members");
     exit;
 }
+
 if(isset($_POST['add_boa'])){
 
     $club = mysqli_real_escape_string($conn,$_SESSION['club_name']);
@@ -334,6 +337,7 @@ if(isset($_POST['add_boa'])){
     header("Location: admin.php?tab=members");
     exit;
 }
+
 if(isset($_POST['update_bod'])){
 
     $id = (int)$_POST['member_id'];
@@ -369,6 +373,7 @@ if(isset($_POST['update_bod'])){
     header("Location: admin.php?tab=members");
     exit;
 }
+
 if(isset($_POST['update_boa'])){
 
     $id=(int)$_POST['boa_member_id'];
@@ -412,6 +417,7 @@ if(isset($_POST['update_boa'])){
     header("Location: admin.php?tab=members");
     exit;
 }
+
 $tab = $_GET['tab'] ?? 'dashboard';
 $applications_only = isset($_GET['applications_only']);
 if ($applications_only) {
@@ -456,54 +462,21 @@ $edit_bod = null;
 $edit_boa = null;
 
 if(isset($_GET['edit_bod'])){
-
     $id = (int)$_GET['edit_bod'];
-
-    $result = mysqli_query($conn,
-    "SELECT *
-     FROM bod_members
-     WHERE id=$id");
-
+    $result = mysqli_query($conn, "SELECT * FROM bod_members WHERE id=$id");
     $edit_bod = mysqli_fetch_assoc($result);
 }
-if(isset($_GET['edit_boa'])){
-
-    $id = (int)$_GET['edit_boa'];
-
-    $result = mysqli_query($conn,
-    "SELECT *
-    FROM boa_members
-    WHERE id=$id");
-
-    $edit_boa = mysqli_fetch_assoc($result);
-
-}
-$edit_boa = null;
 
 if(isset($_GET['edit_boa'])){
-
     $id = (int)$_GET['edit_boa'];
-
-    $result = mysqli_query($conn,
-    "SELECT *
-    FROM boa_members
-    WHERE id=$id");
-
+    $result = mysqli_query($conn, "SELECT * FROM boa_members WHERE id=$id");
     $edit_boa = mysqli_fetch_assoc($result);
-
 }
 
 if(isset($_GET['edit'])){
-
     $id = (int)$_GET['edit'];
-
-    $result = mysqli_query($conn,
-    "SELECT *
-    FROM events
-    WHERE id=$id");
-
+    $result = mysqli_query($conn, "SELECT * FROM events WHERE id=$id");
     $edit_event = mysqli_fetch_assoc($result);
-
 }
 ?>
 
@@ -613,12 +586,8 @@ if(isset($_GET['edit'])){
             <a href="admin.php?tab=dashboard" class="tab-btn <?php echo $tab=='dashboard' ? 'active':''; ?>">&#127968; Dashboard</a>
             <a href="admin.php?tab=registrations" class="tab-btn <?php echo $tab=='registrations' ? 'active':''; ?>">&#128203; Applications</a>
             <a href="admin.php?tab=events" class="tab-btn <?php echo $tab=='events' ? 'active':''; ?>">&#128197; Events</a>
-
-<a href="admin.php?tab=members" class="tab-btn <?php echo $tab=='members' ? 'active':''; ?>">
-    👥 Members
-</a>
-
-<a href="admin.php?tab=votes" class="tab-btn <?php echo $tab=='votes' ? 'active':''; ?>">&#128313; Vote Results</a>
+            <a href="admin.php?tab=members" class="tab-btn <?php echo $tab=='members' ? 'active':''; ?>">👥 Members</a>
+            <a href="admin.php?tab=votes" class="tab-btn <?php echo $tab=='votes' ? 'active':''; ?>">&#128313; Vote Results</a>
             <a href="admin.php?tab=users" class="tab-btn <?php echo $tab=='users' ? 'active':''; ?>">&#128101; Students</a>
         </div>
         <?php endif; ?>
@@ -657,16 +626,11 @@ if(isset($_GET['edit'])){
         </div>
 
         <?php elseif($tab == 'registrations'): ?>
-<?php if(isset($_GET['error']) && $_GET['error']=="time"): ?>
-<div style="
-background:#fdecea;
-color:#7a1028;
-padding:12px;
-margin-bottom:15px;
-border-radius:8px;">
-End time must be after start time.
-</div>
-<?php endif; ?>
+        <?php if(isset($_GET['error']) && $_GET['error']=="time"): ?>
+        <div style="background:#fdecea; color:#7a1028; padding:12px; margin-bottom:15px; border-radius:8px;">
+            End time must be after start time.
+        </div>
+        <?php endif; ?>
 
         <div class="table-box">
             <div class="table-box-header">
@@ -748,82 +712,77 @@ End time must be after start time.
         </div>
 
         <?php elseif($tab == 'events'): ?>
-            <?php
+        <?php
+        $editing = false;
 
-$editing = false;
+        $event = [
+            'id' => '',
+            'title' => '',
+            'description' => '',
+            'event_date' => '',
+            'event_time' => '',
+            'location' => '',
+            'status' => 'upcoming'
+        ];
 
-$event = [
-    'title' => '',
-    'description' => '',
-    'event_date' => '',
-    'event_time' => '',
-    'location' => '',
-    'status' => 'upcoming'
-];
-
-if(isset($_GET['edit'])){
-
-    $editing = true;
-
-    $id = (int)$_GET['edit'];
-
-    $event = mysqli_fetch_assoc(
-        mysqli_query($conn,
-        "SELECT *
-         FROM events
-         WHERE id=$id")
-    );
-
-}
-
-?>
+        if(isset($_GET['edit'])){
+            $editing = true;
+            $id = (int)$_GET['edit'];
+            $res = mysqli_query($conn, "SELECT * FROM events WHERE id=$id");
+            $fetched_event = mysqli_fetch_assoc($res);
+            if ($fetched_event) {
+                $event = $fetched_event;
+            }
+        }
+        ?>
         <div class="form-box">
             <h2>
-<?php
-if($edit_event){
-    echo "Edit Event";
-}else{
-    echo "Add New Event";
-}
-?>
-</h2>
+                <?php
+                if($editing){
+                    echo "Edit Event";
+                }else{
+                    echo "Add New Event";
+                }
+                ?>
+            </h2>
             <form method="POST" enctype="multipart/form-data">
                 <div class="form-grid">
                     <div class="form-group">
-    <?php
-    $clubData = mysqli_fetch_assoc(
-    mysqli_query($conn,
-    "SELECT id,name
-    FROM clubs
-    WHERE name='$club'")
-    );
-    ?>
+                        <?php
+                        $clubData = mysqli_fetch_assoc(
+                            mysqli_query($conn,
+                            "SELECT id,name
+                            FROM clubs
+                            WHERE name='$club'")
+                        );
+                        ?>
 
-    <input
-    type="hidden"
-    name="club_id"
-    value="<?php echo $clubData['id']; ?>">
+                        <input
+                        type="hidden"
+                        name="club_id"
+                        value="<?php echo $clubData['id'] ?? ''; ?>">
 
-    <input
-    type="text"
-    value="<?php echo htmlspecialchars($clubData['name']); ?>"
-    readonly>
-</div>
+                        <!-- ADDED MISSING LABEL HERE TO FIX ALIGNMENT -->
+                        <label>Club</label>
+                        <input
+                        type="text"
+                        value="<?php echo htmlspecialchars($clubData['name'] ?? ''); ?>"
+                        readonly>
+                    </div>
 
-<!-- ADD THIS -->
-<input
-type="hidden"
-name="event_id"
-value="<?php echo $event['id'] ?? ''; ?>">
+                    <input
+                    type="hidden"
+                    name="event_id"
+                    value="<?php echo $event['id']; ?>">
 
-<div class="form-group">
-    <label>Event Title</label>
-    <input
-    type="text"
-    name="title"
-    value="<?php echo htmlspecialchars($event['title']); ?>"
-    required>
-</div>
+                    <div class="form-group">
+                        <label>Event Title</label>
+                        <input
+                        type="text"
+                        name="title"
+                        value="<?php echo htmlspecialchars($event['title']); ?>"
+                        required>
+                    </div>
                     <div class="form-group">
                         <label>Date</label>
                         <input
@@ -851,25 +810,9 @@ value="<?php echo $event['id'] ?? ''; ?>">
                     <div class="form-group">
                         <label>Status</label>
                         <select name="status">
-
-                        <option
-                        value="upcoming"
-                        <?php if(($edit_event['status'] ?? '')=="upcoming") echo "selected"; ?>>
-                        Upcoming
-                        </option>
-
-                        <option
-                        value="ongoing"
-                        <?php if(($edit_event['status'] ?? '')=="ongoing") echo "selected"; ?>>
-                        Ongoing
-                        </option>
-
-                        <option
-                        value="completed"
-                        <?php if(($edit_event['status'] ?? '')=="completed") echo "selected"; ?>>
-                        Completed
-                        </option>
-
+                            <option value="upcoming" <?php if(($event['status']) == "upcoming") echo "selected"; ?>>Upcoming</option>
+                            <option value="ongoing" <?php if(($event['status']) == "ongoing") echo "selected"; ?>>Ongoing</option>
+                            <option value="completed" <?php if(($event['status']) == "completed") echo "selected"; ?>>Completed</option>
                         </select>
                     </div>
                     <div class="form-group" style="grid-column: 1/-1;">
@@ -879,24 +822,22 @@ value="<?php echo $event['id'] ?? ''; ?>">
                         rows="3"><?php echo htmlspecialchars($event['description']); ?></textarea>
                     </div>
                     <div class="form-group" style="grid-column:1/-1;">
-    <label>Event Image</label>
-    <input type="file" name="event_image" accept="image/*">
-</div>
+                        <label>Event Image</label>
+                        <input type="file" name="event_image" accept="image/*">
+                    </div>
                 </div>
                 <button
-type="submit"
-name="add_event"
-class="btn-submit">
-
-<?php
-if($editing){
-    echo "Update Event";
-}else{
-    echo "Add Event";
-}
-?>
-
-</button>
+                type="submit"
+                name="add_event"
+                class="btn-submit">
+                <?php
+                if($editing){
+                    echo "Update Event";
+                }else{
+                    echo "Add Event";
+                }
+                ?>
+                </button>
             </form>
         </div>
 
@@ -930,119 +871,67 @@ if($editing){
                 <?php while($e = mysqli_fetch_assoc($events)): ?>
                 <tr>
                     <td>
-
-<?php
-if(!empty($e['image'])){
-?>
-<img
-src="<?php echo htmlspecialchars($e['image']); ?>"
-style="width:80px;height:55px;object-fit:cover;border-radius:8px;">
-<?php
-}else{
-    echo "No Image";
-}
-?>
-
-</td>
-
-<td><?php echo htmlspecialchars($e['title']); ?></td>
+                    <?php if(!empty($e['image'])): ?>
+                        <img src="<?php echo htmlspecialchars($e['image']); ?>" style="width:80px;height:55px;object-fit:cover;border-radius:8px;">
+                    <?php else: ?>
+                        No Image
+                    <?php endif; ?>
+                    </td>
+                    <td><?php echo htmlspecialchars($e['title']); ?></td>
                     <td><?php echo htmlspecialchars($e['club_name']); ?></td>
                     <td><?php echo date('d M Y', strtotime($e['event_date'])); ?></td>
                     <td><?php echo htmlspecialchars($e['location']); ?></td>
                     <td><span class="badge badge-<?php echo $e['status']; ?>"><?php echo ucfirst($e['status']); ?></span></td>
                     <td>
-
-<a
-href="admin.php?tab=events&edit=<?php echo $e['id']; ?>"
-class="btn-submit"
-style="padding:6px 12px;margin:0;text-decoration:none;">
-Edit
-</a>
-
-</td>
-
-<td>
-
-<a
-href="admin.php?tab=events&edit=<?php echo $e['id']; ?>"
-class="btn-submit"
-style="padding:5px 10px;margin-right:5px;text-decoration:none;">
-Edit
-</a>
-
-<form method="POST" style="display:inline;">
-    <input type="hidden" name="event_id" value="<?php echo $e['id']; ?>">
-    <button
-        type="submit"
-        name="delete_event"
-        class="btn-delete"
-        onclick="return confirm('Delete this event?')">
-        Delete
-    </button>
-</form>
-
-</td>
+                        <a href="admin.php?tab=events&edit=<?php echo $e['id']; ?>" class="btn-submit" style="padding:6px 12px;margin:0;text-decoration:none;">
+                            Edit
+                        </a>
+                    </td>
+                    <td>
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="event_id" value="<?php echo $e['id']; ?>">
+                            <button type="submit" name="delete_event" class="btn-delete" onclick="return confirm('Delete this event?')">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </table>
             <?php endif; ?>
         </div>
 
-        
+        <?php elseif($tab == 'votes'): ?>
         <div class="form-box">
-    <h2>&#128221; Create New Poll</h2>
-
-    <form method="POST">
-
-        <div class="form-group">
-            <label>Poll Question</label>
-            <input
-                type="text"
-                name="question"
-                placeholder="Enter poll question"
-                required>
-        </div><?php elseif($tab == 'votes'): ?>
-
-        <div class="form-group">
-            <label>Option 1</label>
-            <input
-                type="text"
-                name="options[]"
-                required>
+            <h2>&#128221; Create New Poll</h2>
+            <form method="POST">
+                <div class="form-group">
+                    <label>Poll Question</label>
+                    <input type="text" name="question" placeholder="Enter poll question" required>
+                </div>
+                <div class="form-group">
+                    <label>Option 1</label>
+                    <input type="text" name="options[]" required>
+                </div>
+                <div class="form-group">
+                    <label>Option 2</label>
+                    <input type="text" name="options[]" required>
+                </div>
+                <div class="form-group">
+                    <label>Option 3</label>
+                    <input type="text" name="options[]">
+                </div>
+                <div class="form-group">
+                    <label>Option 4</label>
+                    <input type="text" name="options[]">
+                </div>
+                <button type="submit" name="create_poll" class="btn-submit">
+                    Create Poll
+                </button>
+            </form>
         </div>
 
-        <div class="form-group">
-            <label>Option 2</label>
-            <input
-                type="text"
-                name="options[]"
-                required>
-        </div>
-
-        <div class="form-group">
-            <label>Option 3</label>
-            <input
-                type="text"
-                name="options[]">
-        </div>
-
-        <div class="form-group">
-            <label>Option 4</label>
-            <input
-                type="text"
-                name="options[]">
-        </div>
-
-        <button
-            type="submit"
-            name="create_poll"
-            class="btn-submit">
-            Create Poll
-        </button>
-
-    </form>
-</div>
-<?php
+        <?php
         $polls = mysqli_query($conn,
         "SELECT p.*, c.name as club_name
         FROM polls p
@@ -1056,36 +945,24 @@ Edit
         ?>
         <div class="table-box" style="margin-bottom:1rem;">
             <div class="table-box-header">
+                <h2>
+                    <?php echo htmlspecialchars($poll['club_name']); ?>
+                    —
+                    <?php echo htmlspecialchars($poll['question']); ?>
+                </h2>
 
-    <h2>
-        <?php echo htmlspecialchars($poll['club_name']); ?>
-        —
-        <?php echo htmlspecialchars($poll['question']); ?>
-    </h2>
-
-    <div style="display:flex;gap:10px;align-items:center;">
-
-        <span class="badge-count">
-            <?php echo $total_poll_votes; ?> votes
-        </span>
-
-        <form method="POST">
-            <input type="hidden"
-                   name="poll_id"
-                   value="<?php echo $poll['id']; ?>">
-
-            <button
-                type="submit"
-                name="delete_poll"
-                class="btn-delete"
-                onclick="return confirm('Delete this poll?')">
-                Delete Poll
-            </button>
-        </form>
-
-    </div>
-
-</div>
+                <div style="display:flex;gap:10px;align-items:center;">
+                    <span class="badge-count">
+                        <?php echo $total_poll_votes; ?> votes
+                    </span>
+                    <form method="POST">
+                        <input type="hidden" name="poll_id" value="<?php echo $poll['id']; ?>">
+                        <button type="submit" name="delete_poll" class="btn-delete" onclick="return confirm('Delete this poll?')">
+                            Delete Poll
+                        </button>
+                    </form>
+                </div>
+            </div>
             <table>
                 <tr><th>Option</th><th>Votes</th><th>Percentage</th></tr>
                 <?php while($opt = mysqli_fetch_assoc($options)):
@@ -1107,394 +984,191 @@ Edit
             </table>
         </div>
         <?php endwhile; ?>
+
         <?php elseif($tab == 'members'): ?>
         <div class="form-box">
+            <h2>Add New BOD Member</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Position</label>
+                    <input type="text" name="position" required>
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea name="bio" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Photo</label>
+                    <input type="file" name="photo" required>
+                </div>
+                <button type="submit" name="add_bod" class="btn-submit">
+                    Add Member
+                </button>
+            </form>
+        </div>
+
+        <?php if($edit_bod): ?>
+        <div class="form-box">
+            <h2>Edit BOD Member</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="member_id" value="<?php echo $edit_bod['id']; ?>">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" value="<?php echo htmlspecialchars($edit_bod['name']); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Position</label>
+                    <input type="text" name="position" value="<?php echo htmlspecialchars($edit_bod['position']); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea name="bio" rows="4"><?php echo htmlspecialchars($edit_bod['bio']); ?></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Photo</label>
+                    <input type="file" name="photo">
+                </div>
+                <button type="submit" name="update_bod" class="btn-submit">
+                    Update Member
+                </button>
+            </form>
+        </div>
+        <?php endif; ?>
+
+        <div class="table-box">
+            <div class="table-box-header">
+                <h2>👥 Board of Directors</h2>
+            </div>
+            <?php
+            $clubRow = mysqli_fetch_assoc(
+                mysqli_query($conn,
+                "SELECT id FROM clubs WHERE name='$club'")
+            );
+            $club_id = $clubRow['id'];
+            $bod = mysqli_query($conn, "SELECT * FROM bod_members WHERE club_id=$club_id ORDER BY id");
+            ?>
+            <table>
+                <tr>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+                <?php while($member = mysqli_fetch_assoc($bod)): ?>
+                <tr>
+                    <td>
+                        <img src="images/members/<?php echo htmlspecialchars($member['photo']); ?>" style="width:80px;height:80px;object-fit:cover;border-radius:50%;">
+                    </td>
+                    <td><?php echo htmlspecialchars($member['name']); ?></td>
+                    <td><?php echo htmlspecialchars($member['position']); ?></td>
+                    <td>
+                        <a href="admin.php?tab=members&edit_bod=<?php echo $member['id']; ?>" class="btn-submit">Edit</a>
+                    </td>
+                    <td>
+                        <form method="POST">
+                            <input type="hidden" name="bod_id" value="<?php echo $member['id']; ?>">
+                            <button class="btn-delete" name="delete_bod">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                <?php endwhile; ?>
+            </table>
+        </div>
+
+        <div class="form-box">
+            <h2>Add New BOA Member</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="boa_name" required>
+                </div>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="boa_title" required>
+                </div>
+                <div class="form-group">
+                    <label>Expertise</label>
+                    <textarea name="boa_expertise" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Photo</label>
+                    <input type="file" name="boa_photo" required>
+                </div>
+                <button type="submit" name="add_boa" class="btn-submit">
+                    Add BOA Member
+                </button>
+            </form>
+        </div>
+
+        <?php if($edit_boa): ?>
+        <div class="form-box">
+            <h2>Edit BOA Member</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="boa_member_id" value="<?php echo $edit_boa['id']; ?>">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="boa_name" value="<?php echo htmlspecialchars($edit_boa['name']); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="boa_title" value="<?php echo htmlspecialchars($edit_boa['title']); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Expertise</label>
+                    <textarea name="boa_expertise" rows="4"><?php echo htmlspecialchars($edit_boa['expertise']); ?></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Photo</label>
+                    <input type="file" name="boa_photo">
+                </div>
+                <button type="submit" name="update_boa" class="btn-submit">
+                    Update BOA Member
+                </button>
+            </form>
+        </div>
+        <?php endif; ?>
+
+        <div class="table-box">
+            <div class="table-box-header">
+                <h2>👥 Board of Advisors</h2>
+            </div>
+            <?php
+            $boa = mysqli_query($conn, "SELECT * FROM boa_members WHERE club_id=$club_id ORDER BY id");
+            ?>
+            <table>
+                <tr>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Title</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+                <?php while($member=mysqli_fetch_assoc($boa)): ?>
+                <tr>
+                    <td>
+                        <img src="images/members/<?php echo htmlspecialchars($member['photo']); ?>" style="width:80px;height:80px;object-fit:cover;border-radius:50%;">
+                    </td>
+                    <td><?php echo htmlspecialchars($member['name']); ?></td>
+                    <td><?php echo htmlspecialchars($member['title']); ?></td>
+                    <td>
+                        <a href="admin.php?tab=members&edit_boa=<?php echo $member['id']; ?>" class="btn-submit">Edit</a>
+                    </td>
+                    <td>
+                        <form method="POST">
+                            <input type="hidden" name="boa_id" value="<?php echo $member['id']; ?>">
+                            <button type="submit" name="delete_boa" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                <?php endwhile; ?>
+            </table>
+        </div>
 
-<h2>Add New BOD Member</h2>
-
-<form method="POST" enctype="multipart/form-data">
-
-<div class="form-group">
-<label>Name</label>
-<input type="text" name="name" required>
-</div>
-
-<div class="form-group">
-<label>Position</label>
-<input type="text" name="position" required>
-</div>
-
-<div class="form-group">
-<label>Bio</label>
-<textarea name="bio" rows="4"></textarea>
-</div>
-
-<div class="form-group">
-<label>Photo</label>
-<input type="file" name="photo" required>
-</div>
-
-<button
-type="submit"
-name="add_bod"
-class="btn-submit">
-Add Member
-</button>
-
-</form>
-
-</div>
-<?php if($edit_bod): ?>
-
-<div class="form-box">
-
-<h2>
-<?php
-if($edit_bod){
-    echo "Edit BOD Member";
-}else{
-    echo "Add BOD Member";
-}
-?>
-</h2>
-
-<form method="POST" enctype="multipart/form-data">
-
-<input
-type="hidden"
-name="member_id"
-value="<?php echo $edit_bod['id']; ?>">
-
-<div class="form-group">
-<label>Name</label>
-
-<input
-type="text"
-name="name"
-value="<?php echo htmlspecialchars($edit_bod['name']); ?>"
-required>
-</div>
-
-<div class="form-group">
-<label>Position</label>
-
-<input
-type="text"
-name="position"
-value="<?php echo htmlspecialchars($edit_bod['position']); ?>"
-required>
-</div>
-
-<div class="form-group">
-<label>Bio</label>
-
-<textarea
-name="bio"
-rows="4"><?php echo htmlspecialchars($edit_bod['bio']); ?></textarea>
-</div>
-
-<div class="form-group">
-<label>Photo</label>
-
-<input
-type="file"
-name="photo">
-</div>
-
-<?php if($edit_bod): ?>
-
-<button
-type="submit"
-name="update_bod"
-class="btn-submit">
-Update Member
-</button>
-
-<?php else: ?>
-
-<button
-type="submit"
-name="add_bod"
-class="btn-submit">
-Add Member
-</button>
-
-<?php endif; ?>
-
-</form>
-
-</div>
-
-<?php endif; ?>
-<div class="table-box">
-
-    <div class="table-box-header">
-        <h2>👥 Board of Directors</h2>
-    </div>
-
-<?php
-
-$clubRow = mysqli_fetch_assoc(
-mysqli_query($conn,
-"SELECT id
-FROM clubs
-WHERE name='$club'")
-);
-
-$club_id = $clubRow['id'];
-
-$bod = mysqli_query($conn,
-"SELECT *
-FROM bod_members
-WHERE club_id=$club_id
-ORDER BY id");
-
-?>
-
-<table>
-
-<tr>
-    <th>Photo</th>
-    <th>Name</th>
-    <th>Position</th>
-    <th>Edit</th>
-    <th>Delete</th>
-</tr>
-
-<?php while($member = mysqli_fetch_assoc($bod)): ?>
-
-<tr>
-
-<td>
-
-<img
-src="images/members/<?php echo htmlspecialchars($member['photo']); ?>"
-style="width:80px;height:80px;object-fit:cover;border-radius:50%;">
-
-</td>
-
-<td>
-<?php echo htmlspecialchars($member['name']); ?>
-</td>
-
-<td>
-<?php echo htmlspecialchars($member['position']); ?>
-</td>
-
-<td>
-
-<a
-href="admin.php?tab=members&edit_bod=<?php echo $member['id']; ?>"
-class="btn-submit">
-
-Edit
-
-</a>
-
-</td>
-
-<td>
-
-<form method="POST">
-
-<input
-type="hidden"
-name="bod_id"
-value="<?php echo $member['id']; ?>">
-
-<button
-class="btn-delete"
-name="delete_bod">
-
-Delete
-
-</button>
-
-</form>
-
-</td>
-
-</tr>
-
-<?php endwhile; ?>
-
-</table>
-
-</div>
-<div class="form-box">
-
-<h2>Add New BOA Member</h2>
-
-<form method="POST" enctype="multipart/form-data">
-
-<div class="form-group">
-<label>Name</label>
-<input type="text" name="boa_name" required>
-</div>
-
-<div class="form-group">
-<label>Title</label>
-<input type="text" name="boa_title" required>
-</div>
-
-<div class="form-group">
-<label>Expertise</label>
-<textarea name="boa_expertise" rows="4"></textarea>
-</div>
-
-<div class="form-group">
-<label>Photo</label>
-<input type="file" name="boa_photo" required>
-</div>
-
-<button
-type="submit"
-name="add_boa"
-class="btn-submit">
-Add BOA Member
-</button>
-
-</form>
-
-</div>
-
-<?php if($edit_boa): ?>
-
-<div class="form-box">
-
-<h2>Edit BOA Member</h2>
-
-<form method="POST" enctype="multipart/form-data">
-
-<input
-type="hidden"
-name="boa_member_id"
-value="<?php echo $edit_boa['id']; ?>">
-
-<div class="form-group">
-<label>Name</label>
-<input
-type="text"
-name="boa_name"
-value="<?php echo htmlspecialchars($edit_boa['name']); ?>"
-required>
-</div>
-
-<div class="form-group">
-<label>Title</label>
-<input
-type="text"
-name="boa_title"
-value="<?php echo htmlspecialchars($edit_boa['title']); ?>"
-required>
-</div>
-
-<div class="form-group">
-<label>Expertise</label>
-<textarea
-name="boa_expertise"
-rows="4"><?php echo htmlspecialchars($edit_boa['expertise']); ?></textarea>
-</div>
-
-<div class="form-group">
-<label>Photo</label>
-<input
-type="file"
-name="boa_photo">
-</div>
-
-<button
-type="submit"
-name="update_boa"
-class="btn-submit">
-Update BOA Member
-</button>
-
-</form>
-
-</div>
-
-<?php endif; ?>
-
-<div class="table-box">
-
-<div class="table-box-header">
-<h2>👥 Board of Advisors</h2>
-</div>
-
-<?php
-
-$boa = mysqli_query($conn,
-"SELECT *
-FROM boa_members
-WHERE club_id=$club_id
-ORDER BY id");
-
-?>
-
-<table>
-
-<tr>
-<th>Photo</th>
-<th>Name</th>
-<th>Title</th>
-<th>Edit</th>
-<th>Delete</th>
-</tr>
-
-<?php while($member=mysqli_fetch_assoc($boa)): ?>
-
-<tr>
-
-<td>
-
-<img
-src="images/members/<?php echo htmlspecialchars($member['photo']); ?>"
-style="width:80px;height:80px;object-fit:cover;border-radius:50%;">
-
-</td>
-
-<td><?php echo htmlspecialchars($member['name']); ?></td>
-
-<td><?php echo htmlspecialchars($member['title']); ?></td>
-
-<td>
-
-<a
-href="admin.php?tab=members&edit_boa=<?php echo $member['id']; ?>"
-class="btn-submit">
-Edit
-</a>
-
-</td>
-
-<td>
-
-<form method="POST">
-
-<input
-type="hidden"
-name="boa_id"
-value="<?php echo $member['id']; ?>">
-
-<button
-type="submit"
-name="delete_boa"
-class="btn-delete">
-Delete
-</button>
-
-</form>
-
-</td>
-
-</tr>
-
-<?php endwhile; ?>
-
-</table>
-
-</div>
         <?php elseif($tab == 'users'): ?>
         <div class="table-box">
             <div class="table-box-header">
@@ -1536,11 +1210,7 @@ Delete
         <form method="POST">
             <div class="form-group">
                 <label>Club</label>
-                <input
-    type="text"
-    name="club"
-    value="<?php echo htmlspecialchars($_SESSION['club_name']); ?>"
-    readonly>
+                <input type="text" name="club" value="<?php echo htmlspecialchars($_SESSION['club_name']); ?>" readonly>
             </div>
             <div class="form-group">
                 <label>Interview Date</label>
