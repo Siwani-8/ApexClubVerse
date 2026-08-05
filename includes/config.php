@@ -126,3 +126,34 @@ function redirect(string $path): void
     header('Location: ' . url($path));
     exit;
 }
+
+/**
+ * One-time flash messages shown in a page banner (not browser alerts).
+ */
+function flash_set(string $type, string $message): void
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    $_SESSION['flash'] = [
+        'type' => $type === 'error' ? 'error' : 'success',
+        'message' => $message,
+    ];
+}
+
+function flash_render(): string
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (empty($_SESSION['flash']['message'])) {
+        return '';
+    }
+    $type = $_SESSION['flash']['type'] ?? 'success';
+    $message = (string)$_SESSION['flash']['message'];
+    unset($_SESSION['flash']);
+    $class = $type === 'error' ? 'app-flash app-flash-error' : 'app-flash app-flash-success';
+    return '<div class="' . htmlspecialchars($class, ENT_QUOTES, 'UTF-8') . '" role="status">'
+        . htmlspecialchars($message, ENT_QUOTES, 'UTF-8')
+        . '</div>';
+}

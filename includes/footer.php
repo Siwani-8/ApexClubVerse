@@ -180,5 +180,164 @@
     © <?php echo date("Y"); ?> ApexClubVerse - Apex College Student Activity Portal. All Rights Reserved.
 </footer>
 
+<style>
+.app-flash {
+    max-width: 1100px;
+    margin: 1rem auto;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+}
+.app-flash-success {
+    background: #e8f6ee;
+    color: #1a7a4a;
+    border: 1px solid #b7e4c7;
+}
+.app-flash-error {
+    background: #fdecea;
+    color: #7a1028;
+    border: 1px solid #f5c2c7;
+}
+.confirm-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+.confirm-overlay.is-open {
+    display: flex;
+}
+.confirm-box {
+    background: #fff;
+    width: 420px;
+    max-width: 100%;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+    font-family: 'Segoe UI', sans-serif;
+}
+.confirm-box h3 {
+    margin: 0 0 10px;
+    font-size: 1.15rem;
+    color: #1a1a1a;
+}
+.confirm-box p {
+    margin: 0 0 20px;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.confirm-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+.confirm-actions button {
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Segoe UI', sans-serif;
+}
+.confirm-cancel {
+    background: #f0eeea;
+    color: #333;
+}
+.confirm-ok {
+    background: #7a1028;
+    color: #fff;
+}
+</style>
+
+<div id="confirmOverlay" class="confirm-overlay" aria-hidden="true">
+    <div class="confirm-box" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+        <h3 id="confirmTitle">Please confirm</h3>
+        <p id="confirmMessage">Are you sure?</p>
+        <div class="confirm-actions">
+            <button type="button" class="confirm-cancel" id="confirmCancel">Cancel</button>
+            <button type="button" class="confirm-ok" id="confirmOk">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var overlay = document.getElementById('confirmOverlay');
+    var messageEl = document.getElementById('confirmMessage');
+    var titleEl = document.getElementById('confirmTitle');
+    var cancelBtn = document.getElementById('confirmCancel');
+    var okBtn = document.getElementById('confirmOk');
+    var pendingForm = null;
+    var pendingButton = null;
+
+    function closeConfirm() {
+        overlay.classList.remove('is-open');
+        overlay.setAttribute('aria-hidden', 'true');
+        pendingForm = null;
+        pendingButton = null;
+    }
+
+    function openConfirm(message, form, button, title) {
+        pendingForm = form;
+        pendingButton = button;
+        messageEl.textContent = message || 'Are you sure?';
+        titleEl.textContent = title || 'Please confirm';
+        overlay.classList.add('is-open');
+        overlay.setAttribute('aria-hidden', 'false');
+        okBtn.focus();
+    }
+
+    okBtn.addEventListener('click', function () {
+        if (!pendingForm || !pendingButton) return;
+        var form = pendingForm;
+        var btn = pendingButton;
+        closeConfirm();
+        btn.setAttribute('data-confirm-skip', '1');
+        if (typeof form.requestSubmit === 'function') {
+            form.requestSubmit(btn);
+        } else {
+            var hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = btn.name;
+            hidden.value = btn.value || '1';
+            form.appendChild(hidden);
+            form.submit();
+        }
+        setTimeout(function () { btn.removeAttribute('data-confirm-skip'); }, 0);
+    });
+
+    cancelBtn.addEventListener('click', closeConfirm);
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeConfirm();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('is-open')) {
+            closeConfirm();
+        }
+    });
+
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-confirm]');
+        if (!btn || btn.getAttribute('data-confirm-skip') === '1') return;
+        var form = btn.closest('form');
+        if (!form) return;
+        e.preventDefault();
+        openConfirm(
+            btn.getAttribute('data-confirm'),
+            form,
+            btn,
+            btn.getAttribute('data-confirm-title')
+        );
+    });
+})();
+</script>
+
 </body>
 </html>

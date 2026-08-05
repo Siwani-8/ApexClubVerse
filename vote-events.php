@@ -349,7 +349,9 @@ while($poll = mysqli_fetch_assoc($polls)) {
                     </form>
                     <form method="POST" style="display:inline;">
                         <input type="hidden" name="poll_id" value="<?php echo (int)$poll['id']; ?>">
-                        <button type="submit" name="delete_poll" class="btn-poll-admin-outline" onclick="return confirm('Delete this poll permanently?')">Delete Poll</button>
+                        <button type="submit" name="delete_poll" class="btn-poll-admin-outline"
+                                data-confirm="Delete this poll permanently?"
+                                data-confirm-title="Delete poll">Delete Poll</button>
                     </form>
                 </div>
                 <?php endif; ?>
