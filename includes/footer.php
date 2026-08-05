@@ -9,6 +9,8 @@
     flex-shrink:0;
     width:100%;
     display:block;
+    border-top:4px solid #f5f3ef;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
 }
 
 .footer-container{
@@ -338,6 +340,44 @@
         </div>
     </div>
 </div>
+
+<?php
+$toast = function_exists('flash_toast_data') ? flash_toast_data() : null;
+if ($toast):
+    $toastClass = $toast['type'] === 'error' ? 'app-toast-error' : 'app-toast-success';
+    $toastIcon = $toast['type'] === 'error' ? '!' : '✓';
+?>
+<div id="appToast" class="app-toast <?php echo $toastClass; ?>" role="status" aria-live="polite">
+    <span class="app-toast-icon" aria-hidden="true"><?php echo $toastIcon; ?></span>
+    <div class="app-toast-body"><?php echo htmlspecialchars($toast['message'], ENT_QUOTES, 'UTF-8'); ?></div>
+    <button type="button" class="app-toast-close" id="appToastClose" aria-label="Dismiss">&times;</button>
+</div>
+<script>
+(function () {
+    var toast = document.getElementById('appToast');
+    if (!toast) return;
+    var hideTimer;
+    function hideToast() {
+        toast.classList.remove('is-visible');
+        toast.classList.add('is-hiding');
+        setTimeout(function () {
+            if (toast && toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 300);
+    }
+    requestAnimationFrame(function () {
+        toast.classList.add('is-visible');
+    });
+    hideTimer = setTimeout(hideToast, 4500);
+    var closeBtn = document.getElementById('appToastClose');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function () {
+            clearTimeout(hideTimer);
+            hideToast();
+        });
+    }
+})();
+</script>
+<?php endif; ?>
 
 <script>
 (function () {

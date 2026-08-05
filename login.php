@@ -67,6 +67,15 @@ if (isset($_POST['submit'])) {
                 $_SESSION['club_id'] = $user['club_id'];
                 $_SESSION['club_name'] = $user['club_name'];
 
+                $firstName = trim(explode(' ', trim((string)$user['name']))[0]);
+                if ($firstName === '') {
+                    $firstName = 'there';
+                }
+                flash_set(
+                    'success',
+                    'Successfully logged in. Welcome back, ' . $firstName . '! You are now signed in to ApexClubVerse.'
+                );
+
                 if ($user['role'] == 'admin') {
                     redirect('admin.php');
                 } else {

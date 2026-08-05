@@ -143,17 +143,26 @@ function flash_set(string $type, string $message): void
 
 function flash_render(): string
 {
+    // Inline banners are deprecated — toasts render from footer.php via flash_toast_data().
+    return '';
+}
+
+/**
+ * Consume flash once for the floating toast (footer).
+ * @return array{type:string,message:string}|null
+ */
+function flash_toast_data(): ?array
+{
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
     if (empty($_SESSION['flash']['message'])) {
-        return '';
+        return null;
     }
-    $type = $_SESSION['flash']['type'] ?? 'success';
-    $message = (string)$_SESSION['flash']['message'];
+    $data = [
+        'type' => ($_SESSION['flash']['type'] ?? 'success') === 'error' ? 'error' : 'success',
+        'message' => (string) $_SESSION['flash']['message'],
+    ];
     unset($_SESSION['flash']);
-    $class = $type === 'error' ? 'app-flash app-flash-error' : 'app-flash app-flash-success';
-    return '<div class="' . htmlspecialchars($class, ENT_QUOTES, 'UTF-8') . '" role="status">'
-        . htmlspecialchars($message, ENT_QUOTES, 'UTF-8')
-        . '</div>';
+    return $data;
 }
