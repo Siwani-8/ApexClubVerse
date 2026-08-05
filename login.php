@@ -89,8 +89,23 @@ include 'includes/header.php';
 <style>
     *, *::before, *::after { box-sizing: border-box; }
 
+    body:has(.login-page) {
+        height: 100dvh;
+        max-height: 100dvh;
+        overflow: hidden;
+    }
+    body:has(.login-page) .content-wrapper {
+        min-height: 0;
+        overflow: hidden;
+    }
+    body:has(.login-page) .footer-top,
+    body:has(.login-page) .copyright {
+        display: none;
+    }
+
     .login-page {
-        flex: 1 0 auto;
+        flex: 1 1 auto;
+        min-height: 0;
         background: #7a1028;
         background-image:
             radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 0%, transparent 40%),
@@ -98,10 +113,9 @@ include 'includes/header.php';
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 3rem 1.5rem;
+        padding: 1.5rem;
         position: relative;
-        overflow-x: hidden;
-        overflow-y: visible;
+        overflow: hidden;
     }
     .login-page::before {
         content: '';
@@ -128,9 +142,14 @@ include 'includes/header.php';
         padding: 2.5rem 2rem 2rem;
         width: 100%;
         max-width: 420px;
+        max-height: 100%;
         box-shadow: 0 20px 60px rgba(0,0,0,0.25);
         position: relative;
         z-index: 2;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
     }
     .login-card::before {
         content: '';
@@ -247,7 +266,7 @@ include 'includes/header.php';
         .login-page::after { width: 160px; height: 160px; bottom: -40px; left: -40px; }
     }
     @media (max-width: 480px) {
-        .login-page { padding: 2rem 1rem; }
+        .login-page { padding: 0.75rem; }
         .login-card { padding: 2rem 1.25rem 1.5rem; }
     }
 </style>
@@ -275,7 +294,7 @@ include 'includes/header.php';
             </div>
         <?php endif; ?>
 
-        <form action="login.php" method="POST">
+        <form action="<?php echo htmlspecialchars(url('login.php')); ?>" method="POST">
             <div class="form-group">
                 <label>College Email</label>
                 <input type="email" name="email" placeholder="name@apexcollege.edu.np" required>

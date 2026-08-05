@@ -102,20 +102,36 @@ if($success){
 <style>
     *, *::before, *::after { box-sizing: border-box; }
 
-    /* ── Page background ── */
+    /* Modal-shell: maroon bg stays put; only the white card scrolls */
+    body:has(.intake-page) {
+        height: 100dvh;
+        max-height: 100dvh;
+        overflow: hidden;
+    }
+    body:has(.intake-page) .content-wrapper {
+        min-height: 0;
+        overflow: hidden;
+    }
+    body:has(.intake-page) .footer-top,
+    body:has(.intake-page) .copyright {
+        display: none;
+    }
+
     .intake-page {
-        flex: 1 0 auto;
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background: #7a1028;
         background-image:
             radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 0%, transparent 40%),
             radial-gradient(circle at 85% 80%, rgba(0,0,0,0.15) 0%, transparent 40%);
-        padding: 3rem 1.5rem 4rem;
+        padding: 1.5rem;
         position: relative;
-        overflow-x: hidden;
-        overflow-y: visible;
+        overflow: hidden;
     }
 
-    /* Decorative circles */
     .intake-page::before {
         content: '';
         position: absolute;
@@ -135,9 +151,10 @@ if($success){
         pointer-events: none;
     }
 
-    /* ── Form card ── */
     .form-container {
         max-width: 700px;
+        width: 100%;
+        max-height: 100%;
         margin: 0 auto;
         background: #fff;
         border-radius: 16px;
@@ -145,6 +162,10 @@ if($success){
         box-shadow: 0 20px 60px rgba(0,0,0,0.25);
         position: relative;
         z-index: 2;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
     }
 
     /* Top accent bar */
@@ -302,17 +323,18 @@ if($success){
         .form-row { grid-template-columns: 1fr; }
         .club-options { grid-template-columns: 1fr; }
         .form-container { padding: 2rem 1.5rem 1.75rem; }
+        .intake-page { padding: 1rem; }
     }
     @media (max-width: 600px) {
         .form-container { padding: 1.75rem 1.25rem; width: 100%; }
-        .intake-page { padding: 1.5rem 1rem 3rem; }
+        .intake-page { padding: 0.75rem; }
         .form-header h2 { font-size: 1.4rem; }
         .intake-page::before { width: 220px; height: 220px; top: -60px; right: -60px; }
         .intake-page::after { width: 160px; height: 160px; bottom: -40px; left: -40px; }
         .club-options label { font-size: 12px; padding: 9px 10px; }
     }
     @media (max-width: 400px) {
-        .intake-page { padding: 1.25rem 0.75rem 2.5rem; }
+        .intake-page { padding: 0.5rem; }
         .form-container { padding: 1.5rem 1rem 1.25rem; border-radius: 12px; }
         .form-header h2 { font-size: 1.25rem; }
     }

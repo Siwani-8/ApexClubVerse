@@ -271,6 +271,9 @@
     align-items: center;
     justify-content: center;
     padding: 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
 }
 .confirm-overlay.is-open {
     display: flex;
@@ -279,10 +282,13 @@
     background: #fff;
     width: 420px;
     max-width: 100%;
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
     border-radius: 14px;
     padding: 24px;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
     font-family: 'Segoe UI', sans-serif;
+    overscroll-behavior: contain;
 }
 .confirm-box h3 {
     margin: 0 0 10px;
@@ -342,6 +348,7 @@
     function closeConfirm() {
         overlay.classList.remove('is-open');
         overlay.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
         pendingForm = null;
         pendingButton = null;
     }
@@ -353,6 +360,7 @@
         titleEl.textContent = title || 'Please confirm';
         overlay.classList.add('is-open');
         overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
         okBtn.focus();
     }
 

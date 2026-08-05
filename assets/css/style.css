@@ -29,6 +29,10 @@ body {
     position: relative;
 }
 
+body.modal-open {
+    overflow: hidden;
+}
+
 img, video, iframe {
     max-width: 100%;
     height: auto;

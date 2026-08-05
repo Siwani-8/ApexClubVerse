@@ -869,6 +869,7 @@ if (isset($_GET['edit_image'])) {
         padding: 16px;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
     }
     .schedule-modal.is-open { display: flex; }
     .schedule-modal-box {
@@ -878,8 +879,9 @@ if (isset($_GET['edit_image'])) {
         border-radius: 12px;
         padding: 24px;
         margin: auto;
-        max-height: calc(100vh - 32px);
+        max-height: calc(100dvh - 32px);
         overflow-y: auto;
+        overscroll-behavior: contain;
     }
     .schedule-modal-actions {
         display: flex;
@@ -1004,7 +1006,7 @@ if (isset($_GET['edit_image'])) {
                 <h2>&#128203; All Club Intake Applications</h2>
                 <div class="header-actions">
                     <span class="badge-count"><?php echo $total_regs; ?> total</span>
-                    <button class="btn-submit" type="button" onclick="var m=document.getElementById('scheduleModal');m.classList.add('is-open');m.setAttribute('aria-hidden','false');" style="margin:0;">
+                    <button class="btn-submit" type="button" onclick="var m=document.getElementById('scheduleModal');m.classList.add('is-open');m.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');" style="margin:0;">
                         Schedule Interviews
                     </button>
                 </div>
@@ -1928,7 +1930,7 @@ if (isset($_GET['edit_image'])) {
             </div>
             <div class="schedule-modal-actions">
                 <button class="btn-submit" name="schedule_interviews">Save Schedule</button>
-                <button type="button" class="btn-delete" onclick="var m=document.getElementById('scheduleModal');m.classList.remove('is-open');m.setAttribute('aria-hidden','true');">Cancel</button>
+                <button type="button" class="btn-delete" onclick="var m=document.getElementById('scheduleModal');m.classList.remove('is-open');m.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');">Cancel</button>
             </div>
         </form>
     </div>
