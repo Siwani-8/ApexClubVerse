@@ -19,7 +19,7 @@ if (isset($_POST['submit'])) {
 
             $user = mysqli_fetch_assoc($res);
 
-if (!$user['is_verified']) {
+if (!$user[' It's name main rantis_verified']) {
 
     $msg = "Please verify your email before logging in. Check your inbox.";
 

@@ -1,254 +1,379 @@
-<style>
-
-.gallery-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-    gap:20px;
-.event-hero{
-    height:250px;
-    margin:30px auto;
-    max-weidth:1000px;
-    border-radius:30px;
-    overflow:hidden;
-    position:relative;
-    background:url('images/events/musical_banner.jpeg') center/cover;
-}
-
-.hero-overlay{
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,0.45);
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    color:white;
-}
-
-.hero-overlay h1{
-    font-size:2.8rem;
-    margin-bottom:20px;
-}
-
-.hero-overlay p{
-    font-size:1 rem;
-    max-width:800px;
-}
-
-.event-info{
-    display:flex;
-    gap:20px;
-    margin:20px 0 30px;
-    font-weight:600;
-}
-
-.gallery-item{
-    background:white;
-    border-radius:20px;
-    overflow:hidden;
-    box-shadow:0 5px 20px rgba(0,0,0,.08);
-    transition:0.3s;
-}
-
-.gallery-item:hover{
-    transform:translateY(-8px);
-}
-
-.gallery-item img{
-    width:100%;
-<<<<<<< HEAD
-    height:250px;
-    object-fit:cover;
-    border-radius:10px;
-}
-
-.gallery-item{
-    background:#fff;
-    padding:10px;
-    border-radius:10px;
-}
-
-</style>
-
-=======
-    height:300px;
-    object-fit:cover;
-    
-}
-
-.gallery-caption{
-    text-align:center;
-    font-size:24px;
-    font-weight:600;
-    padding:18px;
-}
-.gallery-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-    gap:30px;
-    padding:0 40px 50px;
-}
-.container{
-    max-width:1200px;
-    margin:0 auto;
-    padding:0 40px;
-}
-.event-details{
-    background:white;
-    max-width:900px;
-    margin:0 auto 50px auto;
-    padding:18px 25px;
-    border-radius:25px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:40px;
-    box-shadow:0 8px 25px rgba(0,0,0,0.08);
-}
-
-.detail-card{
-    display:flex;
-    align-items:center;
-    gap:20px;
-}
-
-.detail-icon{
-    width:45px;
-    height:45px;
-    border-radius:15px;
-    background:#ffe9ec;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:20px;
-}
-
-.detail-card span{
-    color:#777;
-    display:block;
-    margin-bottom:5px;
-}
-
-.detail-card h3{
-    margin:0;
-    font-size:20px;
-}
-
-.detail-divider{
-    width:1px;
-    height:70px;
-    background:#ddd;
-}
-.page-wrapper{
-    max-width:1400px;
-    margin:0 auto;
-    transform:scale(0.9);
-    transform-origin:top center;
-}
-</style>
-<div class="page-wrapper">
-
-    <!-- All your current page content here -->
-
-</div>
->>>>>>> 1fee1452aca3ced30870f8c1e91161e1616d80f1
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 include 'db.php';
+
+/*
+|--------------------------------------------------------------------------
+| Login and admin check
+|--------------------------------------------------------------------------
+| Supported session examples:
+| $_SESSION['user_id'] and $_SESSION['role']
+| $_SESSION['user']['id'] and $_SESSION['user']['role']
+| $_SESSION['loggedInUser']['id'] and $_SESSION['loggedInUser']['role']
+*/
+
+$sessionUser = $_SESSION['user'] ?? $_SESSION['loggedInUser'] ?? [];
+
+$user_id = $_SESSION['user_id']
+    ?? ($sessionUser['id'] ?? null);
+
+$user_role = $_SESSION['role']
+    ?? ($sessionUser['role'] ?? '');
+
+$isLoggedIn = !empty($user_id);
+
+$isAdmin = $isLoggedIn && (
+    strtolower((string)$user_role) === 'admin'
+    || !empty($_SESSION['is_admin'])
+);
+
+function h($value) {
+    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
+}
+
+function findImage($path) {
+    $path = ltrim(str_replace('\\', '/', $path), '/');
+
+    if ($path && file_exists(__DIR__ . '/' . $path)) {
+        return $path;
+    }
+
+    /* Fix old names such as apex2023_2.jpg */
+    if (preg_match('/apex2023_(\d+)\.(jpg|jpeg|png)$/i', basename($path), $m)) {
+        $fallback = "images/events/apexday{$m[1]}.jpeg";
+
+        if (file_exists(__DIR__ . '/' . $fallback)) {
+            return $fallback;
+        }
+    }
+
+    return null;
+}
+
+$event_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
+if (!$event_id) {
+    exit('Invalid event ID.');
+}
+
+$error = '';
+
+/* Add a new image without replacing old images */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_image'])) {
+
+    if (!$isLoggedIn) {
+        http_response_code(401);
+        $error = 'Please log in as an admin to edit this event.';
+    } elseif (!$isAdmin) {
+        http_response_code(403);
+        $error = 'Only an admin can edit event images.';
+    } else {
+        $edition_id = (int)($_POST['edition_id'] ?? 0);
+        $caption = trim($_POST['caption'] ?? '');
+        $file = $_FILES['image'] ?? null;
+
+        $stmt = mysqli_prepare(
+            $conn,
+            "SELECT id FROM event_editions WHERE id = ? AND event_id = ?"
+        );
+
+        mysqli_stmt_bind_param($stmt, 'ii', $edition_id, $event_id);
+        mysqli_stmt_execute($stmt);
+        $editionExists = mysqli_stmt_get_result($stmt)->fetch_assoc();
+        mysqli_stmt_close($stmt);
+
+        if (!$editionExists) {
+            $error = 'Invalid event edition.';
+        } elseif (!$file || $file['error'] !== UPLOAD_ERR_OK) {
+            $error = 'Please select an image.';
+        } elseif ($file['size'] > 5 * 1024 * 1024) {
+            $error = 'Image must be smaller than 5 MB.';
+        } else {
+            $allowed = [
+                'image/jpeg' => 'jpeg',
+                'image/png'  => 'png',
+                'image/webp' => 'webp'
+            ];
+
+            $mime = mime_content_type($file['tmp_name']);
+
+            if (!isset($allowed[$mime])) {
+                $error = 'Only JPG, PNG and WEBP images are allowed.';
+            } else {
+                $folder = __DIR__ . '/images/events/';
+
+                if (!is_dir($folder)) {
+                    mkdir($folder, 0775, true);
+                }
+
+                $name = 'event_' . $event_id . '_' . $edition_id . '_' .
+                        uniqid() . '.' . $allowed[$mime];
+
+                $dbPath = 'images/events/' . $name;
+                $fullPath = $folder . $name;
+
+                if (!move_uploaded_file($file['tmp_name'], $fullPath)) {
+                    $error = 'Image upload failed.';
+                } else {
+                    $stmt = mysqli_prepare(
+                        $conn,
+                        "INSERT INTO event_gallery
+                        (event_id, edition_id, image, caption, created_at)
+                        VALUES (?, ?, ?, ?, NOW())"
+                    );
+
+                    mysqli_stmt_bind_param(
+                        $stmt,
+                        'iiss',
+                        $event_id,
+                        $edition_id,
+                        $dbPath,
+                        $caption
+                    );
+
+                    if (mysqli_stmt_execute($stmt)) {
+                        mysqli_stmt_close($stmt);
+                        header("Location: event-details.php?id=$event_id&uploaded=1");
+                        exit;
+                    }
+
+                    mysqli_stmt_close($stmt);
+
+                    if (file_exists($fullPath)) {
+                        unlink($fullPath);
+                    }
+
+                    $error = 'Could not save the image.';
+                }
+            }
+        }
+    }
+}
+
+/* Main event */
+$stmt = mysqli_prepare(
+    $conn,
+    "SELECT id, title, description FROM events WHERE id = ?"
+);
+mysqli_stmt_bind_param($stmt, 'i', $event_id);
+mysqli_stmt_execute($stmt);
+$event = mysqli_stmt_get_result($stmt)->fetch_assoc();
+mysqli_stmt_close($stmt);
+
+if (!$event) {
+    exit('Event not found.');
+}
+
+/* Event editions */
+$stmt = mysqli_prepare(
+    $conn,
+    "SELECT id, title, event_date, location, description
+     FROM event_editions
+     WHERE event_id = ?
+     ORDER BY event_date DESC"
+);
+mysqli_stmt_bind_param($stmt, 'i', $event_id);
+mysqli_stmt_execute($stmt);
+$editions = mysqli_stmt_get_result($stmt)->fetch_all(MYSQLI_ASSOC);
+mysqli_stmt_close($stmt);
+
+/* All gallery images fetched once */
+$stmt = mysqli_prepare(
+    $conn,
+    "SELECT edition_id, image, caption
+     FROM event_gallery
+     WHERE event_id = ?
+     ORDER BY id"
+);
+mysqli_stmt_bind_param($stmt, 'i', $event_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+$gallery = [];
+
+while ($photo = mysqli_fetch_assoc($result)) {
+    $gallery[$photo['edition_id']][] = $photo;
+}
+
+mysqli_stmt_close($stmt);
 include 'header.php';
-
-$event_id = (int)$_GET['id'];
-
-$event_query = mysqli_query($conn,
-    "SELECT * FROM events WHERE id=$event_id");
-
-$event = mysqli_fetch_assoc($event_query);
-
-$gallery_query = mysqli_query($conn,
-    "SELECT * FROM event_gallery WHERE event_id=$event_id");
 ?>
 
-<div class="container">
+<style>
+*{box-sizing:border-box}
+body{background:#f7f8fc}
+.event-container{max-width:1100px;margin:auto;padding:40px 20px}
+.event-hero{min-height:280px;margin-bottom:45px;border-radius:25px;overflow:hidden;position:relative;background:url('images/events/musical1.jpeg') center/cover no-repeat}
+.hero-overlay{position:absolute;inset:0;padding:30px;background:rgba(0,0,0,.55);color:#fff;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.hero-overlay h1{margin:0 0 12px;font-size:clamp(2rem,5vw,3rem)}
+.hero-overlay p{max-width:800px;margin:0;line-height:1.7}
+.message{max-width:850px;margin:0 auto 25px;padding:14px 18px;border-radius:10px}
+.success{background:#d4edda;color:#155724}
+.error{background:#f8d7da;color:#721c24}
+.edition{margin-bottom:60px}
+.edition-title{text-align:center;margin-bottom:20px}
+.edition-title h2{margin-bottom:8px}
+.edition-title p{max-width:750px;margin:auto;color:#666}
+.event-details{max-width:850px;margin:25px auto;padding:22px 30px;border-radius:20px;background:#fff;box-shadow:0 8px 25px rgba(0,0,0,.08);display:flex;justify-content:center;gap:60px}
+.detail{display:flex;align-items:center;gap:15px}
+.icon{width:48px;height:48px;border-radius:14px;background:#ffe9ec;display:grid;place-items:center;font-size:21px}
+.detail small{display:block;color:#777}
+.detail h3{margin:3px 0 0;font-size:18px}
+.upload-box{max-width:850px;margin:0 auto 30px;padding:20px;border-radius:18px;background:#fff;box-shadow:0 5px 18px rgba(0,0,0,.07)}
+.upload-form{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end}
+.form-group label{display:block;margin-bottom:6px;font-weight:600}
+.form-group input{width:100%;min-height:43px;padding:9px 11px;border:1px solid #ddd;border-radius:9px}
+.upload-btn{min-height:43px;padding:10px 20px;border:0;border-radius:9px;color:#fff;background:#ef5b68;cursor:pointer}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:25px}
+.gallery-item{padding:10px;border-radius:18px;background:#fff;box-shadow:0 5px 18px rgba(0,0,0,.08)}
+.gallery-item img{width:100%;height:280px;display:block;object-fit:cover;border-radius:13px}
+.caption{padding:13px 8px 7px;text-align:center;font-size:17px;font-weight:600}
+.empty,.missing{padding:25px;border:2px dashed #ddd;border-radius:14px;color:#777;text-align:center;background:#fff}
+.missing{min-height:180px;display:grid;place-items:center}
+@media(max-width:700px){
+    .event-details{flex-direction:column;gap:20px}
+    .upload-form{grid-template-columns:1fr}
+    .gallery{grid-template-columns:1fr}
+}
+</style>
 
-<<<<<<< HEAD
-<h1><?php echo htmlspecialchars($event['title']); ?></h1>
+<div class="event-container">
 
-<p>
-<?php echo htmlspecialchars($event['description']); ?>
-</p>
+    <?php if (isset($_GET['uploaded'])): ?>
+        <div class="message success">Image added successfully.</div>
+    <?php endif; ?>
 
-<p>
-Date:
-<?php echo htmlspecialchars($event['event_date']); ?>
-</p>
+    <?php if ($error): ?>
+        <div class="message error"><?= h($error) ?></div>
+    <?php endif; ?>
 
-<p>
-Location:
-<?php echo htmlspecialchars($event['location']); ?>
-</p>
+    <section class="event-hero">
+        <div class="hero-overlay">
+            <h1><?= h($event['title']) ?></h1>
 
-=======
-<div class="event-hero">
-    <div class="hero-overlay">
-        <h1><?php echo htmlspecialchars($event['title']); ?></h1>
-        <p><?php echo htmlspecialchars($event['description']); ?></p>
-    </div>
-</div>
-
-<div class="event-details">
-
-    <div class="detail-card">
-        <div class="detail-icon">📅</div>
-
-        <div>
-            <span>Date</span>
-            <h3><?php echo htmlspecialchars($event['event_date']); ?></h3>
+            <?php if ($event['description']): ?>
+                <p><?= nl2br(h($event['description'])) ?></p>
+            <?php endif; ?>
         </div>
-    </div>
+    </section>
 
-    <div class="detail-divider"></div>
+    <?php if (!$editions): ?>
+        <div class="empty">No event editions found.</div>
+    <?php endif; ?>
 
-    <div class="detail-card">
-        <div class="detail-icon">📍</div>
+    <?php foreach ($editions as $edition): ?>
+        <?php
+        $edition_id = (int)$edition['id'];
+        $photos = $gallery[$edition_id] ?? [];
+        ?>
 
-        <div>
-            <span>Location</span>
-            <h3><?php echo htmlspecialchars($event['location']); ?></h3>
-        </div>
-    </div>
+        <section class="edition">
 
-</div>
->>>>>>> 1fee1452aca3ced30870f8c1e91161e1616d80f1
-<div class="gallery-grid">
+            <div class="edition-title">
+                <h2><?= h($edition['title']) ?></h2>
 
-<?php while($photo=mysqli_fetch_assoc($gallery_query)){ ?>
+                <?php if ($edition['description']): ?>
+                    <p><?= nl2br(h($edition['description'])) ?></p>
+                <?php endif; ?>
+            </div>
 
-<<<<<<< HEAD
-    <div class="gallery-item">
+            <div class="event-details">
+                <div class="detail">
+                    <div class="icon">📅</div>
+                    <div>
+                        <small>Date</small>
+                        <h3><?= h(date('F j, Y', strtotime($edition['event_date']))) ?></h3>
+                    </div>
+                </div>
 
-        <img src="<?php echo htmlspecialchars($photo['image']); ?>">
+                <div class="detail">
+                    <div class="icon">📍</div>
+                    <div>
+                        <small>Location</small>
+                        <h3><?= h($edition['location']) ?></h3>
+                    </div>
+                </div>
+            </div>
 
-        <p>
-            <?php echo htmlspecialchars($photo['caption']); ?>
-        </p>
+            <?php if ($isAdmin): ?>
 
-    </div>
+                <div class="upload-box">
+                    <h3>Add image to <?= h($edition['title']) ?></h3>
 
-=======
-<div class="gallery-item">
+                    <form method="POST"
+                          enctype="multipart/form-data"
+                          class="upload-form">
 
-    <img src="<?php echo htmlspecialchars($photo['image']); ?>">
+                        <input type="hidden"
+                               name="edition_id"
+                               value="<?= $edition_id ?>">
 
-    <div class="gallery-caption">
-        <?php echo htmlspecialchars($photo['caption']); ?>
-    </div>
+                        <div class="form-group">
+                            <label>Image</label>
 
-</div>
+                            <input type="file"
+                                   name="image"
+                                   accept=".jpg,.jpeg,.png,.webp"
+                                   required>
+                        </div>
 
->>>>>>> 1fee1452aca3ced30870f8c1e91161e1616d80f1
-<?php } ?>
+                        <div class="form-group">
+                            <label>Caption</label>
 
-</div>
+                            <input type="text"
+                                   name="caption"
+                                   maxlength="255"
+                                   placeholder="Image caption">
+                        </div>
+
+                        <button type="submit"
+                                name="add_image"
+                                class="upload-btn">
+                            Add Image
+                        </button>
+                    </form>
+                </div>
+
+            <?php endif; ?>
+
+            <?php if ($photos): ?>
+                <div class="gallery">
+
+                    <?php foreach ($photos as $photo): ?>
+                        <?php $imagePath = findImage($photo['image']); ?>
+
+                        <div class="gallery-item">
+
+                            <?php if ($imagePath): ?>
+                                <img
+                                    src="<?= h($imagePath) ?>"
+                                    alt="<?= h($photo['caption'] ?: $edition['title']) ?>"
+                                    loading="lazy"
+                                >
+                            <?php else: ?>
+                                <div class="missing">
+                                    Image not found: <?= h(basename($photo['image'])) ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($photo['caption']): ?>
+                                <div class="caption"><?= h($photo['caption']) ?></div>
+                            <?php endif; ?>
+
+                        </div>
+                    <?php endforeach; ?>
+
+                </div>
+            <?php else: ?>
+                <div class="empty">No images added for this edition.</div>
+            <?php endif; ?>
+
+        </section>
+    <?php endforeach; ?>
 
 </div>
 
