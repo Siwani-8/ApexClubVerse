@@ -43,7 +43,7 @@ if (!$club) { header("Location: clubs.php"); exit; }
 
 $bod_result = mysqli_query($conn, "SELECT * FROM bod_members WHERE club_id = $club_id ORDER BY FIELD(position, 'President', 'Vice President', 'Treasurer', 'General Secretary', 'Operations Head')");
 $boa_result = mysqli_query($conn, "SELECT * FROM boa_members WHERE club_id = $club_id");
-$events_result = mysqli_query($conn, "SELECT * FROM club_events WHERE club_id = $club_id");
+$events_result = mysqli_query($conn, "SELECT * FROM events WHERE club_id = $club_id");
 
 // Club-specific data
 $club_data = [
@@ -529,7 +529,7 @@ $data = $club_data[$club_id] ?? $club_data[1];
     <?php } ?>
 
     <div class="event-label">
-        <?php echo htmlspecialchars($event['event_name']); ?>
+       <?php echo htmlspecialchars($event['title']); ?>
     </div>
 
 </div>
