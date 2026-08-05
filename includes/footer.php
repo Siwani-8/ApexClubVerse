@@ -5,8 +5,10 @@
     padding:35px 6%;
     margin-top:0;
     position:relative;
+    z-index:20;
     flex-shrink:0;
     width:100%;
+    display:block;
 }
 
 .footer-container{
@@ -93,8 +95,10 @@
     padding:12px;
     font-size:14px;
     position:relative;
+    z-index:20;
     flex-shrink:0;
     width:100%;
+    display:block;
 }
 
 /* Mobile */

@@ -87,13 +87,12 @@ if(mysqli_query($conn, $sql)){
         background-image:
             radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 0%, transparent 40%),
             radial-gradient(circle at 85% 80%, rgba(0,0,0,0.15) 0%, transparent 40%);
-        background-attachment: fixed;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 3rem 1.5rem;
         position: relative;
-        overflow: hidden;
+        overflow-x: clip;
     }
     .signup-page::before {
         content: '';

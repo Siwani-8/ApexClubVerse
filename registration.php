@@ -109,10 +109,9 @@ if($success){
         background-image:
             radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 0%, transparent 40%),
             radial-gradient(circle at 85% 80%, rgba(0,0,0,0.15) 0%, transparent 40%);
-        background-attachment: fixed;
         padding: 3rem 1.5rem 4rem;
         position: relative;
-        overflow: hidden;
+        overflow-x: clip;
     }
 
     .intake-page::before {
