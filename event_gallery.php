@@ -184,9 +184,9 @@ include __DIR__ . '/includes/header.php';
 *{box-sizing:border-box}
 body{background:#f7f8fc}
 .event-container{max-width:1100px;margin:auto;padding:40px 20px}
-.event-hero{min-height:280px;margin-bottom:45px;border-radius:25px;overflow:hidden;position:relative;background:url('<?php echo h(url('images/events/musical1.jpeg')); ?>') center/cover no-repeat}
-.hero-overlay{position:absolute;inset:0;padding:30px;background:rgba(0,0,0,.55);color:#fff;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
-.hero-overlay h1{margin:0 0 12px;font-size:clamp(2rem,5vw,3rem)}
+.event-hero{min-height:280px;height:auto;margin-bottom:45px;border-radius:25px;overflow:hidden;position:relative;background:url('<?php echo h(url('images/events/musical1.jpeg')); ?>') center/cover no-repeat}
+.hero-overlay{position:relative;min-height:280px;padding:30px 20px;background:rgba(0,0,0,.55);color:#fff;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.hero-overlay h1{margin:0 0 12px;font-size:clamp(1.6rem,5vw,3rem);word-break:break-word}
 .hero-overlay p{max-width:800px;margin:0;line-height:1.7}
 .message{max-width:850px;margin:0 auto 25px;padding:14px 18px;border-radius:10px}
 .success{background:#d4edda;color:#155724}
@@ -213,17 +213,21 @@ body{background:#f7f8fc}
 .missing{min-height:180px;display:grid;place-items:center}
 @media(max-width:900px){
     .event-container{padding:28px 16px}
-    .event-hero{min-height:220px;border-radius:18px;margin-bottom:30px}
+    .event-hero,.hero-overlay{min-height:220px;border-radius:18px}
+    .event-hero{margin-bottom:30px}
     .hero-overlay{padding:20px 16px}
     .event-details{gap:36px;padding:18px 20px}
     .gallery{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
 }
 @media(max-width:700px){
     .event-container{padding:20px 14px}
-    .event-hero{min-height:200px;border-radius:14px}
+    .event-hero,.hero-overlay{min-height:180px;border-radius:14px}
+    .hero-overlay{padding:20px 14px}
     .hero-overlay p{font-size:0.92rem;line-height:1.55}
-    .event-details{flex-direction:column;gap:20px;padding:16px}
+    .event-details{flex-direction:column;gap:20px;padding:16px;align-items:flex-start}
+    .detail{width:100%}
     .upload-form{grid-template-columns:1fr}
+    .upload-btn{width:100%}
     .gallery{grid-template-columns:1fr;gap:16px}
     .gallery-item img{height:220px}
 }
@@ -231,6 +235,7 @@ body{background:#f7f8fc}
     .event-container{padding:16px 12px}
     .edition{margin-bottom:40px}
     .detail h3{font-size:16px}
+    .caption{font-size:15px}
 }
 </style>
 

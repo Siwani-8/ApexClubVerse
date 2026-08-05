@@ -239,6 +239,8 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
     @media (max-width: 600px) {
         .clubs-hero { padding: 2rem 1.15rem 2.5rem; }
         .clubs-hero h1 { font-size: 1.9rem; }
+        .clubs-hero::before { width: 160px; height: 160px; }
+        .clubs-hero::after { width: 120px; height: 120px; }
         .clubs-stats {
             flex-wrap: wrap;
             justify-content: center;

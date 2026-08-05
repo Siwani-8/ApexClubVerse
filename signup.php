@@ -91,7 +91,8 @@ if(mysqli_query($conn, $sql)){
         justify-content: center;
         padding: 3rem 1.5rem;
         position: relative;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
     .signup-page::before {
         content: '';
@@ -242,6 +243,10 @@ if(mysqli_query($conn, $sql)){
     }
     .hint a:hover { text-decoration: underline; }
 
+    @media (max-width: 600px) {
+        .signup-page::before { width: 220px; height: 220px; top: -60px; right: -60px; }
+        .signup-page::after { width: 160px; height: 160px; bottom: -40px; left: -40px; }
+    }
     @media (max-width: 480px) {
         .signup-page { padding: 2rem 1rem; }
         .signup-card { padding: 2rem 1.25rem 1.5rem; }

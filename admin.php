@@ -806,10 +806,12 @@ if (isset($_GET['edit_image'])) {
     .tab-btn.active { background: #7a1028; color: #fff; border-color: #7a1028; }
     .table-box { background: #fff; border: 0.5px solid #e0ddd6; border-radius: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .table-box-header { padding: 1rem 1.5rem; border-bottom: 0.5px solid #e0ddd6; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
-    .table-box-header h2 { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+    .table-box-header h2 { font-size: 15px; font-weight: 600; color: #1a1a1a; min-width: 0; flex: 1 1 200px; word-break: break-word; }
     .badge-count { background: #fdecea; color: #7a1028; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; font-family: 'Segoe UI', sans-serif; }
     .table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; min-width: 640px; }
+    td form[method="POST"] { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     th { background: #f9f8f5; padding: 10px 14px; font-family: 'Segoe UI', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #999; text-align: left; border-bottom: 0.5px solid #e0ddd6; }
     td { padding: 10px 14px; font-family: 'Segoe UI', sans-serif; font-size: 13px; color: #333; border-bottom: 0.5px solid #f0ede7; }
     tr:last-child td { border-bottom: none; }
@@ -855,6 +857,42 @@ if (isset($_GET['edit_image'])) {
 
     @media (max-width: 400px) {
         .stats-row { grid-template-columns: 1fr; }
+    }
+
+    .schedule-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.45);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        padding: 16px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .schedule-modal.is-open { display: flex; }
+    .schedule-modal-box {
+        background: #fff;
+        width: 100%;
+        max-width: 450px;
+        border-radius: 12px;
+        padding: 24px;
+        margin: auto;
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
+    }
+    .schedule-modal-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+    @media (max-width: 480px) {
+        .schedule-modal-box { padding: 16px; }
+        .schedule-modal-actions { flex-direction: column; }
+        .schedule-modal-actions .btn-submit,
+        .schedule-modal-actions .btn-delete { width: 100%; margin: 0; }
     }
 </style>
 
@@ -965,9 +1003,9 @@ if (isset($_GET['edit_image'])) {
         <div class="table-box">
             <div class="table-box-header">
                 <h2>&#128203; All Club Intake Applications</h2>
-                <div style="display:flex;gap:10px;align-items:center;">
+                <div class="header-actions">
                     <span class="badge-count"><?php echo $total_regs; ?> total</span>
-                    <button class="btn-submit" type="button" onclick="document.getElementById('scheduleModal').style.display='flex';" style="margin:0;">
+                    <button class="btn-submit" type="button" onclick="document.getElementById('scheduleModal').classList.add('is-open');" style="margin:0;">
                         Schedule Interviews
                     </button>
                 </div>
@@ -1025,7 +1063,7 @@ if (isset($_GET['edit_image'])) {
                     ?>
                     </td>
                     <td>
-                        <form method="POST" style="display:flex;gap:6px;align-items:center;">
+                        <form method="POST" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
                             <input type="hidden" name="reg_id" value="<?php echo $r['id']; ?>">
                             <select name="status" class="status-select">
                                 <option value="Pending" <?php if($r['application_status']=="Pending") echo "selected"; ?>>Pending</option>
@@ -1612,7 +1650,7 @@ if (isset($_GET['edit_image'])) {
                     <?php echo htmlspecialchars($poll['question']); ?>
                 </h2>
 
-                <div style="display:flex;gap:10px;align-items:center;">
+                <div class="header-actions">
                     <span class="badge-count">
                         <?php echo $total_poll_votes; ?> votes
                     </span>
@@ -1865,8 +1903,8 @@ if (isset($_GET['edit_image'])) {
     </div>
 </div>
 
-<div id="scheduleModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); justify-content:center; align-items:center; z-index:9999;">
-    <div style="background:#fff; width:450px; max-width:95%; border-radius:12px; padding:24px;">
+<div id="scheduleModal" class="schedule-modal" aria-hidden="true">
+    <div class="schedule-modal-box">
         <h2 style="margin-top:0;">Schedule Club Interview</h2>
         <form method="POST">
             <div class="form-group">
@@ -1889,9 +1927,9 @@ if (isset($_GET['edit_image'])) {
                 <label>Venue</label>
                 <input type="text" name="venue" required>
             </div>
-            <div style="display:flex;gap:10px;margin-top:20px;">
+            <div class="schedule-modal-actions">
                 <button class="btn-submit" name="schedule_interviews">Save Schedule</button>
-                <button type="button" class="btn-delete" onclick="document.getElementById('scheduleModal').style.display='none';">Cancel</button>
+                <button type="button" class="btn-delete" onclick="document.getElementById('scheduleModal').classList.remove('is-open');">Cancel</button>
             </div>
         </form>
     </div>

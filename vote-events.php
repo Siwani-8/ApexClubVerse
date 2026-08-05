@@ -186,10 +186,10 @@ while($poll = mysqli_fetch_assoc($polls)) {
     .voted-badge { display: inline-flex; align-items: center; gap: 5px; background: #e8f6ee; border: 0.5px solid #b6dfc5; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; color: #1a7a4a; font-family: 'Segoe UI', sans-serif; margin-bottom: 1.1rem; }
 
     .result-row { margin-bottom: 0.85rem; }
-    .result-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
-    .result-name { font-family: 'Segoe UI', sans-serif; font-size: 13px; color: #444; }
+    .result-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; gap: 8px; }
+    .result-name { font-family: 'Segoe UI', sans-serif; font-size: 13px; color: #444; min-width: 0; flex: 1; overflow-wrap: anywhere; }
     .result-name.is-leader { font-weight: 700; }
-    .result-pct { font-size: 13px; font-weight: 700; color: #1a1a1a; font-family: 'Segoe UI', sans-serif; }
+    .result-pct { font-size: 13px; font-weight: 700; color: #1a1a1a; font-family: 'Segoe UI', sans-serif; flex-shrink: 0; }
     .result-track { background: #f0ede7; border-radius: 30px; height: 8px; overflow: hidden; }
     .result-fill { height: 100%; border-radius: 30px; background: #7a1028; transition: width 0.5s ease; }
     .total-votes-label { font-family: 'Segoe UI', sans-serif; font-size: 11px; color: #bbb; margin-top: 0.9rem; }
@@ -250,6 +250,8 @@ while($poll = mysqli_fetch_assoc($polls)) {
     @media (max-width: 600px) {
         .vote-hero { padding: 2.25rem 1.15rem 2.5rem; }
         .vote-hero h1 { font-size: 1.8rem; }
+        .vote-hero::before { width: 160px; height: 160px; }
+        .vote-hero::after { width: 120px; height: 120px; }
         .vote-content { padding: 1.75rem 1.15rem 3rem; }
         .poll-card { flex-direction: column; }
         .poll-main { padding: 1.15rem 1.25rem; }

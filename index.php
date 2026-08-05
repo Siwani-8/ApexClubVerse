@@ -375,14 +375,13 @@
         .hero-desc { font-size: 0.95rem; margin: 1.25rem auto 1.75rem; }
         .hero-ctas { flex-direction: column; align-items: stretch; }
         .btn-primary, .btn-secondary { justify-content: center; width: 100%; }
-        .gallery-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 130px; gap: 8px; }
+        .gallery-grid { grid-template-columns: 1fr; grid-auto-rows: 160px; gap: 8px; }
+        .gi-1, .gi-4, .gi-7 { grid-column: span 1; }
         .numbers-inner { grid-template-columns: 1fr 1fr; gap: 1rem; }
         .section { padding: 3rem 1.15rem; }
         .cta-banner { padding: 2rem 1.25rem; }
     }
     @media (max-width: 400px) {
-        .gallery-grid { grid-template-columns: 1fr; }
-        .gi-1, .gi-4, .gi-7 { grid-column: span 1; }
         .numbers-inner { grid-template-columns: 1fr; }
     }
 </style>

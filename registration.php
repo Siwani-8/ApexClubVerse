@@ -111,7 +111,8 @@ if($success){
             radial-gradient(circle at 85% 80%, rgba(0,0,0,0.15) 0%, transparent 40%);
         padding: 3rem 1.5rem 4rem;
         position: relative;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
     /* Decorative circles */
@@ -291,6 +292,8 @@ if($success){
         .form-container { padding: 1.75rem 1.25rem; }
         .intake-page { padding: 1.5rem 1rem 3rem; }
         .form-header h2 { font-size: 1.4rem; }
+        .intake-page::before { width: 220px; height: 220px; top: -60px; right: -60px; }
+        .intake-page::after { width: 160px; height: 160px; bottom: -40px; left: -40px; }
     }
 </style>
 

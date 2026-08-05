@@ -67,6 +67,8 @@ ORDER BY applied_at DESC");
     display:flex;
     justify-content:space-between;
     align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
     padding:18px 24px;
     border-bottom:1px solid #ece8e2;
 }
@@ -173,17 +175,21 @@ overflow:hidden;
 }
 
 td{
-padding-left:45%;
+padding:12px 14px;
 position:relative;
 word-break:break-word;
 }
 
 td:before{
-position:absolute;
-left:15px;
-top:16px;
+position:static;
+display:block;
+margin-bottom:6px;
 font-weight:bold;
-max-width:40%;
+font-size:11px;
+color:#888;
+text-transform:uppercase;
+letter-spacing:.04em;
+max-width:none;
 }
 
 td:nth-child(1):before{content:"Club";}
@@ -194,8 +200,11 @@ td:nth-child(4):before{content:"Status";}
 
 @media(max-width:480px){
 .application-page{padding:2rem 1rem;}
+.page-header{padding:18px 16px;}
 .page-header h1{font-size:1.5rem;}
-td{padding-left:42%;font-size:13px;}
+.table-header{padding:14px 16px;}
+.empty-box{padding:32px 16px;}
+td{font-size:13px;}
 }
 </style>
 
