@@ -12,7 +12,8 @@ $events = mysqli_query($conn, "
 ?>
 
 <style>
-    .container { max-width: 900px; margin: 3rem auto; padding: 0 2rem; }
+    /* Added bottom margin to create a gap above the footer */
+    .container { max-width: 900px; margin: 3rem auto 5rem auto; padding: 0 2rem; }
     .page-title { font-size: 2.5rem; margin-bottom: 2rem; color: var(--text-dark); }
 
     .feed-card { background: #ffffff; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; display: flex; border-left: 5px solid var(--primary-crimson); }
@@ -45,23 +46,15 @@ $events = mysqli_query($conn, "
     <?php endif; ?>
 
     <?php while($row = mysqli_fetch_assoc($events)): ?>
-<div class="feed-card">
-    <div class="event-img-box">
-
-<?php if(!empty($row['image'])): ?>
-
-<img
-src="<?php echo htmlspecialchars($row['image']); ?>"
-style="width:100%;height:100%;object-fit:cover;">
-
-<?php else: ?>
-
-<div class="ph-icon">🖼️</div>
-<div>No Image</div>
-
-<?php endif; ?>
-
-</div>
+    <div class="feed-card">
+        <div class="event-img-box">
+            <?php if(!empty($row['image'])): ?>
+                <img src="<?php echo htmlspecialchars($row['image']); ?>" style="width:100%;height:100%;object-fit:cover;">
+            <?php else: ?>
+                <div class="ph-icon">🖼️</div>
+                <div>No Image</div>
+            <?php endif; ?>
+        </div>
         <div class="event-details">
             <span class="event-club"><?php echo htmlspecialchars($row['club_name']); ?></span>
             <span class="event-status status-<?php echo $row['status']; ?>"><?php echo ucfirst($row['status']); ?></span>

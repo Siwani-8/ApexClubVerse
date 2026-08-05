@@ -257,9 +257,9 @@ while($poll = mysqli_fetch_assoc($polls)) {
 <div class="vote-page">
     <div class="vote-hero">
         <div class="vote-hero-inner">
-            <div class="vote-hero-eyebrow">&#128203; Community polls</div>
+            <div class="vote-hero-eyebrow">&#128203; event polls</div>
             <h1>Event Vote</h1>
-            <p>Share your opinion — vote on which event your club should perform next.</p>
+            <p>Share your opinion,vote on which event your club should perform next.</p>
             <div class="vote-stats">
                 <div class="vstat">
                     <strong><?php echo $poll_count; ?></strong>

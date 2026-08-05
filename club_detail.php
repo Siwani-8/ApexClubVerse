@@ -538,6 +538,13 @@ $data = $club_data[$club_id] ?? $club_data[1];
             <?php echo htmlspecialchars($event['title']); ?>
         </div>
 
+<<<<<<< HEAD
+=======
+    <?php } ?>
+
+    <div class="event-label">
+       <?php echo htmlspecialchars($event['title']); ?>
+>>>>>>> 1fee1452aca3ced30870f8c1e91161e1616d80f1
     </div>
 
 </a>

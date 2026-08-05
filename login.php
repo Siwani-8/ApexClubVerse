@@ -18,12 +18,17 @@ if (isset($_POST['submit'])) {
         if (mysqli_num_rows($res) > 0) {
 
             $user = mysqli_fetch_assoc($res);
-            
 
-            if (
+if (!$user['is_verified']) {
+
+    $msg = "Please verify your email before logging in. Check your inbox.";
+
+} elseif (
     password_verify($password, $user['password']) ||
     $password == $user['password']
 ) {
+
+    
 
                 $_SESSION['user_logged_in'] = true;
                 $_SESSION['user_id'] = $user['id'];

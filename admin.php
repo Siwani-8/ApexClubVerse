@@ -6,6 +6,33 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_role'] !== 'admin') {
     header("Location: login.php");
     exit;
 }
+// Get the admin's club name using club_id
+// Get the admin's club name using club_id
+if (empty($_SESSION['club_name'])) {
+
+    $user_id = (int)$_SESSION['user_id'];
+
+    $clubQuery = mysqli_query(
+        $conn,
+        "SELECT c.name
+         FROM users u
+         JOIN clubs c ON u.club_id = c.id
+         WHERE u.id = $user_id
+         LIMIT 1"
+    );
+
+    if ($clubQuery && mysqli_num_rows($clubQuery) > 0) {
+
+        $clubRow = mysqli_fetch_assoc($clubQuery);
+
+        $_SESSION['club_name'] = $clubRow['name'];
+
+    } else {
+
+        die("Error: No club is assigned to this admin.");
+
+    }
+}
 
 if (isset($_POST['update_status'])) {
     $reg_id = (int)$_POST['reg_id'];
@@ -482,7 +509,8 @@ if(isset($_GET['edit'])){
 
 <style>
     *, *::before, *::after { box-sizing: border-box; }
-    .admin-page { min-height: 100vh; background: #f5f3ef; padding: 2rem; }
+    /* Added margin-bottom: 4rem to create gap above footer */
+    .admin-page { min-height: 100vh; background: #f5f3ef; padding: 2rem; margin-bottom: 4rem; }
     .admin-inner { max-width: 1100px; margin: 0 auto; }
     .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
     .admin-header h1 { font-size: 1.6rem; font-weight: 700; color: #1a1a1a; }
@@ -526,7 +554,7 @@ if(isset($_GET['edit'])){
     select.status-select { padding: 4px 8px; border: 0.5px solid #ddd; border-radius: 6px; font-size: 12px; font-family: 'Segoe UI', sans-serif; cursor: pointer; }
     .empty-msg { text-align: center; padding: 2rem; color: #bbb; font-family: 'Segoe UI', sans-serif; font-size: 13px; }
     @media (max-width: 600px) {
-        .admin-page { padding: 1rem; }
+        .admin-page { padding: 1rem; margin-bottom: 2rem; }
         .stats-row { grid-template-columns: 1fr 1fr; }
     }
 </style>
@@ -762,7 +790,6 @@ if(isset($_GET['edit'])){
                         name="club_id"
                         value="<?php echo $clubData['id'] ?? ''; ?>">
 
-                        <!-- ADDED MISSING LABEL HERE TO FIX ALIGNMENT -->
                         <label>Club</label>
                         <input
                         type="text"
