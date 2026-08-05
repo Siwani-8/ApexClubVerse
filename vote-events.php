@@ -7,8 +7,7 @@ include 'includes/club_admin_helpers.php';
 
 // Require login before any vote/poll actions are processed
 if (empty($_SESSION['user_logged_in'])) {
-    header("Location: login.php");
-    exit;
+    redirect('login.php');
 }
 
 $user_email = $_SESSION['user_email'] ?? ($_SESSION['user_name'] ?? '');
@@ -24,8 +23,7 @@ if (isset($_POST['vote'])) {
         mysqli_query($conn, "INSERT INTO poll_votes (poll_id, user_email, option_id) VALUES ($poll_id, '$email_safe', $option_id)");
         mysqli_query($conn, "UPDATE poll_options SET votes = votes + 1 WHERE id = $option_id");
     }
-    header("Location: vote-events.php");
-    exit;
+    redirect('vote-events.php');
 }
 
 if ($is_club_admin) {
@@ -40,8 +38,7 @@ if ($is_club_admin) {
                 mysqli_query($conn, "INSERT INTO poll_options (poll_id, option_text, votes) VALUES ($poll_id, '$opt_safe', 0)");
             }
         }
-        header('Location: vote-events.php');
-        exit;
+        redirect('vote-events.php');
     }
 
     if (isset($_POST['close_poll'])) {
@@ -49,8 +46,7 @@ if ($is_club_admin) {
         if (poll_belongs_to_club($conn, $poll_id, $admin_club_id)) {
             mysqli_query($conn, "UPDATE polls SET is_active = 0 WHERE id = $poll_id AND club_id = $admin_club_id");
         }
-        header('Location: vote-events.php');
-        exit;
+        redirect('vote-events.php');
     }
 
     if (isset($_POST['delete_poll'])) {
@@ -60,8 +56,7 @@ if ($is_club_admin) {
             mysqli_query($conn, "DELETE FROM poll_options WHERE poll_id = $poll_id");
             mysqli_query($conn, "DELETE FROM polls WHERE id = $poll_id AND club_id = $admin_club_id");
         }
-        header('Location: vote-events.php');
-        exit;
+        redirect('vote-events.php');
     }
 }
 

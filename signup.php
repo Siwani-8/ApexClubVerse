@@ -260,7 +260,7 @@ if(mysqli_query($conn, $sql)){
             <button type="submit" name="submit" class="btn-auth">Create Account &rarr;</button>
         </form>
 
-        <p class="hint">Already have an account? <a href="login.php">Sign In</a></p>
+        <p class="hint">Already have an account? <a href="<?php echo htmlspecialchars(url('login.php')); ?>">Sign In</a></p>
 
     </div>
 </div>

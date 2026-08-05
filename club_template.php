@@ -1,6 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_logged_in'])) { header("Location: login.php"); exit; }
+require_once __DIR__ . '/includes/config.php';
+if (!isset($_SESSION['user_logged_in'])) { redirect('login.php'); }
 include 'includes/db.php';
 include 'includes/header.php';
 

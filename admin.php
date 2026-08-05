@@ -1,12 +1,15 @@
 <?php
-include 'includes/header.php';
-include 'includes/db.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/db.php';
 
 if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_role'] !== 'admin') {
-    header("Location: login.php");
-    exit;
+    redirect('login.php');
 }
-// Get the admin's club name using club_id
+
+include 'includes/header.php';
 // Get the admin's club name using club_id
 if (empty($_SESSION['club_name'])) {
 
@@ -38,8 +41,7 @@ if (isset($_POST['update_status'])) {
     $reg_id = (int)$_POST['reg_id'];
     $status = mysqli_real_escape_string($conn, $_POST['status']);
     mysqli_query($conn, "UPDATE registrations SET application_status = '$status' WHERE id = $reg_id");
-    header("Location: admin.php?tab=registrations");
-    exit;
+    redirect('admin.php?tab=registrations');
 }
 
 if (isset($_POST['delete_event'])) {
@@ -60,8 +62,7 @@ if (isset($_POST['delete_event'])) {
         WHERE id=$event_id
         AND club_id=$club_id");
 
-    header("Location: admin.php?tab=events");
-    exit;
+    redirect('admin.php?tab=events');
 }
 
 if (isset($_POST['add_event'])) {
@@ -85,15 +86,15 @@ if (isset($_POST['add_event'])) {
 
     if(isset($_FILES['event_image']) && $_FILES['event_image']['error']==0){
 
-        if(!is_dir("uploads/events")){
-            mkdir("uploads/events",0777,true);
+        if(!is_dir(root_path('uploads/events'))){
+            mkdir(root_path('uploads/events'),0777,true);
         }
 
         $filename = time() . "_" . basename($_FILES['event_image']['name']);
 
         move_uploaded_file(
             $_FILES['event_image']['tmp_name'],
-            "uploads/events/".$filename
+            root_path('uploads/events/' . $filename)
         );
 
         $image = "uploads/events/".$filename;
@@ -160,8 +161,7 @@ if (isset($_POST['add_event'])) {
         )");
 
     }
-    header("Location: admin.php?tab=events");
-    exit;
+    redirect('admin.php?tab=events');
 }
 
 if (isset($_POST['schedule_interviews'])) {
@@ -172,8 +172,7 @@ if (isset($_POST['schedule_interviews'])) {
     $venue = mysqli_real_escape_string($conn, $_POST['venue']);
 
     if (strtotime($start) >= strtotime($end)) {
-        header("Location: admin.php?tab=registrations&error=time");
-        exit;
+        redirect('admin.php?tab=registrations&error=time');
     }
 
     $check = mysqli_query($conn, "SELECT COUNT(*) AS total FROM registrations WHERE selected_club='$club' AND interview_status <> 'PENDING'");
@@ -185,8 +184,7 @@ if (isset($_POST['schedule_interviews'])) {
         mysqli_query($conn, "UPDATE registrations SET interview_date='$date', interview_start_time='$start', interview_end_time='$end', interview_venue='$venue', interview_status='SCHEDULED' WHERE selected_club='$club'");
     }
 
-    header("Location: admin.php?tab=registrations");
-    exit;
+    redirect('admin.php?tab=registrations');
 }
 
 if(isset($_POST['create_poll'])){
@@ -231,8 +229,7 @@ if(isset($_POST['create_poll'])){
         }
     }
 
-    header("Location: admin.php?tab=votes");
-    exit;
+    redirect('admin.php?tab=votes');
 }
 
 if(isset($_POST['delete_poll'])){
@@ -247,8 +244,7 @@ if(isset($_POST['delete_poll'])){
     "DELETE FROM polls
      WHERE id=$poll_id");
 
-    header("Location: admin.php?tab=votes");
-    exit;
+    redirect('admin.php?tab=votes');
 }
 
 if(isset($_POST['delete_bod'])){
@@ -260,8 +256,7 @@ if(isset($_POST['delete_bod'])){
         WHERE id=$id
     ");
 
-    header("Location: admin.php?tab=members");
-    exit;
+    redirect('admin.php?tab=members');
 }
 
 if(isset($_POST['delete_boa'])){
@@ -272,8 +267,7 @@ if(isset($_POST['delete_boa'])){
     "DELETE FROM boa_members
     WHERE id=$id");
 
-    header("Location: admin.php?tab=members");
-    exit;
+    redirect('admin.php?tab=members');
 }
 
 if(isset($_POST['add_bod'])){
@@ -299,7 +293,7 @@ if(isset($_POST['add_bod'])){
 
         move_uploaded_file(
             $_FILES['photo']['tmp_name'],
-            "images/members/".$photo
+            root_path("images/members/" . $photo)
         );
     }
 
@@ -322,8 +316,7 @@ if(isset($_POST['add_bod'])){
         )
     ");
 
-    header("Location: admin.php?tab=members");
-    exit;
+    redirect('admin.php?tab=members');
 }
 
 if(isset($_POST['add_boa'])){
@@ -349,7 +342,7 @@ if(isset($_POST['add_boa'])){
 
         move_uploaded_file(
             $_FILES['boa_photo']['tmp_name'],
-            "images/members/".$photo
+            root_path("images/members/" . $photo)
         );
 
     }
@@ -361,8 +354,7 @@ if(isset($_POST['add_boa'])){
     ($club_id,'$name','$title','$expertise','$photo')
     ");
 
-    header("Location: admin.php?tab=members");
-    exit;
+    redirect('admin.php?tab=members');
 }
 
 if(isset($_POST['update_bod'])){
@@ -381,7 +373,7 @@ if(isset($_POST['update_bod'])){
 
         move_uploaded_file(
             $_FILES['photo']['tmp_name'],
-            "images/members/".$photo
+            root_path("images/members/" . $photo)
         );
 
         $photo_sql = ", photo='$photo'";
@@ -397,8 +389,7 @@ if(isset($_POST['update_bod'])){
     WHERE id=$id
     ");
 
-    header("Location: admin.php?tab=members");
-    exit;
+    redirect('admin.php?tab=members');
 }
 
 if(isset($_POST['update_boa'])){
@@ -415,7 +406,7 @@ if(isset($_POST['update_boa'])){
 
         move_uploaded_file(
             $_FILES['boa_photo']['tmp_name'],
-            "images/members/".$photo
+            root_path("images/members/" . $photo)
         );
 
         mysqli_query($conn,"
@@ -441,8 +432,7 @@ if(isset($_POST['update_boa'])){
 
     }
 
-    header("Location: admin.php?tab=members");
-    exit;
+    redirect('admin.php?tab=members');
 }
 
 $tab = $_GET['tab'] ?? 'dashboard';
@@ -899,7 +889,7 @@ if(isset($_GET['edit'])){
                 <tr>
                     <td>
                     <?php if(!empty($e['image'])): ?>
-                        <img src="<?php echo htmlspecialchars($e['image']); ?>" style="width:80px;height:55px;object-fit:cover;border-radius:8px;">
+                        <img src="<?php echo htmlspecialchars(media_url($e['image'])); ?>" style="width:80px;height:55px;object-fit:cover;border-radius:8px;" alt="">
                     <?php else: ?>
                         No Image
                     <?php endif; ?>
@@ -1089,7 +1079,7 @@ if(isset($_GET['edit'])){
                 <?php while($member = mysqli_fetch_assoc($bod)): ?>
                 <tr>
                     <td>
-                        <img src="images/members/<?php echo htmlspecialchars($member['photo']); ?>" style="width:80px;height:80px;object-fit:cover;border-radius:50%;">
+                        <img src="<?php echo htmlspecialchars(member_photo_url($member['photo'])); ?>" style="width:80px;height:80px;object-fit:cover;border-radius:50%;" alt="">
                     </td>
                     <td><?php echo htmlspecialchars($member['name']); ?></td>
                     <td><?php echo htmlspecialchars($member['position']); ?></td>
@@ -1178,7 +1168,7 @@ if(isset($_GET['edit'])){
                 <?php while($member=mysqli_fetch_assoc($boa)): ?>
                 <tr>
                     <td>
-                        <img src="images/members/<?php echo htmlspecialchars($member['photo']); ?>" style="width:80px;height:80px;object-fit:cover;border-radius:50%;">
+                        <img src="<?php echo htmlspecialchars(member_photo_url($member['photo'])); ?>" style="width:80px;height:80px;object-fit:cover;border-radius:50%;" alt="">
                     </td>
                     <td><?php echo htmlspecialchars($member['name']); ?></td>
                     <td><?php echo htmlspecialchars($member['title']); ?></td>

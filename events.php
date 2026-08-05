@@ -49,7 +49,7 @@ $events = mysqli_query($conn, "
     <div class="feed-card">
         <div class="event-img-box">
             <?php if(!empty($row['image'])): ?>
-                <img src="<?php echo htmlspecialchars($row['image']); ?>" style="width:100%;height:100%;object-fit:cover;">
+                <img src="<?php echo htmlspecialchars(media_url($row['image'])); ?>" style="width:100%;height:100%;object-fit:cover;" alt="">
             <?php else: ?>
                 <div class="ph-icon">🖼️</div>
                 <div>No Image</div>

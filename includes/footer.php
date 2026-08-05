@@ -125,7 +125,7 @@
         <div class="footer-column">
 
 
-            <img src="images/logo1.png" class="footer-logo">
+            <img src="<?php echo htmlspecialchars(url('images/logo1.png')); ?>" class="footer-logo" alt="ApexClubVerse Logo">
 
             <!-- Change path if needed -->
     
@@ -145,17 +145,17 @@
             <div class="links-grid">
 
                 <ul>
-                    <li><a href="index.php">Home</a></li>
-                    <li><a href="clubs.php">Clubs</a></li>
-                    <li><a href="events.php">Events</a></li>
-                    <li><a href="vote-events.php">Event Vote</a></li>
+                    <li><a href="<?php echo htmlspecialchars(url('index.php')); ?>">Home</a></li>
+                    <li><a href="<?php echo htmlspecialchars(url('clubs.php')); ?>">Clubs</a></li>
+                    <li><a href="<?php echo htmlspecialchars(url('events.php')); ?>">Events</a></li>
+                    <li><a href="<?php echo htmlspecialchars(url('vote-events.php')); ?>">Event Vote</a></li>
                 </ul>
 
                 <ul>
-                    <li><a href="about.php">About</a></li>
-                    <li><a href="contact.php">Contact</a></li>
-                    <li><a href="login.php">Login</a></li>
-                    <li><a href="signup.php">Register</a></li>
+                    <li><a href="<?php echo htmlspecialchars(url('about.php')); ?>">About</a></li>
+                    <li><a href="<?php echo htmlspecialchars(url('contact.php')); ?>">Contact</a></li>
+                    <li><a href="<?php echo htmlspecialchars(url('login.php')); ?>">Login</a></li>
+                    <li><a href="<?php echo htmlspecialchars(url('signup.php')); ?>">Register</a></li>
                 </ul>
 
             </div>
@@ -165,7 +165,7 @@
         <!-- Contact -->
         <div class="footer-column">
 
-            <a href="contact.php" class="contact-btn">Contact Us</a>
+            <a href="<?php echo htmlspecialchars(url('contact.php')); ?>" class="contact-btn">Contact Us</a>
 
             <p>+977-9860390455</p>
             <p>info@apexclubverse.com</p>

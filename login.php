@@ -45,9 +45,9 @@ if (empty($user['email_verified'])) {
                 $_SESSION['club_name'] = $user['club_name'];
 
                 if ($user['role'] == 'admin') {
-                    header("Location: admin.php");
+                    redirect('admin.php');
                 } else {
-                    header("Location: vote-events.php");
+                    redirect('vote-events.php');
                 }
                 exit;
 
@@ -246,7 +246,7 @@ include 'includes/header.php';
             <button type="submit" name="submit" class="btn-auth">Sign In &rarr;</button>
         </form>
 
-        <p class="hint">New to the Club? <a href="signup.php">Join Club</a></p>
+        <p class="hint">New to the Club? <a href="<?php echo htmlspecialchars(url('signup.php')); ?>">Join Club</a></p>
 
     </div>
 </div>

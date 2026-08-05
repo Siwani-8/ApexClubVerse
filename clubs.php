@@ -273,32 +273,32 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
         <div class="clubs-section-label">Apex clubs</div>
         <div class="club-grid">
             <?php while($row = mysqli_fetch_assoc($result)) { ?>
-                <a class="club-card" href="club_detail.php?id=<?php echo $row['id']; ?>">
+                <a class="club-card" href="<?php echo htmlspecialchars(url('club_detail.php?id=' . $row['id'])); ?>">
                     <div class="club-card-accent"></div>
                     <div class="club-card-body">
                         <div class="club-card-icon">
                             <?php if($row['name'] == 'Apex Performing Arts Club'): ?>
-                                <img src="images/apac.png" alt="Apex Performing Arts Club">
+                                <img src="<?php echo htmlspecialchars(url('images/apac.png')); ?>" alt="Apex Performing Arts Club">
                             <?php endif; ?>
 
                             <?php if($row['name'] == 'Apex Sports and Leadership Club'): ?>
-                                <img src="images/sports.png" alt="Apex Sports and Leadership Club">
+                                <img src="<?php echo htmlspecialchars(url('images/sports.png')); ?>" alt="Apex Sports and Leadership Club">
                             <?php endif; ?>
 
                             <?php if($row['name'] == 'Apex Travel and Tourism Club'): ?>
-                                <img src="images/travel.png" alt="Apex Travel and Tourism Club">
+                                <img src="<?php echo htmlspecialchars(url('images/travel.png')); ?>" alt="Apex Travel and Tourism Club">
                             <?php endif; ?>
 
                             <?php if($row['name'] == 'Apex Media and Marketing Club'): ?>
-                                <img src="images/media.png" alt="Apex Media and Marketing Club">
+                                <img src="<?php echo htmlspecialchars(url('images/media.png')); ?>" alt="Apex Media and Marketing Club">
                             <?php endif; ?>
 
                             <?php if($row['name'] == 'Apex IT Club'): ?>
-                                <img src="images/it.png" alt="Apex IT Club">
+                                <img src="<?php echo htmlspecialchars(url('images/it.png')); ?>" alt="Apex IT Club">
                             <?php endif; ?>
 
                             <?php if($row['name'] == 'Apex Health Education and Awareness Team (HEAT)'): ?>
-                                <img src="images/heat.png" alt="Apex Health Education and Awareness Team (HEAT)">
+                                <img src="<?php echo htmlspecialchars(url('images/heat.png')); ?>" alt="Apex Health Education and Awareness Team (HEAT)">
                             <?php endif; ?>
                         </div>
                         

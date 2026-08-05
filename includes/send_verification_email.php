@@ -6,6 +6,7 @@ use PHPMailer\PHPMailer\Exception;
 require_once __DIR__ . '/../lib/PHPMailer/src/Exception.php';
 require_once __DIR__ . '/../lib/PHPMailer/src/PHPMailer.php';
 require_once __DIR__ . '/../lib/PHPMailer/src/SMTP.php';
+require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/mail_config.php';
 
 if (!function_exists('sendVerificationEmail')) {
@@ -32,12 +33,9 @@ function sendVerificationEmail($email, $token)
         $mail->isHTML(true);
         $mail->Subject = 'Verify your ApexClubVerse Account';
 
-        // Build the verification link dynamically so it always points
-        // to the folder this app is actually running from.
         $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['PHP_SELF'] ?? '/')), '/');
-        $verificationLink = $scheme . '://' . $host . $basePath . '/verify.php?token=' . $token;
+        $verificationLink = $scheme . '://' . $host . url('verify.php?token=' . urlencode($token));
 
         $mail->Body = "
         <h2>Welcome to ApexClubVerse</h2>
