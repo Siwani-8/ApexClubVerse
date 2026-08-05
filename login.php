@@ -1,5 +1,7 @@
 <?php
-include 'header.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include 'db.php';
 
 $msg = "";
@@ -19,22 +21,27 @@ if (isset($_POST['submit'])) {
 
             $user = mysqli_fetch_assoc($res);
 
-if (!$user[' It's name main rantis_verified']) {
+if (empty($user['email_verified'])) {
 
     $msg = "Please verify your email before logging in. Check your inbox.";
 
 } elseif (
     password_verify($password, $user['password']) ||
-    $password == $user['password']
+    $password === $user['password']
 ) {
 
-    
+                // Upgrade legacy plaintext passwords to secure hashes
+                if ($password === $user['password']) {
+                    $newHash = mysqli_real_escape_string($conn, password_hash($password, PASSWORD_DEFAULT));
+                    mysqli_query($conn, "UPDATE users SET password='$newHash' WHERE id=" . (int)$user['id']);
+                }
 
                 $_SESSION['user_logged_in'] = true;
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_role'] = $user['role'];
+                $_SESSION['club_id'] = $user['club_id'];
                 $_SESSION['club_name'] = $user['club_name'];
 
                 if ($user['role'] == 'admin') {
@@ -53,6 +60,8 @@ if (!$user[' It's name main rantis_verified']) {
         }
     }
 }
+
+include 'header.php';
 ?>
 
 <style>

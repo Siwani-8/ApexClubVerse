@@ -3,10 +3,12 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require 'PHPMailer/src/Exception.php';
-require 'PHPMailer/src/PHPMailer.php';
-require 'PHPMailer/src/SMTP.php';
+require_once 'PHPMailer/src/Exception.php';
+require_once 'PHPMailer/src/PHPMailer.php';
+require_once 'PHPMailer/src/SMTP.php';
+require_once __DIR__ . '/mail_config.php';
 
+if (!function_exists('sendVerificationEmail')) {
 function sendVerificationEmail($email, $token)
 {
     $mail = new PHPMailer(true);
@@ -18,8 +20,8 @@ function sendVerificationEmail($email, $token)
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
 
-        $mail->Username = 'apexclubverse@gmail.com';
-        $mail->Password = 'owvn ymjm ruii lxsz';
+        $mail->Username = MAIL_USERNAME;
+        $mail->Password = MAIL_PASSWORD;
 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
@@ -30,8 +32,12 @@ function sendVerificationEmail($email, $token)
         $mail->isHTML(true);
         $mail->Subject = 'Verify your ApexClubVerse Account';
 
-        $verificationLink =
-            "http://localhost/ApexClubVerse/verify.php?token=".$token;
+        // Build the verification link dynamically so it always points
+        // to the folder this app is actually running from.
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['PHP_SELF'] ?? '/')), '/');
+        $verificationLink = $scheme . '://' . $host . $basePath . '/verify.php?token=' . $token;
 
         $mail->Body = "
         <h2>Welcome to ApexClubVerse</h2>
@@ -61,5 +67,6 @@ function sendVerificationEmail($email, $token)
 
     return false;
 
+}
 }
 }

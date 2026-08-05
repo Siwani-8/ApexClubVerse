@@ -5,7 +5,13 @@ if (session_status() === PHP_SESSION_NONE) {
 include 'db.php';
 include 'club_admin_helpers.php';
 
-$user_email = $_SESSION['user_email'] ?? $_SESSION['user_name'];
+// Require login before any vote/poll actions are processed
+if (empty($_SESSION['user_logged_in'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$user_email = $_SESSION['user_email'] ?? ($_SESSION['user_name'] ?? '');
 $is_club_admin = is_club_admin();
 $admin_club_id = admin_club_id();
 

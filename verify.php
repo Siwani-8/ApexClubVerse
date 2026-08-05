@@ -22,7 +22,7 @@ if(mysqli_num_rows($result) == 0){
 
 $user = mysqli_fetch_assoc($result);
 
-if($user['is_verified'] == 1){
+if($user['email_verified'] == 1){
 
     die("Your account is already verified. You can now log in.");
 
@@ -31,9 +31,9 @@ if($user['is_verified'] == 1){
 mysqli_query($conn,
 "UPDATE users
  SET
- is_verified=1,
+ email_verified=1,
  verification_token=NULL
- WHERE id=".$user['id']);
+ WHERE id=".(int)$user['id']);
 
 echo "
 <!DOCTYPE html>
