@@ -24,8 +24,12 @@
 .footer-logo{
     width:140px;
     height:auto;
+    max-width:100%;
     margin-bottom:15px;
     display:block;
+    background:#fff;
+    border-radius:10px;
+    padding:8px 10px;
 }
 
 .footer-column h2{
@@ -101,6 +105,7 @@
     .footer-container{
         flex-direction:column;
         gap:25px;
+        align-items:stretch;
     }
 
     .links-grid{
@@ -120,6 +125,13 @@
     .footer-logo{
         width:120px;
     }
+
+    .contact-btn{
+        display:block;
+        text-align:center;
+        width:100%;
+        max-width:280px;
+    }
 }
 
 @media(max-width:480px){
@@ -128,8 +140,13 @@
     }
 
     .links-grid{
-        flex-direction:column;
-        gap:8px;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:8px 20px;
+    }
+
+    .links-grid ul{
+        width:100%;
     }
 
     .app-flash{
@@ -144,6 +161,12 @@
 
     .confirm-actions button{
         width:100%;
+    }
+
+    .copyright{
+        padding:12px 16px;
+        font-size:12px;
+        line-height:1.5;
     }
 }
 </style>

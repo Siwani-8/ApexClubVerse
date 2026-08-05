@@ -12,8 +12,8 @@ include 'includes/header.php';
 $message = "";
 
 if (isset($_POST['apply'])) {
-    $name = mysqli_real_escape_string($conn, $_POST['student_name']);
-    $email = mysqli_real_escape_string($conn, $_POST['student_email']);
+    $name = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $email = mysqli_real_escape_string($conn, $_SESSION['user_email']);
     $faculty = mysqli_real_escape_string($conn, $_POST['faculty']);
     $semester = mysqli_real_escape_string($conn, $_POST['semester']);
     $interest = mysqli_real_escape_string($conn, $_POST['interest']);
@@ -218,6 +218,16 @@ if($success){
         outline: none;
         background: #fff;
     }
+    .form-group input[readonly] {
+        background: #f0eeea;
+        color: #444;
+        cursor: default;
+    }
+    .form-group input[readonly]:focus {
+        border-color: #ddd;
+        box-shadow: none;
+        background: #f0eeea;
+    }
 
     /* Two column layout for name/email */
     .form-row {
@@ -244,6 +254,8 @@ if($success){
         font-size: 13px; font-weight: 500;
         color: #333;
         text-transform: none; letter-spacing: 0;
+        word-break: break-word;
+        min-width: 0;
     }
     .club-options label:hover {
         border-color: #7a1028;
@@ -286,14 +298,23 @@ if($success){
     .alert.error   { background: #fdecea; color: #7a1028; border: 0.5px solid #f5c6cb; }
 
     /* ── Responsive ── */
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
         .form-row { grid-template-columns: 1fr; }
         .club-options { grid-template-columns: 1fr; }
-        .form-container { padding: 1.75rem 1.25rem; }
+        .form-container { padding: 2rem 1.5rem 1.75rem; }
+    }
+    @media (max-width: 600px) {
+        .form-container { padding: 1.75rem 1.25rem; width: 100%; }
         .intake-page { padding: 1.5rem 1rem 3rem; }
         .form-header h2 { font-size: 1.4rem; }
         .intake-page::before { width: 220px; height: 220px; top: -60px; right: -60px; }
         .intake-page::after { width: 160px; height: 160px; bottom: -40px; left: -40px; }
+        .club-options label { font-size: 12px; padding: 9px 10px; }
+    }
+    @media (max-width: 400px) {
+        .intake-page { padding: 1.25rem 0.75rem 2.5rem; }
+        .form-container { padding: 1.5rem 1rem 1.25rem; border-radius: 12px; }
+        .form-header h2 { font-size: 1.25rem; }
     }
 </style>
 
@@ -313,11 +334,11 @@ if($success){
             <div class="form-row">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" name="student_name" value="<?php echo htmlspecialchars($_SESSION['user_name']); ?>" required>
+                    <input type="text" name="student_name" value="<?php echo htmlspecialchars($_SESSION['user_name'] ?? ''); ?>" readonly required>
                 </div>
                 <div class="form-group">
                     <label>Apex College Email</label>
-                    <input type="email" name="student_email" placeholder="name@apexcollege.edu.np" required>
+                    <input type="email" name="student_email" value="<?php echo htmlspecialchars($_SESSION['user_email'] ?? ''); ?>" placeholder="name@apexcollege.edu.np" readonly required>
                 </div>
             </div>
 

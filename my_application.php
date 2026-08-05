@@ -154,6 +154,19 @@ tr:hover td{
 
 @media(max-width:850px){
 
+.application-page{
+padding:2rem 1.15rem;
+}
+
+.page-header{
+padding:20px 18px;
+}
+
+.page-header h1{
+font-size:1.6rem;
+word-break:break-word;
+}
+
 table,
 thead,
 tbody,
@@ -199,9 +212,9 @@ td:nth-child(4):before{content:"Status";}
 }
 
 @media(max-width:480px){
-.application-page{padding:2rem 1rem;}
+.application-page{padding:1.5rem 1rem;}
 .page-header{padding:18px 16px;}
-.page-header h1{font-size:1.5rem;}
+.page-header h1{font-size:1.4rem;}
 .table-header{padding:14px 16px;}
 .empty-box{padding:32px 16px;}
 td{font-size:13px;}
