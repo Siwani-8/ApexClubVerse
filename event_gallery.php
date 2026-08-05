@@ -182,8 +182,8 @@ include __DIR__ . '/includes/header.php';
 
 <style>
 *{box-sizing:border-box}
-body{background:#f7f8fc}
-.event-container{max-width:1100px;margin:auto;padding:40px 20px}
+.event-gallery-page{flex:1 0 auto;width:100%;background:#f7f8fc}
+.event-container{max-width:1100px;margin:auto;padding:40px 20px;width:100%}
 .event-hero{min-height:280px;height:auto;margin-bottom:45px;border-radius:25px;overflow:hidden;position:relative;background:url('<?php echo h(url('images/events/musical1.jpeg')); ?>') center/cover no-repeat}
 .hero-overlay{position:relative;min-height:280px;padding:30px 20px;background:rgba(0,0,0,.55);color:#fff;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
 .hero-overlay h1{margin:0 0 12px;font-size:clamp(1.6rem,5vw,3rem);word-break:break-word}
@@ -239,6 +239,7 @@ body{background:#f7f8fc}
 }
 </style>
 
+<div class="event-gallery-page">
 <div class="event-container">
 
     <?php if (isset($_GET['uploaded'])): ?>
@@ -373,6 +374,7 @@ body{background:#f7f8fc}
         </section>
     <?php endforeach; ?>
 
+</div>
 </div>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

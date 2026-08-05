@@ -1,47 +1,20 @@
 <?php
 
+require_once __DIR__ . '/includes/config.php';
 include 'includes/db.php';
 
-if (!isset($_GET['token'])) {
-    die("Invalid verification link.");
-}
+function verify_page($title, $heading, $message, $showLogin = true) {
+    $loginUrl = htmlspecialchars(url('login.php'));
+    $loginLink = $showLogin
+        ? "<a href=\"{$loginUrl}\">Login</a>"
+        : '';
 
-$token = mysqli_real_escape_string($conn, $_GET['token']);
-
-$result = mysqli_query($conn,
-"SELECT *
- FROM users
- WHERE verification_token='$token'
- LIMIT 1");
-
-if(mysqli_num_rows($result) == 0){
-
-    die("Invalid or expired verification link.");
-
-}
-
-$user = mysqli_fetch_assoc($result);
-
-if($user['email_verified'] == 1){
-
-    die("Your account is already verified. You can now log in.");
-
-}
-
-mysqli_query($conn,
-"UPDATE users
- SET
- email_verified=1,
- verification_token=NULL
- WHERE id=".(int)$user['id']);
-
-echo "
-<!DOCTYPE html>
-<html lang='en'>
+    echo "<!DOCTYPE html>
+<html lang=\"en\">
 <head>
-<meta charset='UTF-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0'>
-<title>Email Verified</title>
+<meta charset=\"UTF-8\">
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+<title>" . htmlspecialchars($title) . "</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 body{
@@ -53,7 +26,7 @@ min-height:100vh;
 height:auto;
 margin:0;
 padding:16px;
-background:#f5f5f5;
+background:#f5f3ef;
 }
 .box{
 background:white;
@@ -68,6 +41,7 @@ box-shadow:0 0 15px rgba(0,0,0,.1);
 margin:0 0 12px;
 font-size:1.4rem;
 line-height:1.3;
+color:#1e2530;
 }
 .box p{
 margin:0;
@@ -90,17 +64,49 @@ border-radius:5px;
 </style>
 </head>
 <body>
-
-<div class='box'>
-<h2>✅ Email Verified Successfully</h2>
-
-<p>Your ApexClubVerse account is now active.</p>
-
-<a href='login.php'>Login</a>
-
+<div class=\"box\">
+<h2>" . htmlspecialchars($heading) . "</h2>
+<p>" . htmlspecialchars($message) . "</p>
+{$loginLink}
 </div>
-
 </body>
-</html>
-";
+</html>";
+    exit;
+}
+
+if (!isset($_GET['token'])) {
+    verify_page('Invalid Link', 'Invalid verification link', 'This verification link is missing or incomplete.', true);
+}
+
+$token = mysqli_real_escape_string($conn, $_GET['token']);
+
+$result = mysqli_query($conn,
+"SELECT *
+ FROM users
+ WHERE verification_token='$token'
+ LIMIT 1");
+
+if (mysqli_num_rows($result) == 0) {
+    verify_page('Invalid Link', 'Invalid or expired link', 'This verification link is invalid or has already been used.', true);
+}
+
+$user = mysqli_fetch_assoc($result);
+
+if ($user['email_verified'] == 1) {
+    verify_page('Already Verified', 'Account already verified', 'Your account is already verified. You can now log in.', true);
+}
+
+mysqli_query($conn,
+"UPDATE users
+ SET
+ email_verified=1,
+ verification_token=NULL
+ WHERE id=".(int)$user['id']);
+
+verify_page(
+    'Email Verified',
+    'Email Verified Successfully',
+    'Your ApexClubVerse account is now active.',
+    true
+);
 ?>

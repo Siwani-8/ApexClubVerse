@@ -808,7 +808,6 @@ if (isset($_GET['edit_image'])) {
     .table-box-header { padding: 1rem 1.5rem; border-bottom: 0.5px solid #e0ddd6; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
     .table-box-header h2 { font-size: 15px; font-weight: 600; color: #1a1a1a; min-width: 0; flex: 1 1 200px; word-break: break-word; }
     .badge-count { background: #fdecea; color: #7a1028; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; font-family: 'Segoe UI', sans-serif; }
-    .table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; min-width: 640px; }
     td form[method="POST"] { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
     .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -1005,7 +1004,7 @@ if (isset($_GET['edit_image'])) {
                 <h2>&#128203; All Club Intake Applications</h2>
                 <div class="header-actions">
                     <span class="badge-count"><?php echo $total_regs; ?> total</span>
-                    <button class="btn-submit" type="button" onclick="document.getElementById('scheduleModal').classList.add('is-open');" style="margin:0;">
+                    <button class="btn-submit" type="button" onclick="var m=document.getElementById('scheduleModal');m.classList.add('is-open');m.setAttribute('aria-hidden','false');" style="margin:0;">
                         Schedule Interviews
                     </button>
                 </div>
@@ -1929,7 +1928,7 @@ if (isset($_GET['edit_image'])) {
             </div>
             <div class="schedule-modal-actions">
                 <button class="btn-submit" name="schedule_interviews">Save Schedule</button>
-                <button type="button" class="btn-delete" onclick="document.getElementById('scheduleModal').classList.remove('is-open');">Cancel</button>
+                <button type="button" class="btn-delete" onclick="var m=document.getElementById('scheduleModal');m.classList.remove('is-open');m.setAttribute('aria-hidden','true');">Cancel</button>
             </div>
         </form>
     </div>

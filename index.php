@@ -7,7 +7,7 @@
     /* ══════════════════ HERO ══════════════════ */
     .hero {
         position: relative;
-        min-height: 90vh;
+        min-height: min(90vh, 820px);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -336,7 +336,7 @@
 
     /* ══════════════════ CTA BANNER ══════════════════ */
     .cta-banner {
-        margin: 0 auto 5.5rem;
+        margin: 0 auto 2rem;
         max-width: 1180px;
         border-radius: 20px;
         background: linear-gradient(110deg, #7a1028 0%, #b23417 100%);
@@ -361,12 +361,12 @@
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
-        .hero { padding: 5rem 1.5rem 4rem; min-height: 80vh; }
+        .hero { padding: 5rem 1.5rem 4rem; min-height: auto; }
         .life-grid { grid-template-columns: 1fr; }
         .numbers-inner { grid-template-columns: repeat(2, 1fr); }
         .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
         .gi-1, .gi-4, .gi-7 { grid-column: span 2; grid-row: span 1; }
-        .cta-banner { flex-direction: column; text-align: center; padding: 2.5rem 1.75rem; }
+        .cta-banner { flex-direction: column; text-align: center; padding: 2.5rem 1.75rem; margin-bottom: 1.5rem; }
         .section { padding: 4rem 1.5rem; }
     }
     @media (max-width: 600px) {

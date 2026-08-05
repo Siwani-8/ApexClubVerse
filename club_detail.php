@@ -94,7 +94,7 @@ $data = $club_data[$club_id] ?? $club_data[1];
 
 <style>
     /* ── Base ── */
-    .container { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 2rem; }
 
     .back-link {
         display: inline-flex;
@@ -480,7 +480,7 @@ $data = $club_data[$club_id] ?? $club_data[1];
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
-        .container { padding: 1.5rem 1.25rem 3rem; }
+        .container { padding: 1.5rem 1.25rem 1.5rem; }
         .club-hero { padding: 2.5rem 1.75rem; }
         .club-hero h1 { font-size: 2rem; }
         .club-hero::after { font-size: 5rem; right: 1.5rem; }
@@ -489,7 +489,7 @@ $data = $club_data[$club_id] ?? $club_data[1];
     }
 
     @media (max-width: 600px) {
-        .container { padding: 1.25rem 1rem 2.5rem; }
+        .container { padding: 1.25rem 1rem 1.25rem; }
         .club-hero {
             padding: 2rem 1.25rem;
             border-radius: 12px;

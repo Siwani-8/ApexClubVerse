@@ -329,7 +329,7 @@ if($success){
 
         <?php echo $message; ?>
 
-        <form action="registration.php" method="POST">
+        <form action="<?php echo htmlspecialchars(url('registration.php')); ?>" method="POST">
 
             <div class="form-row">
                 <div class="form-group">

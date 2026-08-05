@@ -59,7 +59,8 @@ ORDER BY applied_at DESC");
     background:#fff;
     border:0.5px solid #e0ddd6;
     border-radius:14px;
-    overflow:hidden;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
     box-shadow:0 8px 25px rgba(0,0,0,.04);
 }
 

@@ -13,14 +13,13 @@
     font-family: 'Georgia', 'Segoe UI', serif;
 }
 
-/* Page grows with content; navbar/footer scroll with the page (not sticky/fixed). */
+/* Page grows with content; navbar/footer scroll with the page. */
 html {
     height: auto;
-    overflow-x: hidden;
 }
 
 body {
-    background-color: #f5f3ef !important;
+    background-color: #f5f3ef;
     color: var(--text-dark);
     display: flex;
     flex-direction: column;
@@ -38,12 +37,13 @@ img, video, iframe {
 /* ===================== NAVBAR ===================== */
 
 .navbar {
-    background: #fff;
+    background: #ffffff;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 60px;
+    padding: 18px 60px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    min-height: 90px;
     position: relative;
     z-index: 1000;
     flex-shrink: 0;
@@ -56,7 +56,7 @@ img, video, iframe {
 }
 
 .navbar-brand-container img.navbar-logo-square {
-    height: 55px;
+    height: 70px;
     width: auto;
     display: block;
     object-fit: contain;
@@ -104,27 +104,29 @@ img, video, iframe {
     display: flex;
     align-items: center;
     gap: 2rem;
+    margin: 0;
+    padding: 0;
 }
 
 .nav-links a {
     text-decoration: none;
-    color: var(--text-dark);
-    font-weight: bold;
+    color: #1e2530;
+    font-weight: 600;
     font-size: 1rem;
     font-family: 'Segoe UI', sans-serif;
-    transition: .3s;
+    transition: color 0.3s ease;
 }
 
 .nav-links a:hover {
-    color: var(--accent-orange);
+    color: #ff4500;
 }
 
 .btn-join {
-    background: var(--primary-crimson);
-    color: #fff !important;
-    padding: 12px 24px;
+    background: #990026;
+    color: #ffffff !important;
+    padding: 10px 24px;
     border-radius: 30px;
-    transition: .3s;
+    transition: background 0.3s ease;
 }
 
 .btn-join:hover {
@@ -132,12 +134,12 @@ img, video, iframe {
 }
 
 .admin-link {
-    color: var(--primary-crimson) !important;
+    color: #990026 !important;
     font-weight: bold;
 }
 
 .logout-link {
-    color: var(--text-dark);
+    color: #1e2530;
 }
 
 /* ===================== CONTENT ===================== */
@@ -149,7 +151,7 @@ img, video, iframe {
     width: 100%;
     max-width: 100%;
     min-height: 0;
-    background-color: #f5f3ef !important;
+    background-color: transparent;
 }
 
 .content-wrapper > div {
@@ -180,7 +182,7 @@ footer {
 
 @media (max-width: 992px) {
     .navbar {
-        padding: 12px 24px;
+        padding: 14px 24px;
     }
 
     .nav-links {
@@ -189,6 +191,10 @@ footer {
 
     .nav-links a {
         font-size: 0.92rem;
+    }
+
+    .navbar-brand-container img.navbar-logo-square {
+        height: 58px;
     }
 }
 
