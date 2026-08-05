@@ -1,23 +1,27 @@
 <?php
 /**
- * Mail credentials for ApexClubVerse.
+ * Mail config — copy to mail_config.php (gitignored) and fill in real values.
  *
- * ON THE LIVE SERVER:
- *   1. Copy this file to mail_config.php (same folder).
- *   2. Fill in a Gmail address + App Password (not your normal password):
- *      https://myaccount.google.com/apppasswords
- *   3. Keep mail_config.php off Git (it is gitignored).
+ * ── RECOMMENDED (ProFreeHost + local): Brevo API ──
+ * 1. Create account: https://www.brevo.com
+ * 2. Verify sender: apexclubverse@gmail.com (Senders → green check)
+ * 3. SMTP & API → API Keys → generate key starting with xkeysib-
+ * 4. If Brevo Security blocks your IP, authorize it or disable IP restriction
  *
- * ProFreeHost notes:
- *   - Outbound SMTP is allowed on port 587; if Gmail still fails, try 465 below.
- *   - Spaces in App Passwords are optional; the mailer strips them automatically.
+ * Optional SMTP settings below are only used when MAIL_BREVO_API_KEY is empty.
  */
-define('MAIL_HOST', 'smtp.gmail.com');
-define('MAIL_PORT', 587);                 // try 465 if 587 fails
-define('MAIL_ENCRYPTION', 'tls');         // 'tls' for 587, 'ssl' for 465
-define('MAIL_USERNAME', 'your-email@gmail.com');
-define('MAIL_PASSWORD', 'your-16-char-app-password');
-define('MAIL_FROM_EMAIL', 'your-email@gmail.com');
+
+define('MAIL_HOST', 'smtp-relay.brevo.com');
+define('MAIL_PORT', 587);
+define('MAIL_ENCRYPTION', 'tls');
+define('MAIL_USERNAME', 'your-brevo-smtp-login@smtp-brevo.com');
+define('MAIL_PASSWORD', 'your-brevo-smtp-key'); // starts with xsmtpsib-
+
+define('MAIL_FROM_EMAIL', 'apexclubverse@gmail.com');
 define('MAIL_FROM_NAME', 'ApexClubVerse');
-define('MAIL_ALLOW_PHP_MAIL', true);      // last-resort fallback on shared hosts
-define('MAIL_DEBUG_LOG', true);           // writes includes/mail_error.log when send fails
+
+// Primary transport on ProFreeHost — paste your xkeysib- API key:
+define('MAIL_BREVO_API_KEY', 'your-brevo-api-key');
+
+define('MAIL_DEBUG_LOG', true);
+define('MAIL_SMTP_DEBUG', false);

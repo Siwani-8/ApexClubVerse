@@ -48,7 +48,7 @@ if(mysqli_query($conn, $sql)){
 
     $verifyUrl = build_verification_url($token);
 
-    if(sendVerificationEmail($email, $token)){
+    if (sendVerificationEmail($email, $token, $name)) {
 
         $msg = "Registration successful! Please check your email (and spam folder) to verify your account.";
 

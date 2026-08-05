@@ -41,7 +41,7 @@ if (isset($_POST['submit'])) {
                         mysqli_query($conn, "UPDATE users SET verification_token='$tokenSafe' WHERE id=" . (int)$user['id']);
                     }
 
-                    $sent = sendVerificationEmail($user['email'], $token);
+                    $sent = sendVerificationEmail($user['email'], $token, $user['name'] ?? '');
                     $fallback_verify_url = build_verification_url($token);
                     $show_verify_fallback = true;
                     $msg = $sent

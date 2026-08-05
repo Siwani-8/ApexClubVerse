@@ -62,12 +62,12 @@ apexclubverse/                 ← upload these contents into htdocs / public_ht
 2. Create the database: `CREATE DATABASE apex_club_db CHARACTER SET utf8mb4;`
 3. Import `database/schema.sql` (phpMyAdmin or CLI).
 4. Confirm DB settings in `includes/config.php` (defaults work for XAMPP).
-5. Copy `includes/mail_config.example.php` → `includes/mail_config.php` and add your
-   Gmail address + [App Password](https://myaccount.google.com/apppasswords).
-   On ProFreeHost, make sure this file exists on the server (it is not in Git).
-   If SMTP still fails, signup/login will show a **Verify my account now** button
-   so users are not locked out. Check `includes/mail_error.log` on the server for the
-   real SMTP error.
+5. **Email (Brevo):** Copy `includes/mail_config.example.php` → `includes/mail_config.php`
+   and set `MAIL_BREVO_API_KEY` (`xkeysib-...`) plus verified sender `MAIL_FROM_EMAIL`.
+   Signup/login send a branded verification email via Brevo API.
+   Test: `smtp_test.php?to=you@gmail.com`
+   On ProFreeHost, upload `mail_config.php` manually (it is gitignored).
+   If send fails, signup/login still show a **Verify my account now** fallback button.
 6. Open `http://localhost/apexclubverse/`.
 
 ## Deployment (ProFreeHost)
