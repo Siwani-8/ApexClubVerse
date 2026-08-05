@@ -366,6 +366,7 @@ $data = $club_data[$club_id] ?? $club_data[1];
         font-family: sans-serif;
         flex-shrink: 0;
         border: 3px solid #e8eaf0;
+        overflow: hidden;
     }
     .boa-avatar img {
     width: 100%;
@@ -513,17 +514,18 @@ $data = $club_data[$club_id] ?? $club_data[1];
             <h2>Our Events</h2>
             <div class="section-line"></div>
         </div>
-   <div class="events-grid">
+  <div class="events-grid">
+
 <?php while($event = mysqli_fetch_assoc($events_result)) { ?>
 
 <a href="event_gallery.php?id=<?php echo $event['id']; ?>" class="event-link">
-<div class="event-photo-card">
 
     <div class="event-photo-card">
 
         <?php if(!empty($event['image'])) { ?>
 
             <img src="<?php echo htmlspecialchars($event['image']); ?>"
+     alt="<?php echo htmlspecialchars($event['title']); ?>"
                  style="width:100%; height:160px; object-fit:cover;">
 
         <?php } else { ?>
@@ -539,15 +541,7 @@ $data = $club_data[$club_id] ?? $club_data[1];
             <?php echo htmlspecialchars($event['title']); ?>
         </div>
 
-<<<<<<< HEAD
-=======
-    <?php } ?>
-
-    <div class="event-label">
-<?php echo htmlspecialchars($event['title']); ?>
-</div>
-
-</a>
+    </div>
 
 </a>
 
