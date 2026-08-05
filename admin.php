@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/club_admin_helpers.php';
 
 if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_role'] !== 'admin') {
     redirect('login.php');
@@ -34,6 +35,14 @@ if (empty($_SESSION['club_name'])) {
 
         die("Error: No club is assigned to this admin.");
 
+    }
+}
+
+if (empty($_SESSION['club_id'])) {
+    $club = mysqli_real_escape_string($conn, $_SESSION['club_name'] ?? '');
+    $idRow = mysqli_fetch_assoc(mysqli_query($conn, "SELECT id FROM clubs WHERE name='$club' LIMIT 1"));
+    if ($idRow) {
+        $_SESSION['club_id'] = (int)$idRow['id'];
     }
 }
 
@@ -435,6 +444,112 @@ if(isset($_POST['update_boa'])){
     redirect('admin.php?tab=members');
 }
 
+/* ── Gallery: add edition ── */
+if (isset($_POST['add_edition'])) {
+    $club_id = admin_club_id();
+    $event_id = (int)($_POST['event_id'] ?? 0);
+    $title = trim($_POST['edition_title'] ?? '');
+    $date = trim($_POST['edition_date'] ?? '');
+    $location = trim($_POST['edition_location'] ?? '');
+    $desc = trim($_POST['edition_description'] ?? '');
+
+    if ($club_id && $event_id && $title !== '' && event_belongs_to_club($conn, $event_id, $club_id)) {
+        $stmt = mysqli_prepare(
+            $conn,
+            'INSERT INTO event_editions (event_id, title, event_date, location, description) VALUES (?, ?, ?, ?, ?)'
+        );
+        $dateVal = $date !== '' ? $date : date('Y-m-d');
+        mysqli_stmt_bind_param($stmt, 'issss', $event_id, $title, $dateVal, $location, $desc);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+    redirect('admin.php?tab=gallery&event_id=' . $event_id);
+}
+
+/* ── Gallery: upload photo ── */
+if (isset($_POST['add_gallery_image'])) {
+    $club_id = admin_club_id();
+    $event_id = (int)($_POST['event_id'] ?? 0);
+    $edition_id = (int)($_POST['edition_id'] ?? 0);
+    $caption = trim($_POST['caption'] ?? '');
+    $file = $_FILES['gallery_image'] ?? null;
+
+    $ok = $club_id
+        && $event_id
+        && $edition_id
+        && event_belongs_to_club($conn, $event_id, $club_id);
+
+    if ($ok) {
+        $chk = mysqli_prepare($conn, 'SELECT id FROM event_editions WHERE id = ? AND event_id = ?');
+        mysqli_stmt_bind_param($chk, 'ii', $edition_id, $event_id);
+        mysqli_stmt_execute($chk);
+        $editionOk = mysqli_stmt_get_result($chk)->fetch_assoc();
+        mysqli_stmt_close($chk);
+        $ok = (bool)$editionOk;
+    }
+
+    if ($ok && $file && ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK && $file['size'] <= 5 * 1024 * 1024) {
+        $allowed = [
+            'image/jpeg' => 'jpeg',
+            'image/png'  => 'png',
+            'image/webp' => 'webp',
+            'image/gif'  => 'gif',
+        ];
+        $mime = mime_content_type($file['tmp_name']);
+        if (isset($allowed[$mime])) {
+            $folder = root_path('images/events');
+            if (!is_dir($folder)) {
+                mkdir($folder, 0775, true);
+            }
+            $name = 'event_' . $event_id . '_' . $edition_id . '_' . uniqid() . '.' . $allowed[$mime];
+            $dbPath = 'images/events/' . $name;
+            if (move_uploaded_file($file['tmp_name'], $folder . DIRECTORY_SEPARATOR . $name)) {
+                $stmt = mysqli_prepare(
+                    $conn,
+                    'INSERT INTO event_gallery (event_id, edition_id, image, caption, created_at) VALUES (?, ?, ?, ?, NOW())'
+                );
+                mysqli_stmt_bind_param($stmt, 'iiss', $event_id, $edition_id, $dbPath, $caption);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_close($stmt);
+            }
+        }
+    }
+    redirect('admin.php?tab=gallery&event_id=' . $event_id . '&edition_id=' . $edition_id);
+}
+
+/* ── Gallery: delete photo ── */
+if (isset($_POST['delete_gallery_image'])) {
+    $club_id = admin_club_id();
+    $image_id = (int)($_POST['image_id'] ?? 0);
+    $event_id = (int)($_POST['event_id'] ?? 0);
+
+    if ($club_id && $image_id && event_belongs_to_club($conn, $event_id, $club_id)) {
+        $stmt = mysqli_prepare(
+            $conn,
+            'SELECT g.image FROM event_gallery g
+             JOIN events e ON e.id = g.event_id
+             WHERE g.id = ? AND g.event_id = ? AND e.club_id = ?'
+        );
+        mysqli_stmt_bind_param($stmt, 'iii', $image_id, $event_id, $club_id);
+        mysqli_stmt_execute($stmt);
+        $row = mysqli_stmt_get_result($stmt)->fetch_assoc();
+        mysqli_stmt_close($stmt);
+
+        if ($row) {
+            $del = mysqli_prepare($conn, 'DELETE FROM event_gallery WHERE id = ?');
+            mysqli_stmt_bind_param($del, 'i', $image_id);
+            mysqli_stmt_execute($del);
+            mysqli_stmt_close($del);
+
+            $full = root_path($row['image']);
+            if (is_file($full) && strpos(str_replace('\\', '/', $row['image']), 'images/events/') === 0) {
+                @unlink($full);
+            }
+        }
+    }
+    redirect('admin.php?tab=gallery&event_id=' . $event_id);
+}
+
 $tab = $_GET['tab'] ?? 'dashboard';
 $applications_only = isset($_GET['applications_only']);
 if ($applications_only) {
@@ -604,6 +719,7 @@ if(isset($_GET['edit'])){
             <a href="admin.php?tab=dashboard" class="tab-btn <?php echo $tab=='dashboard' ? 'active':''; ?>">&#127968; Dashboard</a>
             <a href="admin.php?tab=registrations" class="tab-btn <?php echo $tab=='registrations' ? 'active':''; ?>">&#128203; Applications</a>
             <a href="admin.php?tab=events" class="tab-btn <?php echo $tab=='events' ? 'active':''; ?>">&#128197; Events</a>
+            <a href="admin.php?tab=gallery" class="tab-btn <?php echo $tab=='gallery' ? 'active':''; ?>">&#128247; Gallery</a>
             <a href="admin.php?tab=members" class="tab-btn <?php echo $tab=='members' ? 'active':''; ?>">👥 Members</a>
             <a href="admin.php?tab=votes" class="tab-btn <?php echo $tab=='votes' ? 'active':''; ?>">&#128313; Vote Results</a>
             <a href="admin.php?tab=users" class="tab-btn <?php echo $tab=='users' ? 'active':''; ?>">&#128101; Students</a>
@@ -882,6 +998,7 @@ if(isset($_GET['edit'])){
                     <th>Date</th>
                     <th>Location</th>
                     <th>Status</th>
+                    <th>Gallery</th>
                     <th>Edit</th>
                     <th>Delete</th>
                 </tr>
@@ -900,6 +1017,11 @@ if(isset($_GET['edit'])){
                     <td><?php echo htmlspecialchars($e['location']); ?></td>
                     <td><span class="badge badge-<?php echo $e['status']; ?>"><?php echo ucfirst($e['status']); ?></span></td>
                     <td>
+                        <a href="admin.php?tab=gallery&event_id=<?php echo (int)$e['id']; ?>" class="btn-submit" style="padding:6px 12px;margin:0;text-decoration:none;">
+                            Photos
+                        </a>
+                    </td>
+                    <td>
                         <a href="admin.php?tab=events&edit=<?php echo $e['id']; ?>" class="btn-submit" style="padding:6px 12px;margin:0;text-decoration:none;">
                             Edit
                         </a>
@@ -917,6 +1039,198 @@ if(isset($_GET['edit'])){
             </table>
             <?php endif; ?>
         </div>
+
+        <?php elseif($tab == 'gallery'): ?>
+        <?php
+        $adminClubId = admin_club_id();
+        $selected_event_id = (int)($_GET['event_id'] ?? 0);
+        $selected_edition_id = (int)($_GET['edition_id'] ?? 0);
+
+        $club_events = mysqli_query(
+            $conn,
+            "SELECT id, title FROM events WHERE club_id = $adminClubId ORDER BY event_date DESC, id DESC"
+        );
+
+        if ($selected_event_id && !event_belongs_to_club($conn, $selected_event_id, $adminClubId)) {
+            $selected_event_id = 0;
+            $selected_edition_id = 0;
+        }
+
+        $editions = [];
+        if ($selected_event_id) {
+            $edRes = mysqli_query(
+                $conn,
+                "SELECT * FROM event_editions WHERE event_id = $selected_event_id ORDER BY event_date DESC, id DESC"
+            );
+            while ($ed = mysqli_fetch_assoc($edRes)) {
+                $editions[] = $ed;
+            }
+            if ($selected_edition_id) {
+                $found = false;
+                foreach ($editions as $ed) {
+                    if ((int)$ed['id'] === $selected_edition_id) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    $selected_edition_id = 0;
+                }
+            }
+        }
+
+        $gallery_rows = [];
+        if ($selected_event_id) {
+            $gSql = "SELECT g.*, ed.title AS edition_title
+                     FROM event_gallery g
+                     JOIN event_editions ed ON ed.id = g.edition_id
+                     WHERE g.event_id = $selected_event_id";
+            if ($selected_edition_id) {
+                $gSql .= " AND g.edition_id = $selected_edition_id";
+            }
+            $gSql .= " ORDER BY g.id DESC";
+            $gRes = mysqli_query($conn, $gSql);
+            while ($g = mysqli_fetch_assoc($gRes)) {
+                $gallery_rows[] = $g;
+            }
+        }
+        ?>
+
+        <div class="form-box">
+            <h2>&#128247; Event Gallery Photos</h2>
+            <p style="font-family:'Segoe UI',sans-serif;font-size:13px;color:#666;margin:0 0 1rem;">
+                Upload photos that appear on each event's public gallery page
+                (<code>event_gallery.php</code>). Create an edition (year/run) first, then add images.
+            </p>
+
+            <form method="GET" style="margin-bottom:1.25rem;">
+                <input type="hidden" name="tab" value="gallery">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Select Event</label>
+                        <select name="event_id" required onchange="this.form.submit()">
+                            <option value="">— Choose an event —</option>
+                            <?php while ($ev = mysqli_fetch_assoc($club_events)): ?>
+                                <option value="<?php echo (int)$ev['id']; ?>" <?php echo $selected_event_id === (int)$ev['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($ev['title']); ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+            <?php if (!$selected_event_id): ?>
+                <div class="empty-msg">Select an event above to manage its gallery photos.</div>
+            <?php else: ?>
+
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
+                <a href="<?php echo htmlspecialchars(url('event_gallery.php?id=' . $selected_event_id)); ?>" target="_blank" class="btn-submit" style="margin:0;text-decoration:none;">
+                    View public gallery &#8599;
+                </a>
+            </div>
+
+            <h3 style="font-size:14px;margin:1.5rem 0 0.75rem;">1. Add edition (year / run)</h3>
+            <form method="POST">
+                <input type="hidden" name="event_id" value="<?php echo $selected_event_id; ?>">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Edition Title</label>
+                        <input type="text" name="edition_title" placeholder="e.g. Apex Day 2026" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" name="edition_date">
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" name="edition_location" placeholder="Apex College Premises">
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label>Description</label>
+                        <textarea name="edition_description" rows="2" placeholder="Optional short description"></textarea>
+                    </div>
+                </div>
+                <button type="submit" name="add_edition" class="btn-submit">Add Edition</button>
+            </form>
+
+            <h3 style="font-size:14px;margin:1.5rem 0 0.75rem;">2. Upload photo</h3>
+            <?php if (count($editions) === 0): ?>
+                <div class="empty-msg">Create an edition first, then you can upload photos.</div>
+            <?php else: ?>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="event_id" value="<?php echo $selected_event_id; ?>">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Edition</label>
+                        <select name="edition_id" required>
+                            <?php foreach ($editions as $ed): ?>
+                                <option value="<?php echo (int)$ed['id']; ?>" <?php echo $selected_edition_id === (int)$ed['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($ed['title']); ?>
+                                    <?php if (!empty($ed['event_date'])): ?>
+                                        (<?php echo date('Y', strtotime($ed['event_date'])); ?>)
+                                    <?php endif; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Image (JPG, PNG, WEBP — max 5 MB)</label>
+                        <input type="file" name="gallery_image" accept=".jpg,.jpeg,.png,.webp,image/*" required>
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label>Caption</label>
+                        <input type="text" name="caption" maxlength="255" placeholder="Optional caption">
+                    </div>
+                </div>
+                <button type="submit" name="add_gallery_image" class="btn-submit">Upload Photo</button>
+            </form>
+            <?php endif; ?>
+
+            <?php endif; ?>
+        </div>
+
+        <?php if ($selected_event_id): ?>
+        <div class="table-box" style="margin-top:1.5rem;">
+            <div class="table-box-header">
+                <h2>Gallery images</h2>
+                <span class="badge-count"><?php echo count($gallery_rows); ?> photos</span>
+            </div>
+            <?php if (count($gallery_rows) === 0): ?>
+                <div class="empty-msg">No photos yet for this event.</div>
+            <?php else: ?>
+            <table>
+                <tr>
+                    <th>Photo</th>
+                    <th>Edition</th>
+                    <th>Caption</th>
+                    <th>Added</th>
+                    <th>Delete</th>
+                </tr>
+                <?php foreach ($gallery_rows as $g): ?>
+                <tr>
+                    <td>
+                        <img src="<?php echo htmlspecialchars(media_url($g['image'])); ?>"
+                             alt=""
+                             style="width:90px;height:60px;object-fit:cover;border-radius:8px;">
+                    </td>
+                    <td><?php echo htmlspecialchars($g['edition_title']); ?></td>
+                    <td><?php echo htmlspecialchars($g['caption'] ?: '—'); ?></td>
+                    <td><?php echo date('d M Y', strtotime($g['created_at'])); ?></td>
+                    <td>
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="image_id" value="<?php echo (int)$g['id']; ?>">
+                            <input type="hidden" name="event_id" value="<?php echo $selected_event_id; ?>">
+                            <button type="submit" name="delete_gallery_image" class="btn-delete"
+                                    onclick="return confirm('Delete this photo?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
 
         <?php elseif($tab == 'votes'): ?>
         <div class="form-box">
