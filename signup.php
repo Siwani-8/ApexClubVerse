@@ -295,7 +295,7 @@ if(mysqli_query($conn, $sql)){
             </div>
         <?php endif; ?>
 
-        <form action="signup.php" method="POST">
+        <form action="<?php echo htmlspecialchars(url('signup.php')); ?>" method="POST">
             <div class="form-group">
                 <label>Full Name</label>
                 <input type="text" name="name" placeholder="Enter your full name" required>
