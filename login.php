@@ -3,8 +3,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 include 'includes/db.php';
+include 'includes/send_verification_email.php';
 
 $msg = "";
+$show_verify_fallback = false;
+$fallback_verify_url = '';
 
 if (isset($_POST['submit'])) {
 
@@ -21,14 +24,34 @@ if (isset($_POST['submit'])) {
 
             $user = mysqli_fetch_assoc($res);
 
-if (empty($user['email_verified'])) {
+            $passwordOk = password_verify($password, $user['password']) || $password === $user['password'];
 
-    $msg = "Please verify your email before logging in. Check your inbox.";
+            if (empty($user['email_verified'])) {
+                if ($passwordOk) {
+                    // Upgrade legacy plaintext passwords
+                    if ($password === $user['password']) {
+                        $newHash = mysqli_real_escape_string($conn, password_hash($password, PASSWORD_DEFAULT));
+                        mysqli_query($conn, "UPDATE users SET password='$newHash' WHERE id=" . (int)$user['id']);
+                    }
 
-} elseif (
-    password_verify($password, $user['password']) ||
-    $password === $user['password']
-) {
+                    $token = $user['verification_token'];
+                    if (empty($token)) {
+                        $token = bin2hex(random_bytes(32));
+                        $tokenSafe = mysqli_real_escape_string($conn, $token);
+                        mysqli_query($conn, "UPDATE users SET verification_token='$tokenSafe' WHERE id=" . (int)$user['id']);
+                    }
+
+                    $sent = sendVerificationEmail($user['email'], $token);
+                    $fallback_verify_url = build_verification_url($token);
+                    $show_verify_fallback = true;
+                    $msg = $sent
+                        ? "Your account is not verified yet. We re-sent the email — also use the button below if needed."
+                        : "Your account is not verified yet, and email could not be sent from this server. Use the button below to verify.";
+                } else {
+                    $msg = "Please verify your email before logging in. Check your inbox (or spam).";
+                }
+
+            } elseif ($passwordOk) {
 
                 // Upgrade legacy plaintext passwords to secure hashes
                 if ($password === $user['password']) {
@@ -49,7 +72,6 @@ if (empty($user['email_verified'])) {
                 } else {
                     redirect('vote-events.php');
                 }
-                exit;
 
             } else {
                 $msg = "Wrong password. Please try again.";
@@ -230,7 +252,17 @@ include 'includes/header.php';
         </div>
 
         <?php if(!empty($msg)): ?>
-            <div class="alert-error"><?php echo htmlspecialchars($msg); ?></div>
+            <div class="alert-error">
+                <?php echo htmlspecialchars($msg); ?>
+                <?php if (!empty($show_verify_fallback) && !empty($fallback_verify_url)): ?>
+                    <div style="margin-top:14px;">
+                        <a href="<?php echo htmlspecialchars($fallback_verify_url); ?>"
+                           style="display:inline-block;background:#7a1028;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;">
+                            Verify my account now
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
 
         <form action="login.php" method="POST">

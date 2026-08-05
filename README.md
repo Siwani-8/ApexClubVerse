@@ -64,7 +64,10 @@ apexclubverse/                 ← upload these contents into htdocs / public_ht
 4. Confirm DB settings in `includes/config.php` (defaults work for XAMPP).
 5. Copy `includes/mail_config.example.php` → `includes/mail_config.php` and add your
    Gmail address + [App Password](https://myaccount.google.com/apppasswords).
-6. Open `http://localhost/apexclubverse/`.
+   On ProFreeHost, make sure this file exists on the server (it is not in Git).
+   If SMTP still fails, signup/login will show a **Verify my account now** button
+   so users are not locked out. Check `includes/mail_error.log` on the server for the
+   real SMTP error.
 
 ## Deployment (ProFreeHost)
 
