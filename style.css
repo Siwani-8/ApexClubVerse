@@ -80,7 +80,28 @@ body {
 .btn-join:hover {
     background: #73001c;
 }
+<<<<<<< HEAD
+/* ===================== CONTENT ===================== */
 
+.content-wrapper{
+    flex:1;
+    padding-bottom:4rem;
+}
+
+/* ===================== FOOTER ===================== */
+
+footer{
+    background:#fff;
+    padding:2rem 4rem;
+    border-top:1px solid #d0cfca;
+    text-align:center;
+    font-size:.9rem;
+    color:#555;
+    font-family:'Segoe UI',sans-serif;
+}
+=======
+
+>>>>>>> 6d76946aea833ee58b34205de40f4bb8dcb5bff0
 .admin-link {
     color: var(--primary-crimson) !important;
     font-weight: bold;
@@ -89,6 +110,14 @@ body {
 .logout-link {
     color: var(--text-dark);
 }
+<<<<<<< HEAD
+.navbar-brand-container img.navbar-logo-square {
+    height: 55px;           /* Controls header logo height */
+    width: auto;            /* Keeps original aspect ratio */
+    display: block;
+    object-fit: contain;
+}
+=======
 
 /* ===================== CONTENT ===================== */
 
@@ -114,3 +143,4 @@ footer, .footer-top, .copyright {
     margin: 0 !important;
     background-color: #ffffff !important;
 }
+>>>>>>> 6d76946aea833ee58b34205de40f4bb8dcb5bff0
