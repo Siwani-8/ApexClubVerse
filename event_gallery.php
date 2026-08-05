@@ -1,5 +1,35 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 include 'db.php';
+
+/*
+|--------------------------------------------------------------------------
+| Login and admin check
+|--------------------------------------------------------------------------
+| Supported session examples:
+| $_SESSION['user_id'] and $_SESSION['role']
+| $_SESSION['user']['id'] and $_SESSION['user']['role']
+| $_SESSION['loggedInUser']['id'] and $_SESSION['loggedInUser']['role']
+*/
+
+$sessionUser = $_SESSION['user'] ?? $_SESSION['loggedInUser'] ?? [];
+
+$user_id = $_SESSION['user_id']
+    ?? ($sessionUser['id'] ?? null);
+
+$user_role = $_SESSION['role']
+    ?? ($sessionUser['role'] ?? '');
+
+$isLoggedIn = !empty($user_id);
+
+$isAdmin = $isLoggedIn && (
+    strtolower((string)$user_role) === 'admin'
+    || !empty($_SESSION['is_admin'])
+);
 
 function h($value) {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
@@ -34,77 +64,91 @@ $error = '';
 
 /* Add a new image without replacing old images */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_image'])) {
-    $edition_id = (int)($_POST['edition_id'] ?? 0);
-    $caption = trim($_POST['caption'] ?? '');
-    $file = $_FILES['image'] ?? null;
 
-    $stmt = mysqli_prepare(
-        $conn,
-        "SELECT id FROM event_editions WHERE id = ? AND event_id = ?"
-    );
-    mysqli_stmt_bind_param($stmt, 'ii', $edition_id, $event_id);
-    mysqli_stmt_execute($stmt);
-    $editionExists = mysqli_stmt_get_result($stmt)->fetch_assoc();
-    mysqli_stmt_close($stmt);
-
-    if (!$editionExists) {
-        $error = 'Invalid event edition.';
-    } elseif (!$file || $file['error'] !== UPLOAD_ERR_OK) {
-        $error = 'Please select an image.';
-    } elseif ($file['size'] > 5 * 1024 * 1024) {
-        $error = 'Image must be smaller than 5 MB.';
+    if (!$isLoggedIn) {
+        http_response_code(401);
+        $error = 'Please log in as an admin to edit this event.';
+    } elseif (!$isAdmin) {
+        http_response_code(403);
+        $error = 'Only an admin can edit event images.';
     } else {
-        $allowed = [
-            'image/jpeg' => 'jpeg',
-            'image/png'  => 'png',
-            'image/webp' => 'webp'
-        ];
+        $edition_id = (int)($_POST['edition_id'] ?? 0);
+        $caption = trim($_POST['caption'] ?? '');
+        $file = $_FILES['image'] ?? null;
 
-        $mime = mime_content_type($file['tmp_name']);
+        $stmt = mysqli_prepare(
+            $conn,
+            "SELECT id FROM event_editions WHERE id = ? AND event_id = ?"
+        );
 
-        if (!isset($allowed[$mime])) {
-            $error = 'Only JPG, PNG and WEBP images are allowed.';
+        mysqli_stmt_bind_param($stmt, 'ii', $edition_id, $event_id);
+        mysqli_stmt_execute($stmt);
+        $editionExists = mysqli_stmt_get_result($stmt)->fetch_assoc();
+        mysqli_stmt_close($stmt);
+
+        if (!$editionExists) {
+            $error = 'Invalid event edition.';
+        } elseif (!$file || $file['error'] !== UPLOAD_ERR_OK) {
+            $error = 'Please select an image.';
+        } elseif ($file['size'] > 5 * 1024 * 1024) {
+            $error = 'Image must be smaller than 5 MB.';
         } else {
-            $folder = __DIR__ . '/images/events/';
+            $allowed = [
+                'image/jpeg' => 'jpeg',
+                'image/png'  => 'png',
+                'image/webp' => 'webp'
+            ];
 
-            if (!is_dir($folder)) {
-                mkdir($folder, 0775, true);
-            }
+            $mime = mime_content_type($file['tmp_name']);
 
-            $name = 'event_' . $event_id . '_' . $edition_id . '_' .
-                    uniqid() . '.' . $allowed[$mime];
-
-            $dbPath = 'images/events/' . $name;
-            $fullPath = $folder . $name;
-
-            if (!move_uploaded_file($file['tmp_name'], $fullPath)) {
-                $error = 'Image upload failed.';
+            if (!isset($allowed[$mime])) {
+                $error = 'Only JPG, PNG and WEBP images are allowed.';
             } else {
-                $stmt = mysqli_prepare(
-                    $conn,
-                    "INSERT INTO event_gallery
-                    (event_id, edition_id, image, caption, created_at)
-                    VALUES (?, ?, ?, ?, NOW())"
-                );
+                $folder = __DIR__ . '/images/events/';
 
-                mysqli_stmt_bind_param(
-                    $stmt,
-                    'iiss',
-                    $event_id,
-                    $edition_id,
-                    $dbPath,
-                    $caption
-                );
-
-                if (mysqli_stmt_execute($stmt)) {
-                    mysqli_stmt_close($stmt);
-                    header("Location: event-details.php?id=$event_id&uploaded=1");
-                    exit;
+                if (!is_dir($folder)) {
+                    mkdir($folder, 0775, true);
                 }
 
-                mysqli_stmt_close($stmt);
-                unlink($fullPath);
-                $error = 'Could not save the image.';
+                $name = 'event_' . $event_id . '_' . $edition_id . '_' .
+                        uniqid() . '.' . $allowed[$mime];
+
+                $dbPath = 'images/events/' . $name;
+                $fullPath = $folder . $name;
+
+                if (!move_uploaded_file($file['tmp_name'], $fullPath)) {
+                    $error = 'Image upload failed.';
+                } else {
+                    $stmt = mysqli_prepare(
+                        $conn,
+                        "INSERT INTO event_gallery
+                        (event_id, edition_id, image, caption, created_at)
+                        VALUES (?, ?, ?, ?, NOW())"
+                    );
+
+                    mysqli_stmt_bind_param(
+                        $stmt,
+                        'iiss',
+                        $event_id,
+                        $edition_id,
+                        $dbPath,
+                        $caption
+                    );
+
+                    if (mysqli_stmt_execute($stmt)) {
+                        mysqli_stmt_close($stmt);
+                        header("Location: event-details.php?id=$event_id&uploaded=1");
+                        exit;
+                    }
+
+                    mysqli_stmt_close($stmt);
+
+                    if (file_exists($fullPath)) {
+                        unlink($fullPath);
+                    }
+
+                    $error = 'Could not save the image.';
+                }
             }
         }
     }
@@ -255,27 +299,46 @@ body{background:#f7f8fc}
                 </div>
             </div>
 
-            <div class="upload-box">
-                <h3>Add image to <?= h($edition['title']) ?></h3>
+            <?php if ($isAdmin): ?>
 
-                <form method="POST" enctype="multipart/form-data" class="upload-form">
-                    <input type="hidden" name="edition_id" value="<?= $edition_id ?>">
+                <div class="upload-box">
+                    <h3>Add image to <?= h($edition['title']) ?></h3>
 
-                    <div class="form-group">
-                        <label>Image</label>
-                        <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp" required>
-                    </div>
+                    <form method="POST"
+                          enctype="multipart/form-data"
+                          class="upload-form">
 
-                    <div class="form-group">
-                        <label>Caption</label>
-                        <input type="text" name="caption" maxlength="255" placeholder="Image caption">
-                    </div>
+                        <input type="hidden"
+                               name="edition_id"
+                               value="<?= $edition_id ?>">
 
-                    <button type="submit" name="add_image" class="upload-btn">
-                        Add Image
-                    </button>
-                </form>
-            </div>
+                        <div class="form-group">
+                            <label>Image</label>
+
+                            <input type="file"
+                                   name="image"
+                                   accept=".jpg,.jpeg,.png,.webp"
+                                   required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Caption</label>
+
+                            <input type="text"
+                                   name="caption"
+                                   maxlength="255"
+                                   placeholder="Image caption">
+                        </div>
+
+                        <button type="submit"
+                                name="add_image"
+                                class="upload-btn">
+                            Add Image
+                        </button>
+                    </form>
+                </div>
+
+            <?php endif; ?>
 
             <?php if ($photos): ?>
                 <div class="gallery">
