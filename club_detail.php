@@ -477,6 +477,53 @@ $data = $club_data[$club_id] ?? $club_data[1];
     color:inherit;
     display:block;
 }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+        .container { padding: 1.5rem 1.25rem 3rem; }
+        .club-hero { padding: 2.5rem 1.75rem; }
+        .club-hero h1 { font-size: 2rem; }
+        .club-hero::after { font-size: 5rem; right: 1.5rem; }
+        .boa-grid { grid-template-columns: 1fr; }
+        .stats-strip { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+    }
+
+    @media (max-width: 600px) {
+        .container { padding: 1.25rem 1rem 2.5rem; }
+        .club-hero {
+            padding: 2rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        .club-hero h1 { font-size: 1.7rem; }
+        .club-hero .about-text { font-size: 0.9rem; }
+        .club-hero::before { width: 180px; height: 180px; }
+        .club-hero::after { display: none; }
+        .stats-strip {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card { padding: 1.1rem; }
+        .stat-card .stat-number { font-size: 1.6rem; }
+        .section-header h2 { font-size: 1.35rem; }
+        .events-grid { grid-template-columns: 1fr; }
+        .bod-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .bod-avatar,
+        .boa-avatar { width: 100px; height: 100px; font-size: 1.2rem; }
+        .boa-card {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.25rem;
+        }
+        .cta-box { padding: 2rem 1.25rem; }
+        .cta-box h2 { font-size: 1.4rem; }
+        .cta-btn { padding: 0.75rem 1.75rem; width: 100%; max-width: 280px; }
+    }
+
+    @media (max-width: 400px) {
+        .bod-grid { grid-template-columns: 1fr; }
+    }
 </style>
 
 <div class="container">

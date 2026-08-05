@@ -240,6 +240,11 @@ include 'includes/header.php';
         text-decoration: none;
     }
     .hint a:hover { text-decoration: underline; }
+
+    @media (max-width: 480px) {
+        .login-page { padding: 2rem 1rem; }
+        .login-card { padding: 2rem 1.25rem 1.5rem; }
+    }
 </style>
 
 <div class="login-page">

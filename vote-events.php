@@ -248,10 +248,15 @@ while($poll = mysqli_fetch_assoc($polls)) {
     }
 
     @media (max-width: 600px) {
+        .vote-hero { padding: 2.25rem 1.15rem 2.5rem; }
+        .vote-hero h1 { font-size: 1.8rem; }
+        .vote-content { padding: 1.75rem 1.15rem 3rem; }
         .poll-card { flex-direction: column; }
+        .poll-main { padding: 1.15rem 1.25rem; }
         .vote-stats { flex-direction: column; width: 100%; }
         .vstat { border-right: none; border-bottom: 0.5px solid rgba(255,255,255,0.15); }
         .vstat:last-child { border-bottom: none; }
+        .poll-option { width: 100%; text-align: left; }
     }
 </style>
 

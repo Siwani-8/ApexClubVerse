@@ -233,14 +233,21 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
         .club-grid {
             grid-template-columns: repeat(2, 1fr);
         }
+        .clubs-hero { padding: 2.5rem 1.5rem 3rem; }
     }
 
     @media (max-width: 600px) {
+        .clubs-hero { padding: 2rem 1.15rem 2.5rem; }
         .clubs-hero h1 { font-size: 1.9rem; }
-        .clubs-stats { gap: 1.2rem; }
+        .clubs-stats {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.2rem;
+        }
         .club-grid { grid-template-columns: 1fr; }
         .club-card-icon { height: 130px; }
         .club-card-icon img { max-height: 110px !important; }
+        .clubs-section { padding: 1.75rem 1.15rem 0; }
     }
 </style>
 

@@ -93,6 +93,11 @@
 /* Mobile */
 @media(max-width:768px){
 
+    .footer-top{
+        padding:28px 5%;
+        margin-top:30px;
+    }
+
     .footer-container{
         flex-direction:column;
         gap:25px;
@@ -100,10 +105,12 @@
 
     .links-grid{
         gap:30px;
+        flex-wrap:wrap;
     }
 
     .footer-column{
         width:100%;
+        min-width:0;
     }
 
     .footer-column h2{
@@ -112,6 +119,31 @@
 
     .footer-logo{
         width:120px;
+    }
+}
+
+@media(max-width:480px){
+    .footer-top{
+        padding:24px 4%;
+    }
+
+    .links-grid{
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .app-flash{
+        margin-left:10px;
+        margin-right:10px;
+        max-width:none;
+    }
+
+    .confirm-actions{
+        flex-direction:column-reverse;
+    }
+
+    .confirm-actions button{
+        width:100%;
     }
 }
 </style>

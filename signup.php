@@ -243,6 +243,7 @@ if(mysqli_query($conn, $sql)){
     .hint a:hover { text-decoration: underline; }
 
     @media (max-width: 480px) {
+        .signup-page { padding: 2rem 1rem; }
         .signup-card { padding: 2rem 1.25rem 1.5rem; }
     }
 </style>

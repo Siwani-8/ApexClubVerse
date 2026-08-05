@@ -130,8 +130,10 @@ include 'includes/header.php';
     }
 
     @media (max-width: 600px) {
+        .contact-hero { padding: 2.5rem 1.15rem; }
         .contact-hero h1 { font-size: 1.9rem; }
         .contact-section { padding: 2rem 1rem 3rem; }
+        .contact-card { padding: 1.35rem 1.25rem; }
     }
 </style>
 

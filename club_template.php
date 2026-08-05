@@ -16,6 +16,13 @@ $club = mysqli_fetch_assoc($club_query);
     .club-banner h1 { font-size: 3rem; }
     .club-container { max-width: 900px; margin: 3rem auto; padding: 0 2rem; }
     .content-box { background: white; padding: 3rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-size: 1.1rem; line-height: 1.8; }
+
+    @media (max-width: 600px) {
+        .club-banner { padding: 2.5rem 1.25rem; }
+        .club-banner h1 { font-size: 1.9rem; }
+        .club-container { margin: 1.75rem auto; padding: 0 1rem; }
+        .content-box { padding: 1.5rem 1.25rem; font-size: 1rem; }
+    }
 </style>
 
 <div class="club-banner">

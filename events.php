@@ -32,9 +32,19 @@ $events = mysqli_query($conn, "
     .status-ongoing  { background: #fff3cd; color: #856404; }
     .status-completed { background: #d4edda; color: #155724; }
 
-    @media(max-width: 600px) {
+    @media(max-width: 768px) {
+        .container { margin: 2rem auto 3rem; padding: 0 1.25rem; }
+        .page-title { font-size: 2rem; }
         .feed-card { flex-direction: column; }
-        .event-img-box { width: 100%; height: 120px; }
+        .event-img-box { width: 100%; height: 140px; min-height: 140px; }
+        .event-details { padding: 1.25rem; }
+        .event-title { font-size: 1.25rem; }
+    }
+
+    @media(max-width: 480px) {
+        .container { padding: 0 1rem; }
+        .page-title { font-size: 1.7rem; margin-bottom: 1.5rem; }
+        .event-img-box { height: 120px; min-height: 120px; }
     }
 </style>
 

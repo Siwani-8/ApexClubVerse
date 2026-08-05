@@ -211,10 +211,26 @@ body{background:#f7f8fc}
 .caption{padding:13px 8px 7px;text-align:center;font-size:17px;font-weight:600}
 .empty,.missing{padding:25px;border:2px dashed #ddd;border-radius:14px;color:#777;text-align:center;background:#fff}
 .missing{min-height:180px;display:grid;place-items:center}
+@media(max-width:900px){
+    .event-container{padding:28px 16px}
+    .event-hero{min-height:220px;border-radius:18px;margin-bottom:30px}
+    .hero-overlay{padding:20px 16px}
+    .event-details{gap:36px;padding:18px 20px}
+    .gallery{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+}
 @media(max-width:700px){
-    .event-details{flex-direction:column;gap:20px}
+    .event-container{padding:20px 14px}
+    .event-hero{min-height:200px;border-radius:14px}
+    .hero-overlay p{font-size:0.92rem;line-height:1.55}
+    .event-details{flex-direction:column;gap:20px;padding:16px}
     .upload-form{grid-template-columns:1fr}
-    .gallery{grid-template-columns:1fr}
+    .gallery{grid-template-columns:1fr;gap:16px}
+    .gallery-item img{height:220px}
+}
+@media(max-width:480px){
+    .event-container{padding:16px 12px}
+    .edition{margin-bottom:40px}
+    .detail h3{font-size:16px}
 }
 </style>
 

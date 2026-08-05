@@ -804,11 +804,12 @@ if (isset($_GET['edit_image'])) {
     .tab-btn { padding: 8px 16px; border-radius: 8px; border: 0.5px solid #ddd; background: #fff; font-family: 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; color: #555; text-decoration: none; transition: all 0.15s; }
     .tab-btn:hover { border-color: #7a1028; color: #7a1028; }
     .tab-btn.active { background: #7a1028; color: #fff; border-color: #7a1028; }
-    .table-box { background: #fff; border: 0.5px solid #e0ddd6; border-radius: 12px; overflow: hidden; }
-    .table-box-header { padding: 1rem 1.5rem; border-bottom: 0.5px solid #e0ddd6; display: flex; align-items: center; justify-content: space-between; }
+    .table-box { background: #fff; border: 0.5px solid #e0ddd6; border-radius: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .table-box-header { padding: 1rem 1.5rem; border-bottom: 0.5px solid #e0ddd6; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
     .table-box-header h2 { font-size: 15px; font-weight: 600; color: #1a1a1a; }
     .badge-count { background: #fdecea; color: #7a1028; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; font-family: 'Segoe UI', sans-serif; }
-    table { width: 100%; border-collapse: collapse; }
+    .table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; min-width: 640px; }
     th { background: #f9f8f5; padding: 10px 14px; font-family: 'Segoe UI', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #999; text-align: left; border-bottom: 0.5px solid #e0ddd6; }
     td { padding: 10px 14px; font-family: 'Segoe UI', sans-serif; font-size: 13px; color: #333; border-bottom: 0.5px solid #f0ede7; }
     tr:last-child td { border-bottom: none; }
@@ -833,9 +834,27 @@ if (isset($_GET['edit_image'])) {
     .btn-delete:hover { background: #7a1028; color: #fff; }
     select.status-select { padding: 4px 8px; border: 0.5px solid #ddd; border-radius: 6px; font-size: 12px; font-family: 'Segoe UI', sans-serif; cursor: pointer; }
     .empty-msg { text-align: center; padding: 2rem; color: #bbb; font-family: 'Segoe UI', sans-serif; font-size: 13px; }
+    @media (max-width: 900px) {
+        .admin-page { padding: 1.25rem; }
+        .admin-header { flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+        .form-grid { grid-template-columns: 1fr 1fr; }
+    }
+
     @media (max-width: 600px) {
         .admin-page { padding: 1rem; margin-bottom: 2rem; }
+        .admin-header h1 { font-size: 1.3rem; }
         .stats-row { grid-template-columns: 1fr 1fr; }
+        .stat-box { padding: 1rem; gap: 0.75rem; }
+        .stat-val { font-size: 1.3rem; }
+        .tab-btn { padding: 7px 12px; font-size: 12px; }
+        .table-box-header { padding: 0.85rem 1rem; }
+        .form-box { padding: 1.1rem; }
+        .form-grid { grid-template-columns: 1fr; }
+        th, td { padding: 8px 10px; font-size: 12px; }
+    }
+
+    @media (max-width: 400px) {
+        .stats-row { grid-template-columns: 1fr; }
     }
 </style>
 

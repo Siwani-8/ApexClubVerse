@@ -290,6 +290,7 @@ if($success){
         .club-options { grid-template-columns: 1fr; }
         .form-container { padding: 1.75rem 1.25rem; }
         .intake-page { padding: 1.5rem 1rem 3rem; }
+        .form-header h2 { font-size: 1.4rem; }
     }
 </style>
 

@@ -361,15 +361,29 @@
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
+        .hero { padding: 5rem 1.5rem 4rem; min-height: 80vh; }
         .life-grid { grid-template-columns: 1fr; }
         .numbers-inner { grid-template-columns: repeat(2, 1fr); }
         .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
         .gi-1, .gi-4, .gi-7 { grid-column: span 2; grid-row: span 1; }
-        .cta-banner { flex-direction: column; text-align: center; }
+        .cta-banner { flex-direction: column; text-align: center; padding: 2.5rem 1.75rem; }
+        .section { padding: 4rem 1.5rem; }
     }
     @media (max-width: 600px) {
+        .hero { padding: 4rem 1.15rem 3.5rem; min-height: auto; }
         .hero-title { font-size: 2rem; }
-        .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+        .hero-desc { font-size: 0.95rem; margin: 1.25rem auto 1.75rem; }
+        .hero-ctas { flex-direction: column; align-items: stretch; }
+        .btn-primary, .btn-secondary { justify-content: center; width: 100%; }
+        .gallery-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 130px; gap: 8px; }
+        .numbers-inner { grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .section { padding: 3rem 1.15rem; }
+        .cta-banner { padding: 2rem 1.25rem; }
+    }
+    @media (max-width: 400px) {
+        .gallery-grid { grid-template-columns: 1fr; }
+        .gi-1, .gi-4, .gi-7 { grid-column: span 1; }
+        .numbers-inner { grid-template-columns: 1fr; }
     }
 </style>
 

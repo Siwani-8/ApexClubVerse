@@ -166,7 +166,7 @@ display:none;
 }
 
 tr{
-margin:18px;
+margin:18px 0;
 border:1px solid #ece8e2;
 border-radius:12px;
 overflow:hidden;
@@ -175,18 +175,27 @@ overflow:hidden;
 td{
 padding-left:45%;
 position:relative;
+word-break:break-word;
 }
 
 td:before{
 position:absolute;
 left:15px;
+top:16px;
 font-weight:bold;
+max-width:40%;
 }
 
 td:nth-child(1):before{content:"Club";}
 td:nth-child(2):before{content:"Application";}
 td:nth-child(3):before{content:"Interview";}
 td:nth-child(4):before{content:"Status";}
+}
+
+@media(max-width:480px){
+.application-page{padding:2rem 1rem;}
+.page-header h1{font-size:1.5rem;}
+td{padding-left:42%;font-size:13px;}
 }
 </style>
 
