@@ -248,8 +248,8 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
 <div class="clubs-hero">
     <div class="clubs-hero-inner">
         <div class="clubs-eyebrow">&#127979; Apex College</div>
-        <h1>Find Your Campus Community</h1>
-        <p>Explore clubs built around your passions — from arts to tech, sports to health.</p>
+        <h1>Find Your Apex Community</h1>
+        <p>Explore clubs built around your passions , from arts to tech, sports to health.</p>
         <div class="clubs-stats">
             <div>
                 <span class="clubs-stat-val">6</span>
@@ -270,7 +270,7 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
 <!-- Clubs grid -->
 <div class="clubs-section">
     <div class="clubs-section-inner">
-        <div class="clubs-section-label">Campus clubs</div>
+        <div class="clubs-section-label">Apex clubs</div>
         <div class="club-grid">
             <?php while($row = mysqli_fetch_assoc($result)) { ?>
                 <a class="club-card" href="club_detail.php?id=<?php echo $row['id']; ?>">

@@ -1,5 +1,11 @@
 <style>
 
+<<<<<<< HEAD
+.gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:20px;
+=======
 .event-hero{
     height:250px;
     margin:30px auto;
@@ -49,10 +55,26 @@
 
 .gallery-item:hover{
     transform:translateY(-8px);
+>>>>>>> 1fee1452aca3ced30870f8c1e91161e1616d80f1
 }
 
 .gallery-item img{
     width:100%;
+<<<<<<< HEAD
+    height:250px;
+    object-fit:cover;
+    border-radius:10px;
+}
+
+.gallery-item{
+    background:#fff;
+    padding:10px;
+    border-radius:10px;
+}
+
+</style>
+
+=======
     height:300px;
     object-fit:cover;
     
@@ -133,6 +155,7 @@
     <!-- All your current page content here -->
 
 </div>
+>>>>>>> 1fee1452aca3ced30870f8c1e91161e1616d80f1
 <?php
 include 'db.php';
 include 'header.php';
@@ -150,6 +173,24 @@ $gallery_query = mysqli_query($conn,
 
 <div class="container">
 
+<<<<<<< HEAD
+<h1><?php echo htmlspecialchars($event['title']); ?></h1>
+
+<p>
+<?php echo htmlspecialchars($event['description']); ?>
+</p>
+
+<p>
+Date:
+<?php echo htmlspecialchars($event['event_date']); ?>
+</p>
+
+<p>
+Location:
+<?php echo htmlspecialchars($event['location']); ?>
+</p>
+
+=======
 <div class="event-hero">
     <div class="hero-overlay">
         <h1><?php echo htmlspecialchars($event['title']); ?></h1>
@@ -180,10 +221,23 @@ $gallery_query = mysqli_query($conn,
     </div>
 
 </div>
+>>>>>>> 1fee1452aca3ced30870f8c1e91161e1616d80f1
 <div class="gallery-grid">
 
 <?php while($photo=mysqli_fetch_assoc($gallery_query)){ ?>
 
+<<<<<<< HEAD
+    <div class="gallery-item">
+
+        <img src="<?php echo htmlspecialchars($photo['image']); ?>">
+
+        <p>
+            <?php echo htmlspecialchars($photo['caption']); ?>
+        </p>
+
+    </div>
+
+=======
 <div class="gallery-item">
 
     <img src="<?php echo htmlspecialchars($photo['image']); ?>">
@@ -194,6 +248,7 @@ $gallery_query = mysqli_query($conn,
 
 </div>
 
+>>>>>>> 1fee1452aca3ced30870f8c1e91161e1616d80f1
 <?php } ?>
 
 </div>

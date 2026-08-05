@@ -473,6 +473,11 @@ $data = $club_data[$club_id] ?? $club_data[1];
         margin-bottom: 0.15rem;
         font-family: sans-serif;
     }
+    .event-link{
+    text-decoration:none;
+    color:inherit;
+    display:block;
+}
 </style>
 
 <div class="container">
@@ -509,33 +514,40 @@ $data = $club_data[$club_id] ?? $club_data[1];
             <div class="section-line"></div>
         </div>
    <div class="events-grid">
-
 <?php while($event = mysqli_fetch_assoc($events_result)) { ?>
 
-<a href="event_gallery.php?id=<?php echo $event['id']; ?>" 
-   style="text-decoration:none; color:inherit;">
-
+<a href="event_gallery.php?id=<?php echo $event['id']; ?>" class="event-link">
 <div class="event-photo-card">
 
-    <?php if(!empty($event['image'])) { ?>
+    <div class="event-photo-card">
 
-        <img src="<?php echo htmlspecialchars($event['image']); ?>"
-             style="width:100%; height:160px; object-fit:cover;">
+        <?php if(!empty($event['image'])) { ?>
 
-    <?php } else { ?>
+            <img src="<?php echo htmlspecialchars($event['image']); ?>"
+                 style="width:100%; height:160px; object-fit:cover;">
 
-        <div class="event-photo-placeholder">
-            <div class="ph-icon">📷</div>
-            <div class="ph-text">PHOTO COMING SOON</div>
+        <?php } else { ?>
+
+            <div class="event-photo-placeholder">
+                <div class="ph-icon">📷</div>
+                <div class="ph-text">PHOTO COMING SOON</div>
+            </div>
+
+        <?php } ?>
+
+        <div class="event-label">
+            <?php echo htmlspecialchars($event['title']); ?>
         </div>
 
+<<<<<<< HEAD
+=======
     <?php } ?>
 
     <div class="event-label">
-        <?php echo htmlspecialchars($event['title']); ?>
-    </div>
-
+<?php echo htmlspecialchars($event['title']); ?>
 </div>
+
+</a>
 
 </a>
 
