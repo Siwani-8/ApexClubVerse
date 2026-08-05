@@ -14,7 +14,7 @@ if (defined('APEX_CONFIG_LOADED')) {
 }
 define('APEX_CONFIG_LOADED', true);
 
-/* ── Database (ProFreeHost: replace these with panel credentials) ── */
+/* ── Database (ProFreeHost: replace these with panel credentials ON THE SERVER ONLY) ── */
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
