@@ -1098,9 +1098,16 @@ if(isset($_GET['edit'])){
 
         <div class="form-box">
             <h2>&#128247; Event Gallery Photos</h2>
+            <p style="font-family:'Segoe UI',sans-serif;font-size:13px;color:#666;margin:0 0 0.5rem;">
+                Signed in as <strong><?php echo htmlspecialchars($_SESSION['club_name'] ?? 'your club'); ?></strong>
+                — you only see and upload photos for <em>this club's</em> events.
+                Photos appear on the club page and on each event's public gallery.
+            </p>
             <p style="font-family:'Segoe UI',sans-serif;font-size:13px;color:#666;margin:0 0 1rem;">
-                Upload photos that appear on each event's public gallery page
-                (<code>event_gallery.php</code>). Create an edition (year/run) first, then add images.
+                Create an edition (year/run) first, then add images.
+                <?php if ($adminClubId): ?>
+                    <a href="<?php echo htmlspecialchars(url('club_detail.php?id=' . $adminClubId)); ?>" target="_blank">Open your club page &#8599;</a>
+                <?php endif; ?>
             </p>
 
             <form method="GET" style="margin-bottom:1.25rem;">
