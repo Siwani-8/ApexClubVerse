@@ -13,9 +13,10 @@
     font-family: 'Georgia', 'Segoe UI', serif;
 }
 
-/* ── 1. UNIFIED PAGE BACKGROUND & STICKY FOOTER ── */
-html, body {
-    height: 100%;
+/* Page grows with content; navbar/footer scroll with the page (not sticky/fixed). */
+html {
+    height: auto;
+    overflow-x: hidden;
 }
 
 body {
@@ -24,7 +25,9 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    overflow-x: hidden;
+    height: auto;
+    overflow-x: clip;
+    position: relative;
 }
 
 img, video, iframe {
@@ -43,6 +46,8 @@ img, video, iframe {
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     position: relative;
     z-index: 1000;
+    flex-shrink: 0;
+    width: 100%;
 }
 
 .navbar-brand-container {
@@ -139,17 +144,26 @@ img, video, iframe {
 
 .content-wrapper, main {
     flex: 1 0 auto;
-    padding-bottom: 0 !important;
-    margin-bottom: 0 !important;
-    background-color: #f5f3ef !important;
+    display: flex;
+    flex-direction: column;
     width: 100%;
     max-width: 100%;
+    min-height: 0;
+    background-color: #f5f3ef !important;
 }
 
-/* ===================== FOOTER OVERRIDES ===================== */
+.content-wrapper > div {
+    width: 100%;
+}
 
-footer, .footer-top, .copyright {
+/* ===================== FOOTER ===================== */
+
+.footer-top,
+.copyright,
+footer {
     flex-shrink: 0;
+    position: relative;
+    width: 100%;
 }
 
 .footer-top {

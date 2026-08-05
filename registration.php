@@ -104,7 +104,7 @@ if($success){
 
     /* ── Page background ── */
     .intake-page {
-        min-height: 100vh;
+        flex: 1 0 auto;
         background: #7a1028;
         background-image:
             radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 0%, transparent 40%),
@@ -112,7 +112,7 @@ if($success){
         padding: 3rem 1.5rem 4rem;
         position: relative;
         overflow-x: hidden;
-        overflow-y: auto;
+        overflow-y: visible;
     }
 
     /* Decorative circles */

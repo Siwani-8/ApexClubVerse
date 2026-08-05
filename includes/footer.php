@@ -3,7 +3,10 @@
     background:#7f0d23;
     color:#fff;
     padding:35px 6%;
-    margin-top:50px;
+    margin-top:0;
+    position:relative;
+    flex-shrink:0;
+    width:100%;
 }
 
 .footer-container{
@@ -92,6 +95,9 @@
     text-align:center;
     padding:12px;
     font-size:14px;
+    position:relative;
+    flex-shrink:0;
+    width:100%;
 }
 
 /* Mobile */
@@ -99,7 +105,7 @@
 
     .footer-top{
         padding:28px 5%;
-        margin-top:30px;
+        margin-top:0;
     }
 
     .footer-container{
@@ -170,6 +176,8 @@
     }
 }
 </style>
+
+</div><!-- /.content-wrapper -->
 
 <!-- Footer -->
 <section class="footer-top">

@@ -90,7 +90,7 @@ include 'includes/header.php';
     *, *::before, *::after { box-sizing: border-box; }
 
     .login-page {
-        min-height: 100vh;
+        flex: 1 0 auto;
         background: #7a1028;
         background-image:
             radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 0%, transparent 40%),
@@ -101,7 +101,7 @@ include 'includes/header.php';
         padding: 3rem 1.5rem;
         position: relative;
         overflow-x: hidden;
-        overflow-y: auto;
+        overflow-y: visible;
     }
     .login-page::before {
         content: '';

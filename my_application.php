@@ -24,7 +24,7 @@ ORDER BY applied_at DESC");
 }
 
 .application-page{
-    min-height:100vh;
+    flex:1 0 auto;
     background:#f5f3ef;
     padding:3rem 1.5rem;
 }

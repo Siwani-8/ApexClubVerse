@@ -529,7 +529,4 @@
     <a href="<?php echo htmlspecialchars(url('registration.php')); ?>" class="btn-white">Get started &rarr;</a>
 </div>
 
-</div>
-<!-- closes .content-wrapper opened in header.php -->
-
 <?php include 'includes/footer.php'; ?>

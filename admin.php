@@ -789,8 +789,8 @@ if (isset($_GET['edit_image'])) {
 
 <style>
     *, *::before, *::after { box-sizing: border-box; }
-    /* Added margin-bottom: 4rem to create gap above footer */
-    .admin-page { min-height: 100vh; background: #f5f3ef; padding: 2rem; margin-bottom: 4rem; }
+    /* Gap above footer handled by normal document flow */
+    .admin-page { flex: 1 0 auto; background: #f5f3ef; padding: 2rem; margin-bottom: 0; }
     .admin-inner { max-width: 1100px; margin: 0 auto; }
     .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
     .admin-header h1 { font-size: 1.6rem; font-weight: 700; color: #1a1a1a; }
@@ -843,7 +843,7 @@ if (isset($_GET['edit_image'])) {
     }
 
     @media (max-width: 600px) {
-        .admin-page { padding: 1rem; margin-bottom: 2rem; }
+        .admin-page { padding: 1rem; }
         .admin-header h1 { font-size: 1.3rem; }
         .stats-row { grid-template-columns: 1fr 1fr; }
         .stat-box { padding: 1rem; gap: 0.75rem; }

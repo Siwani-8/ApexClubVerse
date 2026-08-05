@@ -101,7 +101,7 @@ while($poll = mysqli_fetch_assoc($polls)) {
 <style>
     *, *::before, *::after { box-sizing: border-box; }
 
-    .vote-page { background: #7a1028; min-height: 100vh; }
+    .vote-page { background: #7a1028; flex: 1 0 auto; }
 
     .vote-hero {
         background: #7a1028;

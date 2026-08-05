@@ -30,6 +30,8 @@ if (in_array($current_page, $protected_pages) && !isset($_SESSION['user_logged_i
             min-height: 90px;
             position: relative;
             z-index: 1000;
+            flex-shrink: 0;
+            width: 100%;
         }
 
         .navbar-brand-container {
