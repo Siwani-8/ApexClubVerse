@@ -68,6 +68,7 @@ apexclubverse/                 ← upload these contents into htdocs / public_ht
    If SMTP still fails, signup/login will show a **Verify my account now** button
    so users are not locked out. Check `includes/mail_error.log` on the server for the
    real SMTP error.
+6. Open `http://localhost/apexclubverse/`.
 
 ## Deployment (ProFreeHost)
 
