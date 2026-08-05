@@ -2,8 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include 'db.php';
-include 'club_admin_helpers.php';
+include 'includes/db.php';
+include 'includes/club_admin_helpers.php';
 
 $club_id = isset($_GET['id']) ? (int)$_GET['id'] : 1;
 $can_manage_board = is_club_admin() && admin_club_id() === $club_id;
@@ -34,7 +34,7 @@ if ($can_manage_board) {
     }
 }
 
-include 'header.php';
+include 'includes/header.php';
 
 $club_result = mysqli_query($conn, "SELECT * FROM clubs WHERE id = $club_id");
 $club = mysqli_fetch_assoc($club_result);
@@ -658,4 +658,4 @@ function toggleBoardForm(id) {
 }
 </script>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

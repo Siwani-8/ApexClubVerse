@@ -31,12 +31,15 @@ $admins = [
     [6, 'HEAT Admin', 'admin.heat@apexcollege.edu.np'],
 ];
 
-$password = 'ApexAdmin2026!';
+$password = getenv('ADMIN_SEED_PASSWORD');
+if ($password === false || $password === '') {
+    die("Set the ADMIN_SEED_PASSWORD environment variable before running this script.\n");
+}
 
 foreach ($admins as [$club_id, $name, $email]) {
     $email_safe = mysqli_real_escape_string($c, $email);
     $name_safe = mysqli_real_escape_string($c, $name);
-    $pass_safe = mysqli_real_escape_string($c, $password);
+    $pass_safe = mysqli_real_escape_string($c, password_hash($password, PASSWORD_DEFAULT));
     $exists = mysqli_query($c, "SELECT id FROM users WHERE email = '$email_safe'");
     if (mysqli_num_rows($exists) === 0) {
         mysqli_query($c, "INSERT INTO users (name, email, password, role, club_id) VALUES ('$name_safe', '$email_safe', '$pass_safe', 'admin', $club_id)");

@@ -30,9 +30,11 @@ Features
  Database
 
 - Database name: `apex_club_db`
-- Total tables: 9
+- Total tables: 11
   - clubs
   - events
+  - event_editions
+  - event_gallery
   - users
   - polls
   - poll_options
@@ -40,7 +42,48 @@ Features
   - registrations
   - bod_members
   - boa_members
-    
+
+## Project Structure
+
+```
+apexclubverse/
+├── index.php, clubs.php, events.php, ...   # Page entry points (web root)
+├── admin.php, login.php, signup.php, ...
+├── includes/            # Shared PHP: db, header, footer, helpers, mail
+│   ├── db.php
+│   ├── header.php / footer.php
+│   ├── club_admin_helpers.php
+│   ├── mail.php / send_verification_email.php
+│   └── mail_config.example.php   # copy to mail_config.php (gitignored)
+├── assets/css/          # Stylesheets
+├── images/              # Site & event images (referenced by the database)
+├── uploads/             # Admin-uploaded event images
+├── lib/PHPMailer/       # PHPMailer library
+├── database/schema.sql  # Full database schema + public seed data
+└── scripts/             # One-off maintenance / migration scripts
+```
+
+## Setup (Local - XAMPP)
+
+1. Clone the repository into `htdocs`.
+2. Create the database: `CREATE DATABASE apex_club_db CHARACTER SET utf8mb4;`
+3. Import `database/schema.sql` (phpMyAdmin or CLI).
+4. Copy `includes/mail_config.example.php` to `includes/mail_config.php` and add your
+   Gmail address + [App Password](https://myaccount.google.com/apppasswords).
+5. Open `http://localhost/apexclubverse/`.
+
+## Deployment (ProFreeHost or similar shared hosting)
+
+1. Upload the entire project folder contents into `htdocs` (or `public_html`).
+2. Create a MySQL database in the hosting control panel and import `database/schema.sql`.
+3. Update the credentials in `includes/db.php` with the host, username, password and
+   database name provided by the host.
+4. Create `includes/mail_config.php` on the server (copy from the example file) with
+   your SMTP credentials. Note: some free hosts block outbound SMTP (port 587); if
+   verification emails fail, test SMTP availability with your host.
+5. Email verification links are generated dynamically from the request host, so no
+   URL configuration is needed.
+
 Team Members:
 - Monali Kharel 
 - Shristi Shrestha 

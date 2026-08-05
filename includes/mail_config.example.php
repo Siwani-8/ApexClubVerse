@@ -6,5 +6,5 @@
  *
  * For Gmail, create an App Password: https://myaccount.google.com/apppasswords
  */
-define('MAIL_USERNAME', 'your-email@gmail.com');
-define('MAIL_PASSWORD', 'your-app-password');
+define('MAIL_USERNAME', 'siwanikoirala38@gmail.com');
+define('MAIL_PASSWORD', 'okbr rdpl zmlr cugu');

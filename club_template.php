@@ -1,8 +1,8 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_logged_in'])) { header("Location: login.php"); exit; }
-include 'db.php';
-include 'header.php';
+include 'includes/db.php';
+include 'includes/header.php';
 
 if (!isset($club_id)) { die("Invalid Access Parameter."); }
 
@@ -32,4 +32,4 @@ $club = mysqli_fetch_assoc($club_query);
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

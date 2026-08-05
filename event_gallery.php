@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include 'db.php';
+include 'includes/db.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -200,7 +200,7 @@ while ($photo = mysqli_fetch_assoc($result)) {
 }
 
 mysqli_stmt_close($stmt);
-include 'header.php';
+include 'includes/header.php';
 ?>
 
 <style>
@@ -377,4 +377,4 @@ body{background:#f7f8fc}
 
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

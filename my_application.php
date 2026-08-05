@@ -6,8 +6,8 @@ if (!isset($_SESSION['user_logged_in'])) {
     exit;
 }
 
-include 'db.php';
-include 'header.php';
+include 'includes/db.php';
+include 'includes/header.php';
 
 $email = mysqli_real_escape_string($conn, $_SESSION['user_email']);
 
@@ -299,4 +299,4 @@ else{
 
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

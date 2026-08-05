@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include 'db.php';
+include 'includes/db.php';
 
 $msg = "";
 
@@ -61,7 +61,7 @@ if (empty($user['email_verified'])) {
     }
 }
 
-include 'header.php';
+include 'includes/header.php';
 ?>
 
 <style>
@@ -251,4 +251,4 @@ include 'header.php';
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

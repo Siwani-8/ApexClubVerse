@@ -1,5 +1,5 @@
 <?php
-include 'header.php';
+include 'includes/header.php';
 ?>
 
 <style>
@@ -184,4 +184,4 @@ include 'header.php';
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

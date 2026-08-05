@@ -1,5 +1,5 @@
 # Local configuration - contains secrets, never commit
-mail_config.php
+includes/mail_config.php
 
 # OS / editor artifacts
 Thumbs.db

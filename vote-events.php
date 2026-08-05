@@ -2,8 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include 'db.php';
-include 'club_admin_helpers.php';
+include 'includes/db.php';
+include 'includes/club_admin_helpers.php';
 
 // Require login before any vote/poll actions are processed
 if (empty($_SESSION['user_logged_in'])) {
@@ -65,7 +65,7 @@ if ($is_club_admin) {
     }
 }
 
-include 'header.php';
+include 'includes/header.php';
 
 $polls = mysqli_query($conn, "
     SELECT p.*, c.name as club_name 
@@ -364,4 +364,4 @@ while($poll = mysqli_fetch_assoc($polls)) {
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

@@ -1,7 +1,7 @@
 <?php
-include 'header.php';
-include 'db.php';
-include 'send_verification_email.php';
+include 'includes/header.php';
+include 'includes/db.php';
+include 'includes/send_verification_email.php';
 
 $msg = "";
 $msg_type = "";
@@ -265,4 +265,4 @@ if(mysqli_query($conn, $sql)){
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

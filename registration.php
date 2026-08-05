@@ -6,8 +6,8 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true)
     exit;
 }
 
-include 'db.php';
-include 'header.php';
+include 'includes/db.php';
+include 'includes/header.php';
 
 $message = "";
 
@@ -380,4 +380,4 @@ if($success){
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

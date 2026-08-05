@@ -1,4 +1,4 @@
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
 
 <style>
     /* ── Reset & base ── */
@@ -519,4 +519,4 @@
 </div>
 <!-- closes .content-wrapper opened in header.php -->
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

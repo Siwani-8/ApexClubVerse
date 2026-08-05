@@ -1,7 +1,7 @@
 <?php
 session_start();
-include 'db.php';
-include 'header.php';
+include 'includes/db.php';
+include 'includes/header.php';
 
 $events = mysqli_query($conn, "
     SELECT e.*, c.name as club_name 
@@ -67,4 +67,4 @@ $events = mysqli_query($conn, "
     <?php endwhile; ?>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

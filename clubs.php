@@ -1,7 +1,7 @@
 <?php 
 session_start();
-include 'db.php'; 
-include 'header.php'; 
+include 'includes/db.php'; 
+include 'includes/header.php'; 
 
 $result = mysqli_query($conn, "SELECT * FROM clubs");
 ?>
@@ -314,4 +314,4 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

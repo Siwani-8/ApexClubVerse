@@ -1,6 +1,6 @@
 <?php
-include 'header.php';
-include 'db.php';
+include 'includes/header.php';
+include 'includes/db.php';
 
 if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_role'] !== 'admin') {
     header("Location: login.php");
@@ -1263,4 +1263,4 @@ if(isset($_GET['edit'])){
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
