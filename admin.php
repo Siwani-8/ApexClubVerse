@@ -111,6 +111,10 @@ if (isset($_POST['add_event'])) {
     $event_id = (int)($_POST['event_id'] ?? 0);
 
     if($event_id > 0){
+        if (!event_belongs_to_club($conn, $event_id, $club_id)) {
+            flash_set('error', 'You can only edit events for your own club.');
+            redirect('admin.php?tab=events');
+        }
 
         if($image==""){
 
@@ -123,8 +127,9 @@ if (isset($_POST['add_event'])) {
             event_time='$time',
             location='$location',
             status='$status'
-            WHERE id=$event_id
+            WHERE id=$event_id AND club_id=$club_id
             ");
+            flash_set('success', 'Event updated.');
 
         }else{
 
@@ -138,8 +143,9 @@ if (isset($_POST['add_event'])) {
             location='$location',
             image='$image',
             status='$status'
-            WHERE id=$event_id
+            WHERE id=$event_id AND club_id=$club_id
             ");
+            flash_set('success', 'Event updated (cover photo replaced).');
 
         }
 
@@ -168,6 +174,7 @@ if (isset($_POST['add_event'])) {
         '$image',
         '$status'
         )");
+        flash_set('success', 'Event added.');
 
     }
     redirect('admin.php?tab=events');
@@ -257,25 +264,26 @@ if(isset($_POST['delete_poll'])){
 }
 
 if(isset($_POST['delete_bod'])){
-
     $id = (int)$_POST['bod_id'];
-
-    mysqli_query($conn,"
-        DELETE FROM bod_members
-        WHERE id=$id
-    ");
-
+    $club_id = admin_club_id();
+    if ($club_id && bod_belongs_to_club($conn, $id, $club_id)) {
+        mysqli_query($conn, "DELETE FROM bod_members WHERE id=$id AND club_id=$club_id");
+        flash_set('success', 'Board member removed.');
+    } else {
+        flash_set('error', 'You can only manage members of your own club.');
+    }
     redirect('admin.php?tab=members');
 }
 
 if(isset($_POST['delete_boa'])){
-
-    $id=(int)$_POST['boa_id'];
-
-    mysqli_query($conn,
-    "DELETE FROM boa_members
-    WHERE id=$id");
-
+    $id = (int)$_POST['boa_id'];
+    $club_id = admin_club_id();
+    if ($club_id && boa_belongs_to_club($conn, $id, $club_id)) {
+        mysqli_query($conn, "DELETE FROM boa_members WHERE id=$id AND club_id=$club_id");
+        flash_set('success', 'Advisor removed.');
+    } else {
+        flash_set('error', 'You can only manage members of your own club.');
+    }
     redirect('admin.php?tab=members');
 }
 
@@ -367,78 +375,69 @@ if(isset($_POST['add_boa'])){
 }
 
 if(isset($_POST['update_bod'])){
-
     $id = (int)$_POST['member_id'];
+    $club_id = admin_club_id();
+
+    if (!$club_id || !bod_belongs_to_club($conn, $id, $club_id)) {
+        flash_set('error', 'You can only edit members of your own club.');
+        redirect('admin.php?tab=members');
+    }
 
     $name = mysqli_real_escape_string($conn, $_POST['name']);
     $position = mysqli_real_escape_string($conn, $_POST['position']);
     $bio = mysqli_real_escape_string($conn, $_POST['bio']);
+    $photo_sql = '';
 
-    $photo_sql = "";
-
-    if(isset($_FILES['photo']) && $_FILES['photo']['error']==0){
-
-        $photo = time() . "_" . basename($_FILES['photo']['name']);
-
+    if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
+        $photo = time() . '_' . basename($_FILES['photo']['name']);
         move_uploaded_file(
             $_FILES['photo']['tmp_name'],
-            root_path("images/members/" . $photo)
+            root_path('images/members/' . $photo)
         );
-
         $photo_sql = ", photo='$photo'";
     }
 
-    mysqli_query($conn,"
+    mysqli_query($conn, "
     UPDATE bod_members
-    SET
-        name='$name',
-        position='$position',
-        bio='$bio'
-        $photo_sql
-    WHERE id=$id
+    SET name='$name', position='$position', bio='$bio' $photo_sql
+    WHERE id=$id AND club_id=$club_id
     ");
-
+    flash_set('success', 'Board member updated' . ($photo_sql ? ' (photo replaced).' : '.'));
     redirect('admin.php?tab=members');
 }
 
 if(isset($_POST['update_boa'])){
+    $id = (int)$_POST['boa_member_id'];
+    $club_id = admin_club_id();
 
-    $id=(int)$_POST['boa_member_id'];
+    if (!$club_id || !boa_belongs_to_club($conn, $id, $club_id)) {
+        flash_set('error', 'You can only edit members of your own club.');
+        redirect('admin.php?tab=members');
+    }
 
-    $name=mysqli_real_escape_string($conn,$_POST['boa_name']);
-    $title=mysqli_real_escape_string($conn,$_POST['boa_title']);
-    $expertise=mysqli_real_escape_string($conn,$_POST['boa_expertise']);
+    $name = mysqli_real_escape_string($conn, $_POST['boa_name']);
+    $title = mysqli_real_escape_string($conn, $_POST['boa_title']);
+    $expertise = mysqli_real_escape_string($conn, $_POST['boa_expertise']);
 
-    if(isset($_FILES['boa_photo']) && $_FILES['boa_photo']['error']==0){
-
-        $photo=time()."_".basename($_FILES['boa_photo']['name']);
-
+    if (isset($_FILES['boa_photo']) && $_FILES['boa_photo']['error'] == 0) {
+        $photo = time() . '_' . basename($_FILES['boa_photo']['name']);
         move_uploaded_file(
             $_FILES['boa_photo']['tmp_name'],
-            root_path("images/members/" . $photo)
+            root_path('images/members/' . $photo)
         );
-
-        mysqli_query($conn,"
+        mysqli_query($conn, "
         UPDATE boa_members
-        SET
-        name='$name',
-        title='$title',
-        expertise='$expertise',
-        photo='$photo'
-        WHERE id=$id
+        SET name='$name', title='$title', expertise='$expertise', photo='$photo'
+        WHERE id=$id AND club_id=$club_id
         ");
-
-    }else{
-
-        mysqli_query($conn,"
+        flash_set('success', 'Advisor updated (photo replaced).');
+    } else {
+        mysqli_query($conn, "
         UPDATE boa_members
-        SET
-        name='$name',
-        title='$title',
-        expertise='$expertise'
-        WHERE id=$id
+        SET name='$name', title='$title', expertise='$expertise'
+        WHERE id=$id AND club_id=$club_id
         ");
-
+        flash_set('success', 'Advisor updated.');
     }
 
     redirect('admin.php?tab=members');
@@ -608,6 +607,99 @@ if (isset($_POST['delete_gallery_image'])) {
     redirect('admin.php?tab=gallery&event_id=' . $event_id);
 }
 
+/* ── Gallery: edit existing photo (caption / replace file / move edition) ── */
+if (isset($_POST['update_gallery_image'])) {
+    $club_id = admin_club_id();
+    $image_id = (int)($_POST['image_id'] ?? 0);
+    $event_id = (int)($_POST['event_id'] ?? 0);
+    $edition_id = (int)($_POST['edition_id'] ?? 0);
+    $caption = trim($_POST['caption'] ?? '');
+    $file = $_FILES['gallery_image'] ?? null;
+
+    if (!$club_id || !$image_id || !event_belongs_to_club($conn, $event_id, $club_id)) {
+        flash_set('error', 'You can only edit photos for your own club events.');
+        redirect('admin.php?tab=gallery&event_id=' . $event_id);
+    }
+
+    $stmt = mysqli_prepare(
+        $conn,
+        'SELECT g.id, g.image, g.edition_id FROM event_gallery g
+         JOIN events e ON e.id = g.event_id
+         WHERE g.id = ? AND g.event_id = ? AND e.club_id = ?'
+    );
+    mysqli_stmt_bind_param($stmt, 'iii', $image_id, $event_id, $club_id);
+    mysqli_stmt_execute($stmt);
+    $existing = mysqli_stmt_get_result($stmt)->fetch_assoc();
+    mysqli_stmt_close($stmt);
+
+    if (!$existing) {
+        flash_set('error', 'Photo not found for your club.');
+        redirect('admin.php?tab=gallery&event_id=' . $event_id);
+    }
+
+    if ($edition_id <= 0) {
+        $edition_id = (int)$existing['edition_id'];
+    } else {
+        $chk = mysqli_prepare($conn, 'SELECT id FROM event_editions WHERE id = ? AND event_id = ?');
+        mysqli_stmt_bind_param($chk, 'ii', $edition_id, $event_id);
+        mysqli_stmt_execute($chk);
+        $editionOk = mysqli_stmt_get_result($chk)->fetch_assoc();
+        mysqli_stmt_close($chk);
+        if (!$editionOk) {
+            flash_set('error', 'Invalid edition for this event.');
+            redirect('admin.php?tab=gallery&event_id=' . $event_id . '&edit_image=' . $image_id);
+        }
+    }
+
+    $newPath = $existing['image'];
+    $replaced = false;
+
+    if ($file && ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+        if ($file['size'] > 5 * 1024 * 1024) {
+            flash_set('error', 'Image must be smaller than 5 MB.');
+            redirect('admin.php?tab=gallery&event_id=' . $event_id . '&edit_image=' . $image_id);
+        }
+        $allowed = [
+            'image/jpeg' => 'jpeg',
+            'image/png'  => 'png',
+            'image/webp' => 'webp',
+            'image/gif'  => 'gif',
+        ];
+        $mime = mime_content_type($file['tmp_name']);
+        if (!isset($allowed[$mime])) {
+            flash_set('error', 'Only JPG, PNG, WEBP, or GIF images are allowed.');
+            redirect('admin.php?tab=gallery&event_id=' . $event_id . '&edit_image=' . $image_id);
+        }
+        $folder = root_path('images/events');
+        if (!is_dir($folder)) {
+            mkdir($folder, 0775, true);
+        }
+        $name = 'event_' . $event_id . '_' . $edition_id . '_' . uniqid() . '.' . $allowed[$mime];
+        $dbPath = 'images/events/' . $name;
+        if (!move_uploaded_file($file['tmp_name'], $folder . DIRECTORY_SEPARATOR . $name)) {
+            flash_set('error', 'Could not replace the image file.');
+            redirect('admin.php?tab=gallery&event_id=' . $event_id . '&edit_image=' . $image_id);
+        }
+        $old = root_path($existing['image']);
+        if (is_file($old) && strpos(str_replace('\\', '/', $existing['image']), 'images/events/') === 0) {
+            @unlink($old);
+        }
+        $newPath = $dbPath;
+        $replaced = true;
+    }
+
+    $upd = mysqli_prepare(
+        $conn,
+        'UPDATE event_gallery SET edition_id = ?, image = ?, caption = ? WHERE id = ? AND event_id = ?'
+    );
+    mysqli_stmt_bind_param($upd, 'issii', $edition_id, $newPath, $caption, $image_id, $event_id);
+    mysqli_stmt_execute($upd);
+    mysqli_stmt_close($upd);
+
+    flash_set('success', $replaced ? 'Photo updated and file replaced.' : 'Photo details updated.');
+    redirect('admin.php?tab=gallery&event_id=' . $event_id . '&edition_id=' . $edition_id);
+}
+
 $tab = $_GET['tab'] ?? 'dashboard';
 $applications_only = isset($_GET['applications_only']);
 if ($applications_only) {
@@ -650,23 +742,48 @@ $clubs = mysqli_query($conn, "SELECT * FROM clubs ORDER BY id");
 $edit_event = null;
 $edit_bod = null;
 $edit_boa = null;
+$edit_gallery = null;
+$adminClubIdForEdit = admin_club_id();
 
-if(isset($_GET['edit_bod'])){
+if (isset($_GET['edit_bod'])) {
     $id = (int)$_GET['edit_bod'];
-    $result = mysqli_query($conn, "SELECT * FROM bod_members WHERE id=$id");
-    $edit_bod = mysqli_fetch_assoc($result);
+    if ($adminClubIdForEdit && bod_belongs_to_club($conn, $id, $adminClubIdForEdit)) {
+        $result = mysqli_query($conn, "SELECT * FROM bod_members WHERE id=$id AND club_id=$adminClubIdForEdit");
+        $edit_bod = mysqli_fetch_assoc($result);
+    }
 }
 
-if(isset($_GET['edit_boa'])){
+if (isset($_GET['edit_boa'])) {
     $id = (int)$_GET['edit_boa'];
-    $result = mysqli_query($conn, "SELECT * FROM boa_members WHERE id=$id");
-    $edit_boa = mysqli_fetch_assoc($result);
+    if ($adminClubIdForEdit && boa_belongs_to_club($conn, $id, $adminClubIdForEdit)) {
+        $result = mysqli_query($conn, "SELECT * FROM boa_members WHERE id=$id AND club_id=$adminClubIdForEdit");
+        $edit_boa = mysqli_fetch_assoc($result);
+    }
 }
 
-if(isset($_GET['edit'])){
+if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
-    $result = mysqli_query($conn, "SELECT * FROM events WHERE id=$id");
-    $edit_event = mysqli_fetch_assoc($result);
+    if ($adminClubIdForEdit && event_belongs_to_club($conn, $id, $adminClubIdForEdit)) {
+        $result = mysqli_query($conn, "SELECT * FROM events WHERE id=$id AND club_id=$adminClubIdForEdit");
+        $edit_event = mysqli_fetch_assoc($result);
+    }
+}
+
+if (isset($_GET['edit_image'])) {
+    $id = (int)$_GET['edit_image'];
+    $evId = (int)($_GET['event_id'] ?? 0);
+    if ($adminClubIdForEdit && $id && event_belongs_to_club($conn, $evId, $adminClubIdForEdit)) {
+        $stmt = mysqli_prepare(
+            $conn,
+            'SELECT g.* FROM event_gallery g
+             JOIN events e ON e.id = g.event_id
+             WHERE g.id = ? AND g.event_id = ? AND e.club_id = ?'
+        );
+        mysqli_stmt_bind_param($stmt, 'iii', $id, $evId, $adminClubIdForEdit);
+        mysqli_stmt_execute($stmt);
+        $edit_gallery = mysqli_stmt_get_result($stmt)->fetch_assoc();
+        mysqli_stmt_close($stmt);
+    }
 }
 ?>
 
@@ -916,24 +1033,20 @@ if(isset($_GET['edit'])){
             'event_date' => '',
             'event_time' => '',
             'location' => '',
-            'status' => 'upcoming'
+            'status' => 'upcoming',
+            'image' => '',
         ];
 
-        if(isset($_GET['edit'])){
+        if (!empty($edit_event)) {
             $editing = true;
-            $id = (int)$_GET['edit'];
-            $res = mysqli_query($conn, "SELECT * FROM events WHERE id=$id");
-            $fetched_event = mysqli_fetch_assoc($res);
-            if ($fetched_event) {
-                $event = $fetched_event;
-            }
+            $event = $edit_event;
         }
         ?>
         <div class="form-box">
             <h2>
                 <?php
                 if($editing){
-                    echo "Edit Event";
+                    echo "Edit Event (your club only)";
                 }else{
                     echo "Add New Event";
                 }
@@ -966,7 +1079,7 @@ if(isset($_GET['edit'])){
                     <input
                     type="hidden"
                     name="event_id"
-                    value="<?php echo $event['id']; ?>">
+                    value="<?php echo htmlspecialchars((string)$event['id']); ?>">
 
                     <div class="form-group">
                         <label>Event Title</label>
@@ -981,7 +1094,7 @@ if(isset($_GET['edit'])){
                         <input
                         type="date"
                         name="event_date"
-                        value="<?php echo $event['event_date']; ?>"
+                        value="<?php echo htmlspecialchars((string)$event['event_date']); ?>"
                         required>
                     </div>
                     <div class="form-group">
@@ -989,7 +1102,7 @@ if(isset($_GET['edit'])){
                         <input
                         type="time"
                         name="event_time"
-                        value="<?php echo $event['event_time']; ?>"
+                        value="<?php echo htmlspecialchars((string)$event['event_time']); ?>"
                         required>
                     </div>
                     <div class="form-group">
@@ -1015,7 +1128,14 @@ if(isset($_GET['edit'])){
                         rows="3"><?php echo htmlspecialchars($event['description']); ?></textarea>
                     </div>
                     <div class="form-group" style="grid-column:1/-1;">
-                        <label>Event Image</label>
+                        <label><?php echo $editing ? 'Replace cover image (optional)' : 'Event Image'; ?></label>
+                        <?php if ($editing && !empty($event['image'])): ?>
+                            <div style="margin-bottom:8px;">
+                                <img src="<?php echo htmlspecialchars(media_url($event['image'])); ?>"
+                                     alt=""
+                                     style="width:160px;height:100px;object-fit:cover;border-radius:8px;">
+                            </div>
+                        <?php endif; ?>
                         <input type="file" name="event_image" accept="image/*">
                     </div>
                 </div>
@@ -1269,10 +1389,60 @@ if(isset($_GET['edit'])){
             <?php endif; ?>
         </div>
 
+        <?php if ($selected_event_id && !empty($edit_gallery)): ?>
+        <div class="form-box" style="border-color:#7a1028;">
+            <h2>Edit existing photo</h2>
+            <div style="display:flex;gap:1.25rem;flex-wrap:wrap;align-items:flex-start;margin-bottom:1rem;">
+                <img src="<?php echo htmlspecialchars(media_url($edit_gallery['image'])); ?>"
+                     alt=""
+                     style="width:180px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #e0ddd6;">
+                <div style="flex:1;min-width:220px;font-family:'Segoe UI',sans-serif;font-size:13px;color:#555;">
+                    Replace the file and/or update the caption. Only photos from
+                    <strong><?php echo htmlspecialchars($_SESSION['club_name'] ?? 'your club'); ?></strong> can be edited here.
+                </div>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="image_id" value="<?php echo (int)$edit_gallery['id']; ?>">
+                <input type="hidden" name="event_id" value="<?php echo $selected_event_id; ?>">
+                <div class="form-grid">
+                    <?php if (count($editions) > 0): ?>
+                    <div class="form-group">
+                        <label>Edition</label>
+                        <select name="edition_id">
+                            <?php foreach ($editions as $ed): ?>
+                                <option value="<?php echo (int)$ed['id']; ?>"
+                                    <?php echo (int)$edit_gallery['edition_id'] === (int)$ed['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($ed['title']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php else: ?>
+                        <input type="hidden" name="edition_id" value="<?php echo (int)$edit_gallery['edition_id']; ?>">
+                    <?php endif; ?>
+                    <div class="form-group">
+                        <label>Replace image (optional)</label>
+                        <input type="file" name="gallery_image" accept=".jpg,.jpeg,.png,.webp,image/*">
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label>Caption</label>
+                        <input type="text" name="caption" maxlength="255"
+                               value="<?php echo htmlspecialchars($edit_gallery['caption'] ?? ''); ?>">
+                    </div>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:0.75rem;flex-wrap:wrap;">
+                    <button type="submit" name="update_gallery_image" class="btn-submit">Save photo changes</button>
+                    <a href="admin.php?tab=gallery&event_id=<?php echo $selected_event_id; ?>"
+                       class="btn-delete" style="text-decoration:none;display:inline-flex;align-items:center;">Cancel</a>
+                </div>
+            </form>
+        </div>
+        <?php endif; ?>
+
         <?php if ($selected_event_id): ?>
         <div class="table-box" style="margin-top:1.5rem;">
             <div class="table-box-header">
-                <h2>Gallery images</h2>
+                <h2>Existing gallery images (your club only)</h2>
                 <span class="badge-count"><?php echo count($gallery_rows); ?> photos</span>
             </div>
             <?php if (count($gallery_rows) === 0): ?>
@@ -1284,6 +1454,7 @@ if(isset($_GET['edit'])){
                     <th>Edition</th>
                     <th>Caption</th>
                     <th>Added</th>
+                    <th>Edit</th>
                     <th>Delete</th>
                 </tr>
                 <?php foreach ($gallery_rows as $g): ?>
@@ -1297,6 +1468,10 @@ if(isset($_GET['edit'])){
                     <td><?php echo htmlspecialchars($g['caption'] ?: '—'); ?></td>
                     <td><?php echo date('d M Y', strtotime($g['created_at'])); ?></td>
                     <td>
+                        <a href="admin.php?tab=gallery&event_id=<?php echo $selected_event_id; ?>&edit_image=<?php echo (int)$g['id']; ?>"
+                           class="btn-submit" style="padding:6px 12px;margin:0;text-decoration:none;">Edit</a>
+                    </td>
+                    <td>
                         <form method="POST" style="display:inline;">
                             <input type="hidden" name="image_id" value="<?php echo (int)$g['id']; ?>">
                             <input type="hidden" name="event_id" value="<?php echo $selected_event_id; ?>">
@@ -1304,6 +1479,62 @@ if(isset($_GET['edit'])){
                                     data-confirm="Delete this photo from the gallery?"
                                     data-confirm-title="Delete photo">Delete</button>
                         </form>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+            <?php endif; ?>
+        </div>
+        <?php else: ?>
+        <?php
+        // Club-wide filtered photo overview when no event is selected
+        $allClubPhotos = [];
+        if ($adminClubId) {
+            $allRes = mysqli_query(
+                $conn,
+                "SELECT g.id, g.event_id, g.image, g.caption, g.created_at,
+                        e.title AS event_title, ed.title AS edition_title
+                 FROM event_gallery g
+                 JOIN events e ON e.id = g.event_id
+                 JOIN event_editions ed ON ed.id = g.edition_id
+                 WHERE e.club_id = $adminClubId
+                 ORDER BY g.id DESC
+                 LIMIT 50"
+            );
+            while ($row = mysqli_fetch_assoc($allRes)) {
+                $allClubPhotos[] = $row;
+            }
+        }
+        ?>
+        <div class="table-box" style="margin-top:1.5rem;">
+            <div class="table-box-header">
+                <h2>All photos for <?php echo htmlspecialchars($_SESSION['club_name'] ?? 'your club'); ?></h2>
+                <span class="badge-count"><?php echo count($allClubPhotos); ?> shown</span>
+            </div>
+            <?php if (count($allClubPhotos) === 0): ?>
+                <div class="empty-msg">No gallery photos for your club yet. Select an event above to upload.</div>
+            <?php else: ?>
+            <table>
+                <tr>
+                    <th>Photo</th>
+                    <th>Event</th>
+                    <th>Edition</th>
+                    <th>Caption</th>
+                    <th>Edit</th>
+                </tr>
+                <?php foreach ($allClubPhotos as $g): ?>
+                <tr>
+                    <td>
+                        <img src="<?php echo htmlspecialchars(media_url($g['image'])); ?>"
+                             alt=""
+                             style="width:90px;height:60px;object-fit:cover;border-radius:8px;">
+                    </td>
+                    <td><?php echo htmlspecialchars($g['event_title']); ?></td>
+                    <td><?php echo htmlspecialchars($g['edition_title']); ?></td>
+                    <td><?php echo htmlspecialchars($g['caption'] ?: '—'); ?></td>
+                    <td>
+                        <a href="admin.php?tab=gallery&event_id=<?php echo (int)$g['event_id']; ?>&edit_image=<?php echo (int)$g['id']; ?>"
+                           class="btn-submit" style="padding:6px 12px;margin:0;text-decoration:none;">Edit</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>
