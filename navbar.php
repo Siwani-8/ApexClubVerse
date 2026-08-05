@@ -15,6 +15,7 @@
         <li><a href="contact.php">Contact</a></li>
         <li><a href="logout.php" style="color: #cc0000;">Logout (<?php echo $_SESSION['user_name']; ?>)</a></li>
     </ul>
+    <button id="themeToggle" class="theme-toggle">🌙</button>
 </nav>
 
 <style>
