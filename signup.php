@@ -1,78 +1,48 @@
 <?php
 include 'includes/header.php';
 include 'includes/db.php';
-include 'includes/send_verification_email.php';
 
 $msg = "";
 $msg_type = "";
-$show_verify_fallback = false;
-$fallback_verify_url = '';
 
 if (isset($_POST['submit'])) {
-    $name  = mysqli_real_escape_string($conn, $_POST['name']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $name  = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $pass  = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
     // Only allow @apexcollege.edu.np emails
     if (!str_ends_with($email, '@apexcollege.edu.np')) {
         $msg = "Only Apex College email addresses are allowed (e.g. name@apexcollege.edu.np)";
         $msg_type = "error";
     } else {
-        $check = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
-        if (mysqli_num_rows($check) > 0) {
+        // Check if email already exists (prepared statement)
+        $check = mysqli_prepare($conn, "SELECT id FROM users WHERE email = ?");
+        mysqli_stmt_bind_param($check, "s", $email);
+        mysqli_stmt_execute($check);
+        mysqli_stmt_store_result($check);
+
+        if (mysqli_stmt_num_rows($check) > 0) {
             $msg = "This email is already registered. Please sign in.";
             $msg_type = "error";
         } else {
-            $token = bin2hex(random_bytes(32));
+            // Insert new user (prepared statement)
+            // Note: your users table also has role, club_id, club_name, email_verified,
+            // verification_token columns. New signups default to role='student' here —
+            // adjust this value if your app uses a different role name for regular users.
+            $role = 'student';
+            $insert = mysqli_prepare($conn, "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
+            mysqli_stmt_bind_param($insert, "ssss", $name, $email, $pass, $role);
 
-$sql = "INSERT INTO users
-(
-    name,
-    email,
-    password,
-    role,
-    email_verified,
-    verification_token
-)
-VALUES
-(
-    '$name',
-    '$email',
-    '$pass',
-    'student',
-    0,
-    '$token'
-)";
-
-if(mysqli_query($conn, $sql)){
-
-    $verifyUrl = build_verification_url($token);
-
-    if (sendVerificationEmail($email, $token, $name)) {
-
-        $msg = "Registration successful! Please check your email (and spam folder) to verify your account.";
-
-        $msg_type = "success";
-
-    }else{
-
-        // Don't lock the user out if the host blocks SMTP — show a verify link instead.
-        $msg = "Account created, but the verification email could not be sent from this server. "
-             . "Click the button below to verify your account now.";
-        $msg_type = "error";
-        $show_verify_fallback = true;
-        $fallback_verify_url = $verifyUrl;
-
-    }
-
-}else{
-
-    $msg = "Database Error: ".mysqli_error($conn);
-
-    $msg_type = "error";
-
-}
+            if (mysqli_stmt_execute($insert)) {
+                header("Location: login.php");
+                exit;
+            } else {
+                $msg = "Something went wrong. Please try again.";
+                $msg_type = "error";
+            }
+            mysqli_stmt_close($insert);
         }
+        mysqli_stmt_close($check);
     }
 }
 ?>
@@ -81,8 +51,7 @@ if(mysqli_query($conn, $sql)){
     *, *::before, *::after { box-sizing: border-box; }
 
     .signup-page {
-        flex: 1 0 auto;
-        width: 100%;
+        min-height: 100vh;
         background: #7a1028;
         background-image:
             radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 0%, transparent 40%),
@@ -92,7 +61,7 @@ if(mysqli_query($conn, $sql)){
         justify-content: center;
         padding: 3rem 1.5rem;
         position: relative;
-        overflow-x: clip;
+        overflow: hidden;
     }
     .signup-page::before {
         content: '';
@@ -169,16 +138,6 @@ if(mysqli_query($conn, $sql)){
         margin-bottom: 1.25rem;
         text-align: center;
     }
-    .alert-success {
-        background: #e8f6ee;
-        border: 0.5px solid #b7e4c7;
-        border-radius: 8px;
-        padding: 10px 14px;
-        font-family: 'Segoe UI', sans-serif;
-        font-size: 13px; color: #1a7a4a;
-        margin-bottom: 1.25rem;
-        text-align: center;
-    }
 
     .form-group { margin-bottom: 1.1rem; }
     .form-group label {
@@ -243,14 +202,32 @@ if(mysqli_query($conn, $sql)){
     }
     .hint a:hover { text-decoration: underline; }
 
-    @media (max-width: 600px) {
-        .signup-page::before { width: 220px; height: 220px; top: -60px; right: -60px; }
-        .signup-page::after { width: 160px; height: 160px; bottom: -40px; left: -40px; }
-    }
     @media (max-width: 480px) {
-        .signup-page { padding: 2rem 1rem; }
         .signup-card { padding: 2rem 1.25rem 1.5rem; }
     }
+
+    .password-wrapper {
+        position: relative;
+    }
+    .password-wrapper input {
+        padding-right: 42px;
+    }
+    .toggle-password {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+    }
+    .toggle-password:hover { color: #7a1028; }
+    .toggle-password svg { width: 18px; height: 18px; }
 </style>
 
 <div class="signup-page">
@@ -263,20 +240,10 @@ if(mysqli_query($conn, $sql)){
         </div>
 
         <?php if($msg): ?>
-            <div class="<?php echo $msg_type === 'success' ? 'alert-success' : 'alert-error'; ?>">
-                <?php echo htmlspecialchars($msg); ?>
-                <?php if (!empty($show_verify_fallback) && !empty($fallback_verify_url)): ?>
-                    <div style="margin-top:14px;">
-                        <a href="<?php echo htmlspecialchars($fallback_verify_url); ?>"
-                           style="display:inline-block;background:#7a1028;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;">
-                            Verify my account now
-                        </a>
-                    </div>
-                <?php endif; ?>
-            </div>
+            <div class="alert-error"><?php echo htmlspecialchars($msg); ?></div>
         <?php endif; ?>
 
-        <form action="<?php echo htmlspecialchars(url('signup.php')); ?>" method="POST">
+        <form action="signup.php" method="POST">
             <div class="form-group">
                 <label>Full Name</label>
                 <input type="text" name="name" placeholder="Enter your full name" required>
@@ -288,14 +255,45 @@ if(mysqli_query($conn, $sql)){
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" placeholder="Create a password" required>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" placeholder="Create a password" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('password', this)" aria-label="Show password">
+                        <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                            <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.62 21.62 0 0 1 5.06-6.06M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a21.6 21.6 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
             <button type="submit" name="submit" class="btn-auth">Create Account &rarr;</button>
         </form>
 
-        <p class="hint">Already have an account? <a href="<?php echo htmlspecialchars(url('login.php')); ?>">Sign In</a></p>
+        <p class="hint">Already have an account? <a href="login.php">Sign In</a></p>
 
     </div>
 </div>
+
+<script>
+    function togglePassword(inputId, btn) {
+        var input = document.getElementById(inputId);
+        var eyeIcon = btn.querySelector('.icon-eye');
+        var eyeOffIcon = btn.querySelector('.icon-eye-off');
+        if (input.type === 'password') {
+            input.type = 'text';
+            eyeIcon.style.display = 'none';
+            eyeOffIcon.style.display = 'block';
+            btn.setAttribute('aria-label', 'Hide password');
+        } else {
+            input.type = 'password';
+            eyeIcon.style.display = 'block';
+            eyeOffIcon.style.display = 'none';
+            btn.setAttribute('aria-label', 'Show password');
+        }
+    }
+</script>
 
 <?php include 'includes/footer.php'; ?>

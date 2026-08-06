@@ -2,116 +2,94 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+include 'includes/header.php';
 include 'includes/db.php';
-include 'includes/send_verification_email.php';
 
 $msg = "";
-$show_verify_fallback = false;
-$fallback_verify_url = '';
+$loginSuccess = false;
+$redirectUrl = "index.php";
+$welcomeName = "";
 
 if (isset($_POST['submit'])) {
-
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
 
     if (!str_ends_with($email, '@apexcollege.edu.np')) {
         $msg = "Only Apex College email addresses are allowed (e.g. name@apexcollege.edu.np)";
     } else {
-
         $res = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
-
         if (mysqli_num_rows($res) > 0) {
-
             $user = mysqli_fetch_assoc($res);
-
-            $passwordOk = password_verify($password, $user['password']) || $password === $user['password'];
-
-            if (empty($user['email_verified'])) {
-                if ($passwordOk) {
-                    // Upgrade legacy plaintext passwords
-                    if ($password === $user['password']) {
-                        $newHash = mysqli_real_escape_string($conn, password_hash($password, PASSWORD_DEFAULT));
-                        mysqli_query($conn, "UPDATE users SET password='$newHash' WHERE id=" . (int)$user['id']);
-                    }
-
-                    $token = $user['verification_token'];
-                    if (empty($token)) {
-                        $token = bin2hex(random_bytes(32));
-                        $tokenSafe = mysqli_real_escape_string($conn, $token);
-                        mysqli_query($conn, "UPDATE users SET verification_token='$tokenSafe' WHERE id=" . (int)$user['id']);
-                    }
-
-                    $sent = sendVerificationEmail($user['email'], $token, $user['name'] ?? '');
-                    $fallback_verify_url = build_verification_url($token);
-                    $show_verify_fallback = true;
-                    $msg = $sent
-                        ? "Your account is not verified yet. We re-sent the email — also use the button below if needed."
-                        : "Your account is not verified yet, and email could not be sent from this server. Use the button below to verify.";
-                } else {
-                    $msg = "Please verify your email before logging in. Check your inbox (or spam).";
-                }
-
-            } elseif ($passwordOk) {
-
-                // Upgrade legacy plaintext passwords to secure hashes
-                if ($password === $user['password']) {
-                    $newHash = mysqli_real_escape_string($conn, password_hash($password, PASSWORD_DEFAULT));
-                    mysqli_query($conn, "UPDATE users SET password='$newHash' WHERE id=" . (int)$user['id']);
-                }
-
+            if (password_verify($password, $user['password'])) {
                 $_SESSION['user_logged_in'] = true;
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_role'] = $user['role'];
-                $_SESSION['club_id'] = $user['club_id'];
-                $_SESSION['club_name'] = $user['club_name'];
 
-                $firstName = trim(explode(' ', trim((string)$user['name']))[0]);
-                if ($firstName === '') {
-                    $firstName = 'there';
+                if ($user['role'] == 'club_admin') {
+                    $_SESSION['club_id'] = $user['club_id'];
                 }
-                flash_set(
-                    'success',
-                    'Successfully logged in. Welcome back, ' . $firstName . '! You are now signed in to ApexClubVerse.'
-                );
 
                 if ($user['role'] == 'admin') {
-                    redirect('admin.php');
+                    $redirectUrl = "admin.php";
+                } elseif ($user['role'] == 'club_admin') {
+                    $redirectUrl = "club_admin.php";
                 } else {
-                    redirect('vote-events.php');
+                    $redirectUrl = "index.php";
                 }
+
+                $loginSuccess = true;
+                $welcomeName = $user['name'];
 
             } else {
                 $msg = "Wrong password. Please try again.";
             }
-
         } else {
             $msg = "No account found with this email.";
         }
     }
 }
-
-include 'includes/header.php';
 ?>
 
 <style>
     *, *::before, *::after { box-sizing: border-box; }
 
+    html, body {
+        margin: 0;
+        padding: 0;
+        background: #ebdede;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
     .login-page {
-        flex: 1 0 auto;
-        width: 100%;
-        background: #7a1028;
+        flex: 1; 
+        background: #ebdede;
         background-image:
             radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 0%, transparent 40%),
             radial-gradient(circle at 85% 80%, rgba(0,0,0,0.15) 0%, transparent 40%);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 3rem 1.5rem;
+        padding: 4rem 1.5rem; 
         position: relative;
-        overflow-x: clip;
+        overflow: hidden;
+        margin-bottom: 0;
     }
+
+    footer, .footer, [class*="footer"] {
+        margin-top: 0 !important;
+        padding-top: 0;
+    }
+
+    footer p, .copyright, [class*="copy"] {
+        margin: 0;
+        padding: 15px 0;
+        background: #fff;
+    }
+
     .login-page::before {
         content: '';
         position: absolute;
@@ -130,7 +108,6 @@ include 'includes/header.php';
         bottom: -80px; left: -80px;
         pointer-events: none;
     }
-
     .login-card {
         background: #fff;
         border-radius: 16px;
@@ -149,17 +126,16 @@ include 'includes/header.php';
         background: linear-gradient(to right, #7a1028, #d44000);
         border-radius: 16px 16px 0 0;
     }
-
     .login-header {
         text-align: center;
         margin-bottom: 1.75rem;
         padding-bottom: 1.25rem;
-        border-bottom: 0.5px solid #f0ede7;
+        border-bottom: 0.5px solid #ebdede;
     }
     .login-badge {
         display: inline-flex; align-items: center; gap: 6px;
-        background: #fdecea;
-        border: 0.5px solid #f5c6cb;
+        background: #ebdede;
+        border: 0.5px solid #ebdede;
         border-radius: 20px;
         padding: 4px 14px;
         font-size: 11px; font-weight: 700;
@@ -176,10 +152,9 @@ include 'includes/header.php';
         font-family: 'Segoe UI', sans-serif;
         color: #999; font-size: 13px;
     }
-
     .alert-error {
         background: #fdecea;
-        border: 0.5px solid #f5c6cb;
+        border: 0.5px solid #ebdede;
         border-radius: 8px;
         padding: 10px 14px;
         font-family: 'Segoe UI', sans-serif;
@@ -187,7 +162,6 @@ include 'includes/header.php';
         margin-bottom: 1.25rem;
         text-align: center;
     }
-
     .form-group { margin-bottom: 1.1rem; }
     .form-group label {
         display: block;
@@ -208,19 +182,49 @@ include 'includes/header.php';
         background: #fafaf9;
         transition: border-color 0.15s, box-shadow 0.15s;
     }
+    .password-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .password-wrapper input {
+        padding-right: 40px;
+    }
+    .toggle-password {
+        position: absolute;
+        right: 12px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #777;
+    }
+    .toggle-password:focus {
+        outline: none;
+    }
+    .toggle-password svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
     .form-group input:focus {
         border-color: #7a1028;
         box-shadow: 0 0 0 3px rgba(122,16,40,0.1);
         outline: none;
         background: #fff;
     }
-
     .email-hint {
         font-family: 'Segoe UI', sans-serif;
         font-size: 11px; color: #bbb;
         margin-top: 4px;
     }
-
     .btn-auth {
         width: 100%;
         background: #7a1028;
@@ -238,7 +242,6 @@ include 'includes/header.php';
         background: #5e0c1e;
         transform: translateY(-1px);
     }
-
     .hint {
         text-align: center;
         font-family: 'Segoe UI', sans-serif;
@@ -251,15 +254,74 @@ include 'includes/header.php';
     }
     .hint a:hover { text-decoration: underline; }
 
-    @media (max-width: 600px) {
-        .login-page::before { width: 220px; height: 220px; top: -60px; right: -60px; }
-        .login-page::after { width: 160px; height: 160px; bottom: -40px; left: -40px; }
+    /* Welcome popup styles */
+    .welcome-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: overlayFadeIn 0.25s ease;
     }
-    @media (max-width: 480px) {
-        .login-page { padding: 2rem 1rem; }
-        .login-card { padding: 2rem 1.25rem 1.5rem; }
+    .welcome-popup-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        max-width: 360px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        animation: popupPop 0.35s cubic-bezier(.34,1.56,.64,1);
+    }
+    .welcome-popup-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px; height: 56px;
+        border-radius: 50%;
+        background: #7a1028;
+        color: #fff;
+        font-size: 26px;
+        margin-bottom: 1rem;
+    }
+    .welcome-popup-card h3 {
+        margin: 0 0 6px;
+        font-size: 20px;
+        color: #1a1a1a;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    .welcome-popup-card p {
+        margin: 0;
+        font-size: 14px;
+        color: #888;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    @keyframes overlayFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes popupPop {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
     }
 </style>
+
+<?php if ($loginSuccess): ?>
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="welcome-popup-card">
+            <div class="welcome-popup-icon">&#10003;</div>
+            <h3>Welcome <?php echo $welcomeName ? ', ' . htmlspecialchars($welcomeName) : ''; ?>!</h3>
+            <p>You've successfully signed in. Redirecting...</p>
+        </div>
+    </div>
+    <script>
+        setTimeout(function () {
+            window.location.href = "<?php echo htmlspecialchars($redirectUrl, ENT_QUOTES); ?>";
+        }, 1800);
+    </script>
+<?php else: ?>
 
 <div class="login-page">
     <div class="login-card">
@@ -271,20 +333,10 @@ include 'includes/header.php';
         </div>
 
         <?php if(!empty($msg)): ?>
-            <div class="alert-error">
-                <?php echo htmlspecialchars($msg); ?>
-                <?php if (!empty($show_verify_fallback) && !empty($fallback_verify_url)): ?>
-                    <div style="margin-top:14px;">
-                        <a href="<?php echo htmlspecialchars($fallback_verify_url); ?>"
-                           style="display:inline-block;background:#7a1028;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;">
-                            Verify my account now
-                        </a>
-                    </div>
-                <?php endif; ?>
-            </div>
+            <div class="alert-error"><?php echo htmlspecialchars($msg); ?></div>
         <?php endif; ?>
 
-        <form action="<?php echo htmlspecialchars(url('login.php')); ?>" method="POST">
+        <form action="login.php" method="POST">
             <div class="form-group">
                 <label>College Email</label>
                 <input type="email" name="email" placeholder="name@apexcollege.edu.np" required>
@@ -292,14 +344,39 @@ include 'includes/header.php';
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" placeholder="Enter your password" required>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="passwordInput" placeholder="Enter your password" required>
+                    <button type="button" class="toggle-password" id="togglePasswordBtn" aria-label="Toggle password visibility">
+                        <svg id="eyeIcon" viewBox="0 0 24 24">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
             </div>
             <button type="submit" name="submit" class="btn-auth">Sign In &rarr;</button>
         </form>
 
-        <p class="hint">New to the Club? <a href="<?php echo htmlspecialchars(url('signup.php')); ?>">Join Club</a></p>
+        <p class="hint">New to the club? <a href="signup.php">Join Club</a></p>
 
     </div>
 </div>
+
+<script>
+    const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+    const passwordInput = document.getElementById('passwordInput');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    const eyeOpenPath = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+    const eyeClosedPath = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+
+    togglePasswordBtn.addEventListener('click', function () {
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        eyeIcon.innerHTML = isPassword ? eyeClosedPath : eyeOpenPath;
+    });
+</script>
+
+<?php endif; ?>
 
 <?php include 'includes/footer.php'; ?>
