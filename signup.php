@@ -135,6 +135,16 @@ if (isset($_POST['submit'])) {
         margin-bottom: 1.25rem;
         text-align: center;
     }
+    .alert-success {
+        background: #eaf7ee;
+        border: 0.5px solid #b7e0c2;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 13px; color: #1e5c34;
+        margin-bottom: 1.25rem;
+        text-align: center;
+    }
 
     .form-group { margin-bottom: 1.1rem; }
     .form-group label {
