@@ -42,15 +42,12 @@ apexclubverse/                 ← upload these contents into htdocs / public_ht
 │   ├── config.php             # DB credentials + url()/media helpers
 │   ├── db.php
 │   ├── header.php / footer.php
-│   ├── club_admin_helpers.php
-│   ├── mail.php / send_verification_email.php
-│   └── mail_config.example.php  # copy → mail_config.php (gitignored)
+│   └── club_admin_helpers.php
 ├── assets/css/                # Stylesheets
 ├── images/                    # Site & event images
 │   ├── events/
 │   └── members/
 ├── uploads/                   # Admin-uploaded event images
-├── lib/PHPMailer/             # PHPMailer library
 ├── database/schema.sql        # Full schema + public seed data
 ├── scripts/                   # One-off maintenance scripts
 └── .htaccess                  # Protects includes/, database/, scripts/
@@ -62,13 +59,7 @@ apexclubverse/                 ← upload these contents into htdocs / public_ht
 2. Create the database: `CREATE DATABASE apex_club_db CHARACTER SET utf8mb4;`
 3. Import `database/schema.sql` (phpMyAdmin or CLI).
 4. Confirm DB settings in `includes/config.php` (defaults work for XAMPP).
-5. **Email (Brevo):** Copy `includes/mail_config.example.php` → `includes/mail_config.php`
-   and set `MAIL_BREVO_API_KEY` (`xkeysib-...`) plus verified sender `MAIL_FROM_EMAIL`.
-   Signup/login send a branded verification email via Brevo API.
-   Test: `smtp_test.php?to=you@gmail.com`
-   On ProFreeHost, upload `mail_config.php` manually (it is gitignored).
-   If send fails, signup/login still show a **Verify my account now** fallback button.
-6. Open `http://localhost/apexclubverse/`.
+5. Open `http://localhost/apexclubverse/`.
 
 ## Deployment (ProFreeHost)
 
@@ -84,11 +75,13 @@ apexclubverse/                 ← upload these contents into htdocs / public_ht
    define('DB_PASS', 'your_db_password');
    define('DB_NAME', 'your_db_name');
    ```
-5. Create `includes/mail_config.php` on the server (from the example file) with SMTP
-   credentials. Some free hosts block outbound SMTP (port 587); test if verification
-   emails fail.
-6. URLs and verification links are built automatically from the request host and
-   folder path — no hardcoded domain is required.
+5. If upgrading an older database that still has email-verification columns, run:
+   ```sql
+   ALTER TABLE users DROP COLUMN email_verified;
+   ALTER TABLE users DROP COLUMN verification_token;
+   ```
+   Also delete these old files from the server if present:
+   `verify.php`, `smtp_test.php`, `includes/mail*.php`, `includes/send_verification_email.php`, `lib/PHPMailer/`.
 
 ## Club admin logins (seeded in schema.sql)
 
@@ -103,7 +96,7 @@ Password for **all** club admins: `Admin@12345`
 | 5 | IT Club | `admin.it@apexcollege.edu.np` | `Admin@12345` |
 | 6 | HEAT | `admin.heat@apexcollege.edu.np` | `Admin@12345` |
 
-Accounts are pre-verified (`email_verified = 1`). Change these passwords after first login on a live host.
+Change these passwords after first login on a live host.
 
 ### Team Members
 - Monali Kharel

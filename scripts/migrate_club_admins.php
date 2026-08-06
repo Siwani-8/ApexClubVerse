@@ -46,10 +46,10 @@ foreach ($admins as [$club_id, $name, $email, $club_name]) {
     $pass_safe = mysqli_real_escape_string($c, password_hash($password, PASSWORD_DEFAULT));
     $exists = mysqli_query($c, "SELECT id FROM users WHERE email = '$email_safe'");
     if (mysqli_num_rows($exists) === 0) {
-        mysqli_query($c, "INSERT INTO users (name, email, password, role, club_id, club_name, email_verified) VALUES ('$name_safe', '$email_safe', '$pass_safe', 'admin', $club_id, '$club_name_safe', 1)");
+        mysqli_query($c, "INSERT INTO users (name, email, password, role, club_id, club_name) VALUES ('$name_safe', '$email_safe', '$pass_safe', 'admin', $club_id, '$club_name_safe')");
         echo "Created admin: $email\n";
     } else {
-        mysqli_query($c, "UPDATE users SET role = 'admin', club_id = $club_id, club_name = '$club_name_safe', password = '$pass_safe', name = '$name_safe', email_verified = 1 WHERE email = '$email_safe'");
+        mysqli_query($c, "UPDATE users SET role = 'admin', club_id = $club_id, club_name = '$club_name_safe', password = '$pass_safe', name = '$name_safe' WHERE email = '$email_safe'");
         echo "Updated admin: $email\n";
     }
 }

@@ -79,8 +79,6 @@ CREATE TABLE `users` (
   `role` enum('student','admin') NOT NULL DEFAULT 'student',
   `club_id` int(11) DEFAULT NULL,
   `club_name` varchar(100) DEFAULT NULL,
-  `email_verified` tinyint(1) NOT NULL DEFAULT 0,
-  `verification_token` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
   KEY `fk_users_club` (`club_id`),
@@ -375,12 +373,12 @@ ALTER TABLE `event_gallery` AUTO_INCREMENT = 37;
 -- Login password for ALL of these accounts: Admin@12345
 -- Emails use @apexcollege.edu.np (required by login.php)
 -- ---------------------------------------------------------------------
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`, `club_id`, `club_name`, `email_verified`, `verification_token`) VALUES
-(1, 'APAC Admin', 'admin.performingarts@apexcollege.edu.np', '$2y$10$TXJujipOOVGjJPFFvRKl1uky3YuBixUqbmRTB7S5bJFLeJtc7sR5a', 'admin', 1, 'Apex Performing Arts Club', 1, NULL),
-(2, 'ASLC Admin', 'admin.sports@apexcollege.edu.np', '$2y$10$TXJujipOOVGjJPFFvRKl1uky3YuBixUqbmRTB7S5bJFLeJtc7sR5a', 'admin', 2, 'Apex Sports and Leadership Club', 1, NULL),
-(3, 'ATTC Admin', 'admin.travel@apexcollege.edu.np', '$2y$10$TXJujipOOVGjJPFFvRKl1uky3YuBixUqbmRTB7S5bJFLeJtc7sR5a', 'admin', 3, 'Apex Travel and Tourism Club', 1, NULL),
-(4, 'AMMC Admin', 'admin.media@apexcollege.edu.np', '$2y$10$TXJujipOOVGjJPFFvRKl1uky3YuBixUqbmRTB7S5bJFLeJtc7sR5a', 'admin', 4, 'Apex Media and Marketing Club', 1, NULL),
-(5, 'AITC Admin', 'admin.it@apexcollege.edu.np', '$2y$10$TXJujipOOVGjJPFFvRKl1uky3YuBixUqbmRTB7S5bJFLeJtc7sR5a', 'admin', 5, 'Apex IT Club', 1, NULL),
-(6, 'HEAT Admin', 'admin.heat@apexcollege.edu.np', '$2y$10$TXJujipOOVGjJPFFvRKl1uky3YuBixUqbmRTB7S5bJFLeJtc7sR5a', 'admin', 6, 'Apex Health Education and Awareness Team (HEAT)', 1, NULL);
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`, `club_id`, `club_name`) VALUES
+(1, 'APAC Admin', 'admin.performingarts@apexcollege.edu.np', '$2y$10$TXJujipOOVGjJPFFvRKl1uky3YuBixUqbmRTB7S5bJFLeJtc7sR5a', 'admin', 1, 'Apex Performing Arts Club'),
+(2, 'ASLC Admin', 'admin.sports@apexcollege.edu.np', '$2y$10$TXJujipOOVGjJPFFvRKl1uky3YuBixUqbmRTB7S5bJFLeJtc7sR5a', 'admin', 2, 'Apex Sports and Leadership Club'),
+(3, 'ATTC Admin', 'admin.travel@apexcollege.edu.np', '$2y$10$TXJujipOOVGjJPFFvRKl1uky3YuBixUqbmRTB7S5bJFLeJtc7sR5a', 'admin', 3, 'Apex Travel and Tourism Club'),
+(4, 'AMMC Admin', 'admin.media@apexcollege.edu.np', '$2y$10$TXJujipOOVGjJPFFvRKl1uky3YuBixUqbmRTB7S5bJFLeJtc7sR5a', 'admin', 4, 'Apex Media and Marketing Club'),
+(5, 'AITC Admin', 'admin.it@apexcollege.edu.np', '$2y$10$TXJujipOOVGjJPFFvRKl1uky3YuBixUqbmRTB7S5bJFLeJtc7sR5a', 'admin', 5, 'Apex IT Club'),
+(6, 'HEAT Admin', 'admin.heat@apexcollege.edu.np', '$2y$10$TXJujipOOVGjJPFFvRKl1uky3YuBixUqbmRTB7S5bJFLeJtc7sR5a', 'admin', 6, 'Apex Health Education and Awareness Team (HEAT)');
 
 ALTER TABLE `users` AUTO_INCREMENT = 7;

@@ -25,17 +25,14 @@ if (isset($_POST['submit'])) {
             $msg = "This email is already registered. Please sign in.";
             $msg_type = "error";
         } else {
-            // Insert new user (prepared statement)
-            // Note: your users table also has role, club_id, club_name, email_verified,
-            // verification_token columns. New signups default to role='student' here —
-            // adjust this value if your app uses a different role name for regular users.
+            // Insert new user — no email verification required
             $role = 'student';
             $insert = mysqli_prepare($conn, "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
             mysqli_stmt_bind_param($insert, "ssss", $name, $email, $pass, $role);
 
             if (mysqli_stmt_execute($insert)) {
-                header("Location: login.php");
-                exit;
+                $msg = "Registration successful! You can sign in now.";
+                $msg_type = "success";
             } else {
                 $msg = "Something went wrong. Please try again.";
                 $msg_type = "error";
@@ -240,7 +237,9 @@ if (isset($_POST['submit'])) {
         </div>
 
         <?php if($msg): ?>
-            <div class="alert-error"><?php echo htmlspecialchars($msg); ?></div>
+            <div class="<?php echo $msg_type === 'success' ? 'alert-success' : 'alert-error'; ?>">
+                <?php echo htmlspecialchars($msg); ?>
+            </div>
         <?php endif; ?>
 
         <form action="signup.php" method="POST">

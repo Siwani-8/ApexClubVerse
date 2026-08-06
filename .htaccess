@@ -3,7 +3,7 @@ Options -Indexes
 
 # Block direct web access to sensitive folders
 RewriteEngine On
-RewriteRule ^(includes|database|scripts|lib)/ - [F,L]
+RewriteRule ^(includes|database|scripts)/ - [F,L]
 
 # Deny access to hidden / config-like files
 <FilesMatch "^\.">
