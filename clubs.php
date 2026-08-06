@@ -1,7 +1,7 @@
 <?php 
 session_start();
-include 'db.php'; 
-include 'header.php'; 
+include 'includes/db.php'; 
+include 'includes/header.php'; 
 
 $result = mysqli_query($conn, "SELECT * FROM clubs");
 ?>
@@ -233,14 +233,23 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
         .club-grid {
             grid-template-columns: repeat(2, 1fr);
         }
+        .clubs-hero { padding: 2.5rem 1.5rem 3rem; }
     }
 
     @media (max-width: 600px) {
+        .clubs-hero { padding: 2rem 1.15rem 2.5rem; }
         .clubs-hero h1 { font-size: 1.9rem; }
-        .clubs-stats { gap: 1.2rem; }
+        .clubs-hero::before { width: 160px; height: 160px; }
+        .clubs-hero::after { width: 120px; height: 120px; }
+        .clubs-stats {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.2rem;
+        }
         .club-grid { grid-template-columns: 1fr; }
         .club-card-icon { height: 130px; }
         .club-card-icon img { max-height: 110px !important; }
+        .clubs-section { padding: 1.75rem 1.15rem 0; }
     }
 </style>
 
@@ -273,32 +282,32 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
         <div class="clubs-section-label">Apex clubs</div>
         <div class="club-grid">
             <?php while($row = mysqli_fetch_assoc($result)) { ?>
-                <a class="club-card" href="club_detail.php?id=<?php echo $row['id']; ?>">
+                <a class="club-card" href="<?php echo htmlspecialchars(url('club_detail.php?id=' . $row['id'])); ?>">
                     <div class="club-card-accent"></div>
                     <div class="club-card-body">
                         <div class="club-card-icon">
                             <?php if($row['name'] == 'Apex Performing Arts Club'): ?>
-                                <img src="images/apac.png" alt="Apex Performing Arts Club">
+                                <img src="<?php echo htmlspecialchars(url('images/apac.png')); ?>" alt="Apex Performing Arts Club">
                             <?php endif; ?>
 
                             <?php if($row['name'] == 'Apex Sports and Leadership Club'): ?>
-                                <img src="images/sports.png" alt="Apex Sports and Leadership Club">
+                                <img src="<?php echo htmlspecialchars(url('images/sports.png')); ?>" alt="Apex Sports and Leadership Club">
                             <?php endif; ?>
 
                             <?php if($row['name'] == 'Apex Travel and Tourism Club'): ?>
-                                <img src="images/travel.png" alt="Apex Travel and Tourism Club">
+                                <img src="<?php echo htmlspecialchars(url('images/travel.png')); ?>" alt="Apex Travel and Tourism Club">
                             <?php endif; ?>
 
                             <?php if($row['name'] == 'Apex Media and Marketing Club'): ?>
-                                <img src="images/media.png" alt="Apex Media and Marketing Club">
+                                <img src="<?php echo htmlspecialchars(url('images/media.png')); ?>" alt="Apex Media and Marketing Club">
                             <?php endif; ?>
 
                             <?php if($row['name'] == 'Apex IT Club'): ?>
-                                <img src="images/it.png" alt="Apex IT Club">
+                                <img src="<?php echo htmlspecialchars(url('images/it.png')); ?>" alt="Apex IT Club">
                             <?php endif; ?>
 
                             <?php if($row['name'] == 'Apex Health Education and Awareness Team (HEAT)'): ?>
-                                <img src="images/heat.png" alt="Apex Health Education and Awareness Team (HEAT)">
+                                <img src="<?php echo htmlspecialchars(url('images/heat.png')); ?>" alt="Apex Health Education and Awareness Team (HEAT)">
                             <?php endif; ?>
                         </div>
                         
@@ -314,4 +323,4 @@ $result = mysqli_query($conn, "SELECT * FROM clubs");
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

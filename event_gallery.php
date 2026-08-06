@@ -4,54 +4,32 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include 'db.php';
+require_once __DIR__ . '/includes/db.php';
 
-/*
-|--------------------------------------------------------------------------
-| Login and admin check
-|--------------------------------------------------------------------------
-| Supported session examples:
-| $_SESSION['user_id'] and $_SESSION['role']
-| $_SESSION['user']['id'] and $_SESSION['user']['role']
-| $_SESSION['loggedInUser']['id'] and $_SESSION['loggedInUser']['role']
-*/
-
-$sessionUser = $_SESSION['user'] ?? $_SESSION['loggedInUser'] ?? [];
-
-$user_id = $_SESSION['user_id']
-    ?? ($sessionUser['id'] ?? null);
-
-$user_role = $_SESSION['role']
-    ?? ($sessionUser['role'] ?? '');
-
-$isLoggedIn = !empty($user_id);
-
-$isAdmin = $isLoggedIn && (
-    strtolower((string)$user_role) === 'admin'
-    || !empty($_SESSION['is_admin'])
-);
+$isLoggedIn = !empty($_SESSION['user_logged_in']);
+$isAdmin = $isLoggedIn && (($_SESSION['user_role'] ?? '') === 'admin');
 
 function h($value) {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 
 function findImage($path) {
-    $path = ltrim(str_replace('\\', '/', $path), '/');
+    $path = ltrim(str_replace('\\', '/', (string)$path), '/');
 
-    if ($path && file_exists(__DIR__ . '/' . $path)) {
-        return $path;
+    if ($path && is_file(root_path($path))) {
+        return url($path);
     }
 
     /* Fix old names such as apex2023_2.jpg */
     if (preg_match('/apex2023_(\d+)\.(jpg|jpeg|png)$/i', basename($path), $m)) {
-        $fallback = "images/events/apexday{$m[1]}.jpeg";
-
-        if (file_exists(__DIR__ . '/' . $fallback)) {
-            return $fallback;
+        $fallback = 'images/events/apexday' . $m[1] . '.jpeg';
+        if (is_file(root_path($fallback))) {
+            return url($fallback);
         }
     }
 
-    return null;
+    $resolved = media_url($path);
+    return $resolved !== '' ? $resolved : null;
 }
 
 $event_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -78,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_image'])) {
 
         $stmt = mysqli_prepare(
             $conn,
-            "SELECT id FROM event_editions WHERE id = ? AND event_id = ?"
+            'SELECT id FROM event_editions WHERE id = ? AND event_id = ?'
         );
 
         mysqli_stmt_bind_param($stmt, 'ii', $edition_id, $event_id);
@@ -104,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_image'])) {
             if (!isset($allowed[$mime])) {
                 $error = 'Only JPG, PNG and WEBP images are allowed.';
             } else {
-                $folder = __DIR__ . '/images/events/';
+                $folder = root_path('images/events');
 
                 if (!is_dir($folder)) {
                     mkdir($folder, 0775, true);
@@ -114,16 +92,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_image'])) {
                         uniqid() . '.' . $allowed[$mime];
 
                 $dbPath = 'images/events/' . $name;
-                $fullPath = $folder . $name;
+                $fullPath = $folder . DIRECTORY_SEPARATOR . $name;
 
                 if (!move_uploaded_file($file['tmp_name'], $fullPath)) {
                     $error = 'Image upload failed.';
                 } else {
                     $stmt = mysqli_prepare(
                         $conn,
-                        "INSERT INTO event_gallery
+                        'INSERT INTO event_gallery
                         (event_id, edition_id, image, caption, created_at)
-                        VALUES (?, ?, ?, ?, NOW())"
+                        VALUES (?, ?, ?, ?, NOW())'
                     );
 
                     mysqli_stmt_bind_param(
@@ -137,8 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_image'])) {
 
                     if (mysqli_stmt_execute($stmt)) {
                         mysqli_stmt_close($stmt);
-                        header("Location: event-details.php?id=$event_id&uploaded=1");
-                        exit;
+                        redirect('event_gallery.php?id=' . $event_id . '&uploaded=1');
                     }
 
                     mysqli_stmt_close($stmt);
@@ -157,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_image'])) {
 /* Main event */
 $stmt = mysqli_prepare(
     $conn,
-    "SELECT id, title, description FROM events WHERE id = ?"
+    'SELECT id, title, description FROM events WHERE id = ?'
 );
 mysqli_stmt_bind_param($stmt, 'i', $event_id);
 mysqli_stmt_execute($stmt);
@@ -171,10 +148,10 @@ if (!$event) {
 /* Event editions */
 $stmt = mysqli_prepare(
     $conn,
-    "SELECT id, title, event_date, location, description
+    'SELECT id, title, event_date, location, description
      FROM event_editions
      WHERE event_id = ?
-     ORDER BY event_date DESC"
+     ORDER BY event_date DESC'
 );
 mysqli_stmt_bind_param($stmt, 'i', $event_id);
 mysqli_stmt_execute($stmt);
@@ -184,10 +161,10 @@ mysqli_stmt_close($stmt);
 /* All gallery images fetched once */
 $stmt = mysqli_prepare(
     $conn,
-    "SELECT edition_id, image, caption
+    'SELECT edition_id, image, caption
      FROM event_gallery
      WHERE event_id = ?
-     ORDER BY id"
+     ORDER BY id'
 );
 mysqli_stmt_bind_param($stmt, 'i', $event_id);
 mysqli_stmt_execute($stmt);
@@ -200,16 +177,16 @@ while ($photo = mysqli_fetch_assoc($result)) {
 }
 
 mysqli_stmt_close($stmt);
-include 'header.php';
+include __DIR__ . '/includes/header.php';
 ?>
 
 <style>
 *{box-sizing:border-box}
-body{background:#f7f8fc}
-.event-container{max-width:1100px;margin:auto;padding:40px 20px}
-.event-hero{min-height:280px;margin-bottom:45px;border-radius:25px;overflow:hidden;position:relative;background:url('images/events/musical1.jpeg') center/cover no-repeat}
-.hero-overlay{position:absolute;inset:0;padding:30px;background:rgba(0,0,0,.55);color:#fff;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
-.hero-overlay h1{margin:0 0 12px;font-size:clamp(2rem,5vw,3rem)}
+.event-gallery-page{flex:1 0 auto;width:100%;background:#f7f8fc}
+.event-container{max-width:1100px;margin:auto;padding:40px 20px;width:100%}
+.event-hero{min-height:280px;height:auto;margin-bottom:45px;border-radius:25px;overflow:hidden;position:relative;background:url('<?php echo h(url('images/events/musical1.jpeg')); ?>') center/cover no-repeat}
+.hero-overlay{position:relative;min-height:280px;padding:30px 20px;background:rgba(0,0,0,.55);color:#fff;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.hero-overlay h1{margin:0 0 12px;font-size:clamp(1.6rem,5vw,3rem);word-break:break-word}
 .hero-overlay p{max-width:800px;margin:0;line-height:1.7}
 .message{max-width:850px;margin:0 auto 25px;padding:14px 18px;border-radius:10px}
 .success{background:#d4edda;color:#155724}
@@ -234,13 +211,35 @@ body{background:#f7f8fc}
 .caption{padding:13px 8px 7px;text-align:center;font-size:17px;font-weight:600}
 .empty,.missing{padding:25px;border:2px dashed #ddd;border-radius:14px;color:#777;text-align:center;background:#fff}
 .missing{min-height:180px;display:grid;place-items:center}
+@media(max-width:900px){
+    .event-container{padding:28px 16px}
+    .event-hero,.hero-overlay{min-height:220px;border-radius:18px}
+    .event-hero{margin-bottom:30px}
+    .hero-overlay{padding:20px 16px}
+    .event-details{gap:36px;padding:18px 20px}
+    .gallery{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+}
 @media(max-width:700px){
-    .event-details{flex-direction:column;gap:20px}
+    .event-container{padding:20px 14px}
+    .event-hero,.hero-overlay{min-height:180px;border-radius:14px}
+    .hero-overlay{padding:20px 14px}
+    .hero-overlay p{font-size:0.92rem;line-height:1.55}
+    .event-details{flex-direction:column;gap:20px;padding:16px;align-items:flex-start}
+    .detail{width:100%}
     .upload-form{grid-template-columns:1fr}
-    .gallery{grid-template-columns:1fr}
+    .upload-btn{width:100%}
+    .gallery{grid-template-columns:1fr;gap:16px}
+    .gallery-item img{height:220px}
+}
+@media(max-width:480px){
+    .event-container{padding:16px 12px}
+    .edition{margin-bottom:40px}
+    .detail h3{font-size:16px}
+    .caption{font-size:15px}
 }
 </style>
 
+<div class="event-gallery-page">
 <div class="event-container">
 
     <?php if (isset($_GET['uploaded'])): ?>
@@ -376,5 +375,6 @@ body{background:#f7f8fc}
     <?php endforeach; ?>
 
 </div>
+</div>
 
-<?php include 'footer.php'; ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>

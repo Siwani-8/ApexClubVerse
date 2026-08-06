@@ -2,8 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include 'db.php';
-include 'club_admin_helpers.php';
+include 'includes/db.php';
+include 'includes/club_admin_helpers.php';
 
 $club_id = isset($_GET['id']) ? (int)$_GET['id'] : 1;
 $can_manage_board = is_club_admin() && admin_club_id() === $club_id;
@@ -17,8 +17,7 @@ if ($can_manage_board) {
             $bio = mysqli_real_escape_string($conn, $_POST['bio']);
             mysqli_query($conn, "UPDATE bod_members SET name='$name', position='$position', bio='$bio' WHERE id = $member_id AND club_id = $club_id");
         }
-        header("Location: club_detail.php?id=$club_id");
-        exit;
+        redirect('club_detail.php?id=' . $club_id);
     }
 
     if (isset($_POST['update_boa'])) {
@@ -29,17 +28,16 @@ if ($can_manage_board) {
             $expertise = mysqli_real_escape_string($conn, $_POST['expertise']);
             mysqli_query($conn, "UPDATE boa_members SET name='$name', title='$title', expertise='$expertise' WHERE id = $member_id AND club_id = $club_id");
         }
-        header("Location: club_detail.php?id=$club_id");
-        exit;
+        redirect('club_detail.php?id=' . $club_id);
     }
 }
 
-include 'header.php';
+include 'includes/header.php';
 
 $club_result = mysqli_query($conn, "SELECT * FROM clubs WHERE id = $club_id");
 $club = mysqli_fetch_assoc($club_result);
 
-if (!$club) { header("Location: clubs.php"); exit; }
+if (!$club) { redirect('clubs.php'); }
 
 $bod_result = mysqli_query($conn, "SELECT * FROM bod_members WHERE club_id = $club_id ORDER BY FIELD(position, 'President', 'Vice President', 'Treasurer', 'General Secretary', 'Operations Head')");
 $boa_result = mysqli_query($conn, "SELECT * FROM boa_members WHERE club_id = $club_id");
@@ -96,7 +94,7 @@ $data = $club_data[$club_id] ?? $club_data[1];
 
 <style>
     /* ── Base ── */
-    .container { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 2rem; }
 
     .back-link {
         display: inline-flex;
@@ -479,10 +477,54 @@ $data = $club_data[$club_id] ?? $club_data[1];
     color:inherit;
     display:block;
 }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+        .container { padding: 1.5rem 1.25rem 1.5rem; }
+        .club-hero { padding: 2.5rem 1.75rem; }
+        .club-hero h1 { font-size: 2rem; }
+        .club-hero::after { font-size: 5rem; right: 1.5rem; }
+        .boa-grid { grid-template-columns: 1fr; }
+        .stats-strip { grid-template-columns: 1fr; gap: 0.75rem; }
+    }
+
+    @media (max-width: 600px) {
+        .container { padding: 1.25rem 1rem 1.25rem; }
+        .club-hero {
+            padding: 2rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        .club-hero h1 { font-size: 1.7rem; }
+        .club-hero .about-text { font-size: 0.9rem; }
+        .club-hero::before { width: 160px; height: 160px; }
+        .club-hero::after { display: none; }
+        .stats-strip {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card { padding: 1.1rem; }
+        .stat-card .stat-number { font-size: 1.6rem; }
+        .section-header h2 { font-size: 1.35rem; }
+        .events-grid { grid-template-columns: 1fr; }
+        .bod-grid { grid-template-columns: 1fr; gap: 1rem; }
+        .bod-avatar,
+        .boa-avatar { width: 100px; height: 100px; font-size: 1.2rem; }
+        .boa-card {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.25rem;
+        }
+        .cta-box { padding: 2rem 1.25rem; }
+        .cta-box::before { width: 120px; height: 120px; }
+        .cta-box h2 { font-size: 1.4rem; }
+        .cta-btn { padding: 0.75rem 1.75rem; width: 100%; max-width: 280px; }
+    }
 </style>
 
 <div class="container">
-    <a href="clubs.php" class="back-link">&larr; Back to All Clubs</a>
+    <a href="<?php echo htmlspecialchars(url('clubs.php')); ?>" class="back-link">&larr; Back to All Clubs</a>
 
     <!-- Hero -->
     <div class="club-hero">
@@ -518,13 +560,13 @@ $data = $club_data[$club_id] ?? $club_data[1];
 
 <?php while($event = mysqli_fetch_assoc($events_result)) { ?>
 
-<a href="event_gallery.php?id=<?php echo $event['id']; ?>" class="event-link">
+<a href="<?php echo htmlspecialchars(url('event_gallery.php?id=' . $event['id'])); ?>" class="event-link">
 
     <div class="event-photo-card">
 
         <?php if(!empty($event['image'])) { ?>
 
-            <img src="<?php echo htmlspecialchars($event['image']); ?>"
+            <img src="<?php echo htmlspecialchars(media_url($event['image'])); ?>"
      alt="<?php echo htmlspecialchars($event['title']); ?>"
                  style="width:100%; height:160px; object-fit:cover;">
 
@@ -563,7 +605,7 @@ $data = $club_data[$club_id] ?? $club_data[1];
             <div class="bod-card">
                 <div class="bod-avatar">
     <?php if (!empty($member['photo'])): ?>
-       <img src="images/members/<?php echo htmlspecialchars($member['photo']); ?>?v=<?php echo time(); ?>"
+       <img src="<?php echo htmlspecialchars(member_photo_url($member['photo'])); ?>?v=<?php echo time(); ?>"
      alt="<?php echo htmlspecialchars($member['name']); ?>">
     <?php else: ?>
         <?php echo $initials; ?>
@@ -606,8 +648,8 @@ $data = $club_data[$club_id] ?? $club_data[1];
        <div class="boa-card">
     <div class="boa-avatar">
 <?php if (!empty($advisor['photo'])): ?>
-    <img src="images/members/<?php echo htmlspecialchars($advisor['photo']); ?>?v=<?php echo time(); ?>"
-         alt="<?php echo htmlspecialchars($advisor['name']); ?>">
+    <img src="<?php echo htmlspecialchars(member_photo_url($advisor['photo'])); ?>?v=<?php echo time(); ?>"
+     alt="<?php echo htmlspecialchars($advisor['name']); ?>">
 <?php else: ?>
     <?php echo $initials; ?>
 <?php endif; ?>
@@ -640,13 +682,13 @@ $data = $club_data[$club_id] ?? $club_data[1];
     <div class="cta-box">
         <h2>Want to join <?php echo htmlspecialchars($club['name']); ?>?</h2>
         <p>Apply for the club interview and become a part of our amazing team.</p>
-        <a href="registration.php?club_id=<?php echo $club_id; ?>" class="cta-btn">Apply for Interview &rarr;</a>
+        <a href="<?php echo htmlspecialchars(url('registration.php?club_id=' . $club_id)); ?>" class="cta-btn">Apply for Interview &rarr;</a>
     </div>
     <?php else: ?>
     <div class="cta-box">
         <h2>Interested in joining?</h2>
         <p>Sign in with your Apex College email to apply for a club interview.</p>
-        <a href="login.php" class="cta-btn">Sign In to Apply &rarr;</a>
+        <a href="<?php echo htmlspecialchars(url('login.php')); ?>" class="cta-btn">Sign In to Apply &rarr;</a>
     </div>
     <?php endif; ?>
 </div>
@@ -658,4 +700,4 @@ function toggleBoardForm(id) {
 }
 </script>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

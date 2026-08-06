@@ -1,8 +1,9 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_logged_in'])) { header("Location: login.php"); exit; }
-include 'db.php';
-include 'header.php';
+require_once __DIR__ . '/includes/config.php';
+if (!isset($_SESSION['user_logged_in'])) { redirect('login.php'); }
+include 'includes/db.php';
+include 'includes/header.php';
 
 if (!isset($club_id)) { die("Invalid Access Parameter."); }
 
@@ -12,9 +13,21 @@ $club = mysqli_fetch_assoc($club_query);
 
 <style>
     .club-banner { background: var(--primary-crimson); color: white; padding: 4rem 2rem; text-align: center; }
-    .club-banner h1 { font-size: 3rem; }
+    .club-banner h1 { font-size: 3rem; word-break: break-word; }
     .club-container { max-width: 900px; margin: 3rem auto; padding: 0 2rem; }
     .content-box { background: white; padding: 3rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-size: 1.1rem; line-height: 1.8; }
+
+    @media (max-width: 900px) {
+        .club-banner h1 { font-size: 2.2rem; }
+        .content-box { padding: 2rem 1.5rem; }
+    }
+
+    @media (max-width: 600px) {
+        .club-banner { padding: 2.5rem 1.25rem; }
+        .club-banner h1 { font-size: 1.9rem; }
+        .club-container { margin: 1.75rem auto; padding: 0 1rem; }
+        .content-box { padding: 1.5rem 1.25rem; font-size: 1rem; }
+    }
 </style>
 
 <div class="club-banner">
@@ -32,4 +45,4 @@ $club = mysqli_fetch_assoc($club_query);
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

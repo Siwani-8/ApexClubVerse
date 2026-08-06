@@ -1,4 +1,4 @@
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
 
 <style>
     /* ── Reset & base ── */
@@ -7,7 +7,7 @@
     /* ══════════════════ HERO ══════════════════ */
     .hero {
         position: relative;
-        min-height: 90vh;
+        min-height: min(90vh, 820px);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -336,7 +336,7 @@
 
     /* ══════════════════ CTA BANNER ══════════════════ */
     .cta-banner {
-        margin: 0 auto 5.5rem;
+        margin: 0 auto 2rem;
         max-width: 1180px;
         border-radius: 20px;
         background: linear-gradient(110deg, #7a1028 0%, #b23417 100%);
@@ -361,21 +361,34 @@
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
+        .hero { padding: 5rem 1.5rem 4rem; min-height: auto; }
         .life-grid { grid-template-columns: 1fr; }
         .numbers-inner { grid-template-columns: repeat(2, 1fr); }
         .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
         .gi-1, .gi-4, .gi-7 { grid-column: span 2; grid-row: span 1; }
-        .cta-banner { flex-direction: column; text-align: center; }
+        .cta-banner { flex-direction: column; text-align: center; padding: 2.5rem 1.75rem; margin-bottom: 1.5rem; }
+        .section { padding: 4rem 1.5rem; }
     }
     @media (max-width: 600px) {
+        .hero { padding: 4rem 1.15rem 3.5rem; min-height: auto; }
         .hero-title { font-size: 2rem; }
-        .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+        .hero-desc { font-size: 0.95rem; margin: 1.25rem auto 1.75rem; }
+        .hero-ctas { flex-direction: column; align-items: stretch; }
+        .btn-primary, .btn-secondary { justify-content: center; width: 100%; }
+        .gallery-grid { grid-template-columns: 1fr; grid-auto-rows: 160px; gap: 8px; }
+        .gi-1, .gi-4, .gi-7 { grid-column: span 1; }
+        .numbers-inner { grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .section { padding: 3rem 1.15rem; }
+        .cta-banner { padding: 2rem 1.25rem; }
+    }
+    @media (max-width: 400px) {
+        .numbers-inner { grid-template-columns: 1fr; }
     }
 </style>
 
 <!-- ══════════════════ HERO ══════════════════ -->
 <div class="hero">
-    <img class="hero-bg-img" src="images/hero-group.jpeg" alt="ApexClubVerse members at Adventurous Apex retreat">
+    <img class="hero-bg-img" src="<?php echo htmlspecialchars(url('images/hero-group.jpeg')); ?>" alt="ApexClubVerse members at Adventurous Apex retreat">
     <div class="hero-bg-overlay"></div>
     <div class="hero-inner">
 
@@ -394,8 +407,8 @@
         </p>
 
         <div class="hero-ctas">
-            <a href="clubs.php" class="btn-primary">Browse clubs &rarr;</a>
-            <a href="events.php" class="btn-secondary">See events feed</a>
+            <a href="<?php echo htmlspecialchars(url('clubs.php')); ?>" class="btn-primary">Browse clubs &rarr;</a>
+            <a href="<?php echo htmlspecialchars(url('events.php')); ?>" class="btn-secondary">See events feed</a>
         </div>
 
     </div>
@@ -408,8 +421,8 @@
     <p class="section-desc">From flagship retreats to championship nights, our clubs give you a place to lead, compete, and connect.</p>
 
     <div class="life-grid">
-        <a href="clubs.php" class="life-card">
-            <img src="images/clubs-stage.jpeg" alt="Club leaders on stage at Apex Day 2026">
+        <a href="<?php echo htmlspecialchars(url('clubs.php')); ?>" class="life-card">
+            <img src="<?php echo htmlspecialchars(url('images/clubs-stage.jpeg')); ?>" alt="Club leaders on stage at Apex Day 2026">
             <div class="life-card-overlay"></div>
             <div class="life-card-content">
                 <span class="life-card-tag">Student Clubs</span>
@@ -419,8 +432,8 @@
             </div>
         </a>
 
-        <a href="events.php" class="life-card">
-            <img src="images/night-crowd.jpeg" alt="Students celebrating at an ApexClubVerse night event">
+        <a href="<?php echo htmlspecialchars(url('events.php')); ?>" class="life-card">
+            <img src="<?php echo htmlspecialchars(url('images/night-crowd.jpeg')); ?>" alt="Students celebrating at an ApexClubVerse night event">
             <div class="life-card-overlay"></div>
             <div class="life-card-content">
                 <span class="life-card-tag">Events &amp; Adventures</span>
@@ -430,8 +443,8 @@
             </div>
         </a>
 
-        <a href="vote-events.php" class="life-card">
-            <img src="images/football.jpeg" alt="Apex Sports Club football match">
+        <a href="<?php echo htmlspecialchars(url('vote-events.php')); ?>" class="life-card">
+            <img src="<?php echo htmlspecialchars(url('images/football.jpeg')); ?>" alt="Apex Sports Club football match">
             <div class="life-card-overlay"></div>
             <div class="life-card-content">
                 <span class="life-card-tag">Sports &amp; Wellness</span>
@@ -473,35 +486,35 @@
 
     <div class="gallery-grid">
         <div class="gallery-item gi-1">
-            <img src="images/speaker-man.jpeg" alt="Guest speaker addressing ApexClubVerse members">
+            <img src="<?php echo htmlspecialchars(url('images/speaker-man.jpeg')); ?>" alt="Guest speaker addressing ApexClubVerse members">
             <div class="gcap">Guest Speaker Series</div>
         </div>
         <div class="gallery-item gi-2">
-            <img src="images/soundbath.jpeg" alt="Apex Heat wellness sound bath session">
+            <img src="<?php echo htmlspecialchars(url('images/soundbath.jpeg')); ?>" alt="Apex Heat wellness sound bath session">
             <div class="gcap">Apex Heat Wellness</div>
         </div>
         <div class="gallery-item gi-3">
-            <img src="images/gaming.jpeg" alt="Apex gaming club members competing">
+            <img src="<?php echo htmlspecialchars(url('images/gaming.jpeg')); ?>" alt="Apex gaming club members competing">
             <div class="gcap">Gaming Nights</div>
         </div>
         <div class="gallery-item gi-4">
-            <img src="images/basketball-team.jpeg" alt="Apex Sports Club basketball team">
+            <img src="<?php echo htmlspecialchars(url('images/basketball-team.jpeg')); ?>" alt="Apex Sports Club basketball team">
             <div class="gcap">Sports &amp; Leadership Club</div>
         </div>
         <div class="gallery-item gi-5">
-            <img src="images/speaker-woman.jpeg" alt="Guest speaker at ApexClubVerse event">
+            <img src="<?php echo htmlspecialchars(url('images/speaker-woman.jpeg')); ?>" alt="Guest speaker at ApexClubVerse event">
             <div class="gcap">Talks &amp; Panels</div>
         </div>
         <div class="gallery-item gi-6">
-            <img src="images/hero-group.jpeg" alt="ApexClubVerse members at Adventurous Apex retreat">
+            <img src="<?php echo htmlspecialchars(url('images/hero-group.jpeg')); ?>" alt="ApexClubVerse members at Adventurous Apex retreat">
             <div class="gcap">Adventurous Apex Retreat</div>
         </div>
         <div class="gallery-item gi-7">
-            <img src="images/dance.jpeg" alt="Apex Performing Arts Club classical dance performance">
+            <img src="<?php echo htmlspecialchars(url('images/dance.jpeg')); ?>" alt="Apex Performing Arts Club classical dance performance">
             <div class="gcap">Performing Arts Club</div>
         </div>
         <div class="gallery-item gi-8">
-            <img src="images/siwani.jpeg" alt="ApexClubVerse members celebrating Apex Day">
+            <img src="<?php echo htmlspecialchars(url('images/siwani.jpeg')); ?>" alt="ApexClubVerse members celebrating Apex Day">
             <div class="gcap">Apex Day</div>
         </div>
     </div>
@@ -513,10 +526,7 @@
         <h3>Ready to join the ClubVerse?</h3>
         <p>Submit your club intake application and start shaping Apex culture today.</p>
     </div>
-    <a href="registration.php" class="btn-white">Get started &rarr;</a>
+    <a href="<?php echo htmlspecialchars(url('registration.php')); ?>" class="btn-white">Get started &rarr;</a>
 </div>
 
-</div>
-<!-- closes .content-wrapper opened in header.php -->
-
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

@@ -1,8 +1,13 @@
 <?php
-include 'header.php';
-include 'db.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include 'includes/db.php';
+include 'includes/send_verification_email.php';
 
 $msg = "";
+$show_verify_fallback = false;
+$fallback_verify_url = '';
 
 if (isset($_POST['submit'])) {
 
@@ -19,30 +24,63 @@ if (isset($_POST['submit'])) {
 
             $user = mysqli_fetch_assoc($res);
 
-if (!$user['is_verified']) {
+            $passwordOk = password_verify($password, $user['password']) || $password === $user['password'];
 
-    $msg = "Please verify your email before logging in. Check your inbox.";
+            if (empty($user['email_verified'])) {
+                if ($passwordOk) {
+                    // Upgrade legacy plaintext passwords
+                    if ($password === $user['password']) {
+                        $newHash = mysqli_real_escape_string($conn, password_hash($password, PASSWORD_DEFAULT));
+                        mysqli_query($conn, "UPDATE users SET password='$newHash' WHERE id=" . (int)$user['id']);
+                    }
 
-} elseif (
-    password_verify($password, $user['password']) ||
-    $password == $user['password']
-) {
+                    $token = $user['verification_token'];
+                    if (empty($token)) {
+                        $token = bin2hex(random_bytes(32));
+                        $tokenSafe = mysqli_real_escape_string($conn, $token);
+                        mysqli_query($conn, "UPDATE users SET verification_token='$tokenSafe' WHERE id=" . (int)$user['id']);
+                    }
 
-    
+                    $sent = sendVerificationEmail($user['email'], $token, $user['name'] ?? '');
+                    $fallback_verify_url = build_verification_url($token);
+                    $show_verify_fallback = true;
+                    $msg = $sent
+                        ? "Your account is not verified yet. We re-sent the email — also use the button below if needed."
+                        : "Your account is not verified yet, and email could not be sent from this server. Use the button below to verify.";
+                } else {
+                    $msg = "Please verify your email before logging in. Check your inbox (or spam).";
+                }
+
+            } elseif ($passwordOk) {
+
+                // Upgrade legacy plaintext passwords to secure hashes
+                if ($password === $user['password']) {
+                    $newHash = mysqli_real_escape_string($conn, password_hash($password, PASSWORD_DEFAULT));
+                    mysqli_query($conn, "UPDATE users SET password='$newHash' WHERE id=" . (int)$user['id']);
+                }
 
                 $_SESSION['user_logged_in'] = true;
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_role'] = $user['role'];
+                $_SESSION['club_id'] = $user['club_id'];
                 $_SESSION['club_name'] = $user['club_name'];
 
-                if ($user['role'] == 'admin') {
-                    header("Location: admin.php");
-                } else {
-                    header("Location: vote-events.php");
+                $firstName = trim(explode(' ', trim((string)$user['name']))[0]);
+                if ($firstName === '') {
+                    $firstName = 'there';
                 }
-                exit;
+                flash_set(
+                    'success',
+                    'Successfully logged in. Welcome back, ' . $firstName . '! You are now signed in to ApexClubVerse.'
+                );
+
+                if ($user['role'] == 'admin') {
+                    redirect('admin.php');
+                } else {
+                    redirect('vote-events.php');
+                }
 
             } else {
                 $msg = "Wrong password. Please try again.";
@@ -53,13 +91,16 @@ if (!$user['is_verified']) {
         }
     }
 }
+
+include 'includes/header.php';
 ?>
 
 <style>
     *, *::before, *::after { box-sizing: border-box; }
 
     .login-page {
-        min-height: 100vh;
+        flex: 1 0 auto;
+        width: 100%;
         background: #7a1028;
         background-image:
             radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 0%, transparent 40%),
@@ -69,7 +110,7 @@ if (!$user['is_verified']) {
         justify-content: center;
         padding: 3rem 1.5rem;
         position: relative;
-        overflow: hidden;
+        overflow-x: clip;
     }
     .login-page::before {
         content: '';
@@ -209,6 +250,15 @@ if (!$user['is_verified']) {
         text-decoration: none;
     }
     .hint a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+        .login-page::before { width: 220px; height: 220px; top: -60px; right: -60px; }
+        .login-page::after { width: 160px; height: 160px; bottom: -40px; left: -40px; }
+    }
+    @media (max-width: 480px) {
+        .login-page { padding: 2rem 1rem; }
+        .login-card { padding: 2rem 1.25rem 1.5rem; }
+    }
 </style>
 
 <div class="login-page">
@@ -221,10 +271,20 @@ if (!$user['is_verified']) {
         </div>
 
         <?php if(!empty($msg)): ?>
-            <div class="alert-error"><?php echo htmlspecialchars($msg); ?></div>
+            <div class="alert-error">
+                <?php echo htmlspecialchars($msg); ?>
+                <?php if (!empty($show_verify_fallback) && !empty($fallback_verify_url)): ?>
+                    <div style="margin-top:14px;">
+                        <a href="<?php echo htmlspecialchars($fallback_verify_url); ?>"
+                           style="display:inline-block;background:#7a1028;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;">
+                            Verify my account now
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
 
-        <form action="login.php" method="POST">
+        <form action="<?php echo htmlspecialchars(url('login.php')); ?>" method="POST">
             <div class="form-group">
                 <label>College Email</label>
                 <input type="email" name="email" placeholder="name@apexcollege.edu.np" required>
@@ -237,9 +297,9 @@ if (!$user['is_verified']) {
             <button type="submit" name="submit" class="btn-auth">Sign In &rarr;</button>
         </form>
 
-        <p class="hint">New to the Club? <a href="signup.php">Join Club</a></p>
+        <p class="hint">New to the Club? <a href="<?php echo htmlspecialchars(url('signup.php')); ?>">Join Club</a></p>
 
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

@@ -1,0 +1,2 @@
+# Deny direct HTTP access (extra layer; root .htaccess also blocks this folder)
+Require all denied

@@ -1,0 +1,8 @@
+includes/mail_config.php
+includes/mail_error.log
+
+# OS / editor artifacts
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/

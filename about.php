@@ -1,5 +1,5 @@
 <?php
-include 'header.php';
+include 'includes/header.php';
 ?>
 
 <style>
@@ -133,8 +133,13 @@ include 'header.php';
     }
 
     @media (max-width: 600px) {
+        .about-hero { padding: 2.5rem 1.15rem; }
         .about-hero h1 { font-size: 1.9rem; }
+        .about-hero::before { width: 160px; height: 160px; }
+        .about-hero::after { width: 120px; height: 120px; }
         .about-section { padding: 2rem 1rem 3rem; }
+        .info-card { padding: 1.35rem 1.25rem; }
+        .clubs-grid { grid-template-columns: 1fr; }
     }
 </style>
 
@@ -184,4 +189,4 @@ include 'header.php';
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

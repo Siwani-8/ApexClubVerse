@@ -1,10 +1,12 @@
 <?php
-include 'header.php';
-include 'db.php';
-include 'send_verification_email.php';
+include 'includes/header.php';
+include 'includes/db.php';
+include 'includes/send_verification_email.php';
 
 $msg = "";
 $msg_type = "";
+$show_verify_fallback = false;
+$fallback_verify_url = '';
 
 if (isset($_POST['submit'])) {
     $name  = mysqli_real_escape_string($conn, $_POST['name']);
@@ -44,17 +46,22 @@ VALUES
 
 if(mysqli_query($conn, $sql)){
 
-    if(sendVerificationEmail($email, $token)){
+    $verifyUrl = build_verification_url($token);
 
-        $msg = "Registration successful! Please check your email to verify your account.";
+    if (sendVerificationEmail($email, $token, $name)) {
+
+        $msg = "Registration successful! Please check your email (and spam folder) to verify your account.";
 
         $msg_type = "success";
 
     }else{
 
-        $msg = "Account created, but verification email could not be sent.";
-
+        // Don't lock the user out if the host blocks SMTP — show a verify link instead.
+        $msg = "Account created, but the verification email could not be sent from this server. "
+             . "Click the button below to verify your account now.";
         $msg_type = "error";
+        $show_verify_fallback = true;
+        $fallback_verify_url = $verifyUrl;
 
     }
 
@@ -74,7 +81,8 @@ if(mysqli_query($conn, $sql)){
     *, *::before, *::after { box-sizing: border-box; }
 
     .signup-page {
-        min-height: 100vh;
+        flex: 1 0 auto;
+        width: 100%;
         background: #7a1028;
         background-image:
             radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 0%, transparent 40%),
@@ -84,7 +92,7 @@ if(mysqli_query($conn, $sql)){
         justify-content: center;
         padding: 3rem 1.5rem;
         position: relative;
-        overflow: hidden;
+        overflow-x: clip;
     }
     .signup-page::before {
         content: '';
@@ -161,6 +169,16 @@ if(mysqli_query($conn, $sql)){
         margin-bottom: 1.25rem;
         text-align: center;
     }
+    .alert-success {
+        background: #e8f6ee;
+        border: 0.5px solid #b7e4c7;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 13px; color: #1a7a4a;
+        margin-bottom: 1.25rem;
+        text-align: center;
+    }
 
     .form-group { margin-bottom: 1.1rem; }
     .form-group label {
@@ -225,7 +243,12 @@ if(mysqli_query($conn, $sql)){
     }
     .hint a:hover { text-decoration: underline; }
 
+    @media (max-width: 600px) {
+        .signup-page::before { width: 220px; height: 220px; top: -60px; right: -60px; }
+        .signup-page::after { width: 160px; height: 160px; bottom: -40px; left: -40px; }
+    }
     @media (max-width: 480px) {
+        .signup-page { padding: 2rem 1rem; }
         .signup-card { padding: 2rem 1.25rem 1.5rem; }
     }
 </style>
@@ -240,10 +263,20 @@ if(mysqli_query($conn, $sql)){
         </div>
 
         <?php if($msg): ?>
-            <div class="alert-error"><?php echo htmlspecialchars($msg); ?></div>
+            <div class="<?php echo $msg_type === 'success' ? 'alert-success' : 'alert-error'; ?>">
+                <?php echo htmlspecialchars($msg); ?>
+                <?php if (!empty($show_verify_fallback) && !empty($fallback_verify_url)): ?>
+                    <div style="margin-top:14px;">
+                        <a href="<?php echo htmlspecialchars($fallback_verify_url); ?>"
+                           style="display:inline-block;background:#7a1028;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600;">
+                            Verify my account now
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
 
-        <form action="signup.php" method="POST">
+        <form action="<?php echo htmlspecialchars(url('signup.php')); ?>" method="POST">
             <div class="form-group">
                 <label>Full Name</label>
                 <input type="text" name="name" placeholder="Enter your full name" required>
@@ -260,9 +293,9 @@ if(mysqli_query($conn, $sql)){
             <button type="submit" name="submit" class="btn-auth">Create Account &rarr;</button>
         </form>
 
-        <p class="hint">Already have an account? <a href="login.php">Sign In</a></p>
+        <p class="hint">Already have an account? <a href="<?php echo htmlspecialchars(url('login.php')); ?>">Sign In</a></p>
 
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

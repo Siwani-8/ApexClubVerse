@@ -1,13 +1,13 @@
 <?php
 session_start();
+require_once __DIR__ . '/includes/config.php';
 
 if (!isset($_SESSION['user_logged_in'])) {
-    header("Location: login.php");
-    exit;
+    redirect('login.php');
 }
 
-include 'db.php';
-include 'header.php';
+include 'includes/db.php';
+include 'includes/header.php';
 
 $email = mysqli_real_escape_string($conn, $_SESSION['user_email']);
 
@@ -24,7 +24,7 @@ ORDER BY applied_at DESC");
 }
 
 .application-page{
-    min-height:100vh;
+    flex:1 0 auto;
     background:#f5f3ef;
     padding:3rem 1.5rem;
 }
@@ -59,7 +59,8 @@ ORDER BY applied_at DESC");
     background:#fff;
     border:0.5px solid #e0ddd6;
     border-radius:14px;
-    overflow:hidden;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
     box-shadow:0 8px 25px rgba(0,0,0,.04);
 }
 
@@ -67,6 +68,8 @@ ORDER BY applied_at DESC");
     display:flex;
     justify-content:space-between;
     align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
     padding:18px 24px;
     border-bottom:1px solid #ece8e2;
 }
@@ -152,6 +155,19 @@ tr:hover td{
 
 @media(max-width:850px){
 
+.application-page{
+padding:2rem 1.15rem;
+}
+
+.page-header{
+padding:20px 18px;
+}
+
+.page-header h1{
+font-size:1.6rem;
+word-break:break-word;
+}
+
 table,
 thead,
 tbody,
@@ -166,27 +182,43 @@ display:none;
 }
 
 tr{
-margin:18px;
+margin:18px 0;
 border:1px solid #ece8e2;
 border-radius:12px;
 overflow:hidden;
 }
 
 td{
-padding-left:45%;
+padding:12px 14px;
 position:relative;
+word-break:break-word;
 }
 
 td:before{
-position:absolute;
-left:15px;
+position:static;
+display:block;
+margin-bottom:6px;
 font-weight:bold;
+font-size:11px;
+color:#888;
+text-transform:uppercase;
+letter-spacing:.04em;
+max-width:none;
 }
 
 td:nth-child(1):before{content:"Club";}
 td:nth-child(2):before{content:"Application";}
 td:nth-child(3):before{content:"Interview";}
 td:nth-child(4):before{content:"Status";}
+}
+
+@media(max-width:480px){
+.application-page{padding:1.5rem 1rem;}
+.page-header{padding:18px 16px;}
+.page-header h1{font-size:1.4rem;}
+.table-header{padding:14px 16px;}
+.empty-box{padding:32px 16px;}
+td{font-size:13px;}
 }
 </style>
 
@@ -299,4 +331,4 @@ else{
 
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

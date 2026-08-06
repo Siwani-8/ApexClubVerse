@@ -1,7 +1,7 @@
 <?php
 session_start();
-include 'db.php';
-include 'header.php';
+include 'includes/db.php';
+include 'includes/header.php';
 
 $events = mysqli_query($conn, "
     SELECT e.*, c.name as club_name 
@@ -12,8 +12,7 @@ $events = mysqli_query($conn, "
 ?>
 
 <style>
-    /* Added bottom margin to create a gap above the footer */
-    .container { max-width: 900px; margin: 3rem auto 5rem auto; padding: 0 2rem; }
+    .container { max-width: 900px; margin: 2rem auto 2rem auto; padding: 0 2rem; }
     .page-title { font-size: 2.5rem; margin-bottom: 2rem; color: var(--text-dark); }
 
     .feed-card { background: #ffffff; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; display: flex; border-left: 5px solid var(--primary-crimson); }
@@ -32,9 +31,19 @@ $events = mysqli_query($conn, "
     .status-ongoing  { background: #fff3cd; color: #856404; }
     .status-completed { background: #d4edda; color: #155724; }
 
-    @media(max-width: 600px) {
+    @media(max-width: 768px) {
+        .container { margin: 1.5rem auto 1.5rem; padding: 0 1.25rem; }
+        .page-title { font-size: 2rem; }
         .feed-card { flex-direction: column; }
-        .event-img-box { width: 100%; height: 120px; }
+        .event-img-box { width: 100%; height: 140px; min-height: 140px; }
+        .event-details { padding: 1.25rem; }
+        .event-title { font-size: 1.25rem; }
+    }
+
+    @media(max-width: 480px) {
+        .container { padding: 0 1rem; margin: 1.25rem auto 1.25rem; }
+        .page-title { font-size: 1.7rem; margin-bottom: 1.5rem; }
+        .event-img-box { height: 120px; min-height: 120px; }
     }
 </style>
 
@@ -49,7 +58,7 @@ $events = mysqli_query($conn, "
     <div class="feed-card">
         <div class="event-img-box">
             <?php if(!empty($row['image'])): ?>
-                <img src="<?php echo htmlspecialchars($row['image']); ?>" style="width:100%;height:100%;object-fit:cover;">
+                <img src="<?php echo htmlspecialchars(media_url($row['image'])); ?>" style="width:100%;height:100%;object-fit:cover;" alt="">
             <?php else: ?>
                 <div class="ph-icon">🖼️</div>
                 <div>No Image</div>
@@ -67,4 +76,4 @@ $events = mysqli_query($conn, "
     <?php endwhile; ?>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

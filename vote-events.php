@@ -2,10 +2,15 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include 'db.php';
-include 'club_admin_helpers.php';
+include 'includes/db.php';
+include 'includes/club_admin_helpers.php';
 
-$user_email = $_SESSION['user_email'] ?? $_SESSION['user_name'];
+// Require login before any vote/poll actions are processed
+if (empty($_SESSION['user_logged_in'])) {
+    redirect('login.php');
+}
+
+$user_email = $_SESSION['user_email'] ?? ($_SESSION['user_name'] ?? '');
 $is_club_admin = is_club_admin();
 $admin_club_id = admin_club_id();
 
@@ -18,8 +23,7 @@ if (isset($_POST['vote'])) {
         mysqli_query($conn, "INSERT INTO poll_votes (poll_id, user_email, option_id) VALUES ($poll_id, '$email_safe', $option_id)");
         mysqli_query($conn, "UPDATE poll_options SET votes = votes + 1 WHERE id = $option_id");
     }
-    header("Location: vote-events.php");
-    exit;
+    redirect('vote-events.php');
 }
 
 if ($is_club_admin) {
@@ -34,8 +38,7 @@ if ($is_club_admin) {
                 mysqli_query($conn, "INSERT INTO poll_options (poll_id, option_text, votes) VALUES ($poll_id, '$opt_safe', 0)");
             }
         }
-        header('Location: vote-events.php');
-        exit;
+        redirect('vote-events.php');
     }
 
     if (isset($_POST['close_poll'])) {
@@ -43,8 +46,7 @@ if ($is_club_admin) {
         if (poll_belongs_to_club($conn, $poll_id, $admin_club_id)) {
             mysqli_query($conn, "UPDATE polls SET is_active = 0 WHERE id = $poll_id AND club_id = $admin_club_id");
         }
-        header('Location: vote-events.php');
-        exit;
+        redirect('vote-events.php');
     }
 
     if (isset($_POST['delete_poll'])) {
@@ -54,12 +56,11 @@ if ($is_club_admin) {
             mysqli_query($conn, "DELETE FROM poll_options WHERE poll_id = $poll_id");
             mysqli_query($conn, "DELETE FROM polls WHERE id = $poll_id AND club_id = $admin_club_id");
         }
-        header('Location: vote-events.php');
-        exit;
+        redirect('vote-events.php');
     }
 }
 
-include 'header.php';
+include 'includes/header.php';
 
 $polls = mysqli_query($conn, "
     SELECT p.*, c.name as club_name 
@@ -100,7 +101,7 @@ while($poll = mysqli_fetch_assoc($polls)) {
 <style>
     *, *::before, *::after { box-sizing: border-box; }
 
-    .vote-page { background: #7a1028; min-height: 100vh; }
+    .vote-page { background: #7a1028; flex: 1 0 auto; width: 100%; }
 
     .vote-hero {
         background: #7a1028;
@@ -185,10 +186,10 @@ while($poll = mysqli_fetch_assoc($polls)) {
     .voted-badge { display: inline-flex; align-items: center; gap: 5px; background: #e8f6ee; border: 0.5px solid #b6dfc5; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; color: #1a7a4a; font-family: 'Segoe UI', sans-serif; margin-bottom: 1.1rem; }
 
     .result-row { margin-bottom: 0.85rem; }
-    .result-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
-    .result-name { font-family: 'Segoe UI', sans-serif; font-size: 13px; color: #444; }
+    .result-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; gap: 8px; }
+    .result-name { font-family: 'Segoe UI', sans-serif; font-size: 13px; color: #444; min-width: 0; flex: 1; overflow-wrap: anywhere; }
     .result-name.is-leader { font-weight: 700; }
-    .result-pct { font-size: 13px; font-weight: 700; color: #1a1a1a; font-family: 'Segoe UI', sans-serif; }
+    .result-pct { font-size: 13px; font-weight: 700; color: #1a1a1a; font-family: 'Segoe UI', sans-serif; flex-shrink: 0; }
     .result-track { background: #f0ede7; border-radius: 30px; height: 8px; overflow: hidden; }
     .result-fill { height: 100%; border-radius: 30px; background: #7a1028; transition: width 0.5s ease; }
     .total-votes-label { font-family: 'Segoe UI', sans-serif; font-size: 11px; color: #bbb; margin-top: 0.9rem; }
@@ -247,10 +248,17 @@ while($poll = mysqli_fetch_assoc($polls)) {
     }
 
     @media (max-width: 600px) {
+        .vote-hero { padding: 2.25rem 1.15rem 2.5rem; }
+        .vote-hero h1 { font-size: 1.8rem; }
+        .vote-hero::before { width: 160px; height: 160px; }
+        .vote-hero::after { width: 120px; height: 120px; }
+        .vote-content { padding: 1.75rem 1.15rem 3rem; }
         .poll-card { flex-direction: column; }
+        .poll-main { padding: 1.15rem 1.25rem; }
         .vote-stats { flex-direction: column; width: 100%; }
         .vstat { border-right: none; border-bottom: 0.5px solid rgba(255,255,255,0.15); }
         .vstat:last-child { border-bottom: none; }
+        .poll-option { width: 100%; text-align: left; }
     }
 </style>
 
@@ -348,7 +356,9 @@ while($poll = mysqli_fetch_assoc($polls)) {
                     </form>
                     <form method="POST" style="display:inline;">
                         <input type="hidden" name="poll_id" value="<?php echo (int)$poll['id']; ?>">
-                        <button type="submit" name="delete_poll" class="btn-poll-admin-outline" onclick="return confirm('Delete this poll permanently?')">Delete Poll</button>
+                        <button type="submit" name="delete_poll" class="btn-poll-admin-outline"
+                                data-confirm="Delete this poll permanently?"
+                                data-confirm-title="Delete poll">Delete Poll</button>
                     </form>
                 </div>
                 <?php endif; ?>
@@ -358,4 +368,4 @@ while($poll = mysqli_fetch_assoc($polls)) {
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

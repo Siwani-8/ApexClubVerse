@@ -1,19 +1,19 @@
 <?php
 session_start();
+require_once __DIR__ . '/includes/config.php';
 
 if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) {
-    header("Location: login.php");
-    exit;
+    redirect('login.php');
 }
 
-include 'db.php';
-include 'header.php';
+include 'includes/db.php';
+include 'includes/header.php';
 
 $message = "";
 
 if (isset($_POST['apply'])) {
-    $name = mysqli_real_escape_string($conn, $_POST['student_name']);
-    $email = mysqli_real_escape_string($conn, $_POST['student_email']);
+    $name = mysqli_real_escape_string($conn, $_SESSION['user_name']);
+    $email = mysqli_real_escape_string($conn, $_SESSION['user_email']);
     $faculty = mysqli_real_escape_string($conn, $_POST['faculty']);
     $semester = mysqli_real_escape_string($conn, $_POST['semester']);
     $interest = mysqli_real_escape_string($conn, $_POST['interest']);
@@ -102,19 +102,18 @@ if($success){
 <style>
     *, *::before, *::after { box-sizing: border-box; }
 
-    /* ── Page background ── */
     .intake-page {
-        min-height: 100vh;
+        flex: 1 0 auto;
+        width: 100%;
         background: #7a1028;
         background-image:
             radial-gradient(circle at 15% 20%, rgba(255,255,255,0.06) 0%, transparent 40%),
             radial-gradient(circle at 85% 80%, rgba(0,0,0,0.15) 0%, transparent 40%);
         padding: 3rem 1.5rem 4rem;
         position: relative;
-        overflow: hidden;
+        overflow-x: clip;
     }
 
-    /* Decorative circles */
     .intake-page::before {
         content: '';
         position: absolute;
@@ -134,9 +133,9 @@ if($success){
         pointer-events: none;
     }
 
-    /* ── Form card ── */
     .form-container {
         max-width: 700px;
+        width: 100%;
         margin: 0 auto;
         background: #fff;
         border-radius: 16px;
@@ -217,6 +216,16 @@ if($success){
         outline: none;
         background: #fff;
     }
+    .form-group input[readonly] {
+        background: #f0eeea;
+        color: #444;
+        cursor: default;
+    }
+    .form-group input[readonly]:focus {
+        border-color: #ddd;
+        box-shadow: none;
+        background: #f0eeea;
+    }
 
     /* Two column layout for name/email */
     .form-row {
@@ -243,6 +252,8 @@ if($success){
         font-size: 13px; font-weight: 500;
         color: #333;
         text-transform: none; letter-spacing: 0;
+        word-break: break-word;
+        min-width: 0;
     }
     .club-options label:hover {
         border-color: #7a1028;
@@ -285,11 +296,24 @@ if($success){
     .alert.error   { background: #fdecea; color: #7a1028; border: 0.5px solid #f5c6cb; }
 
     /* ── Responsive ── */
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
         .form-row { grid-template-columns: 1fr; }
         .club-options { grid-template-columns: 1fr; }
-        .form-container { padding: 1.75rem 1.25rem; }
-        .intake-page { padding: 1.5rem 1rem 3rem; }
+        .form-container { padding: 2rem 1.5rem 1.75rem; }
+        .intake-page { padding: 2rem 1rem 3rem; }
+    }
+    @media (max-width: 600px) {
+        .form-container { padding: 1.75rem 1.25rem; width: 100%; }
+        .intake-page { padding: 1.5rem 1rem 2.5rem; }
+        .form-header h2 { font-size: 1.4rem; }
+        .intake-page::before { width: 220px; height: 220px; top: -60px; right: -60px; }
+        .intake-page::after { width: 160px; height: 160px; bottom: -40px; left: -40px; }
+        .club-options label { font-size: 12px; padding: 9px 10px; }
+    }
+    @media (max-width: 400px) {
+        .intake-page { padding: 1.25rem 0.75rem 2rem; }
+        .form-container { padding: 1.5rem 1rem 1.25rem; border-radius: 12px; }
+        .form-header h2 { font-size: 1.25rem; }
     }
 </style>
 
@@ -304,16 +328,16 @@ if($success){
 
         <?php echo $message; ?>
 
-        <form action="registration.php" method="POST">
+        <form action="<?php echo htmlspecialchars(url('registration.php')); ?>" method="POST">
 
             <div class="form-row">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" name="student_name" value="<?php echo htmlspecialchars($_SESSION['user_name']); ?>" required>
+                    <input type="text" name="student_name" value="<?php echo htmlspecialchars($_SESSION['user_name'] ?? ''); ?>" readonly required>
                 </div>
                 <div class="form-group">
                     <label>Apex College Email</label>
-                    <input type="email" name="student_email" placeholder="name@apexcollege.edu.np" required>
+                    <input type="email" name="student_email" value="<?php echo htmlspecialchars($_SESSION['user_email'] ?? ''); ?>" placeholder="name@apexcollege.edu.np" readonly required>
                 </div>
             </div>
 
@@ -380,4 +404,4 @@ if($success){
     </div>
 </div>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
