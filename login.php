@@ -312,7 +312,7 @@ if (isset($_POST['submit'])) {
     <div class="welcome-overlay" id="welcomeOverlay">
         <div class="welcome-popup-card">
             <div class="welcome-popup-icon">&#10003;</div>
-            <h3>Welcome <?php echo $welcomeName ? ', ' . htmlspecialchars($welcomeName) : ''; ?>!</h3>
+            <h3>Welcome git <?php echo $welcomeName ? ', ' . htmlspecialchars($welcomeName) : ''; ?>!</h3>
             <p>You've successfully signed in. Redirecting...</p>
         </div>
     </div>
